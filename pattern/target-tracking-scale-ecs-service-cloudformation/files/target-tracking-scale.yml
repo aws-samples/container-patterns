@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Add target tracking scaling rules for an ECS service
+Parameters:
+  ClusterName:
+    Type: String
+    Default: default
+    Description: The cluster that is running the service you want to scale
+  ServiceName:
+    Type: String
+    Default: nginx
+    Description: The name of the service to scale
+
+Resources:
+
+  # Role that Application Auto Scaling will use to interact with
+  # CloudWatch and Amazon ECS
+  AutoscalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [application-autoscaling.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: service-autoscaling
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - 'application-autoscaling:*'
+              - 'cloudwatch:DescribeAlarms'
+              - 'cloudwatch:PutMetricAlarm'
+              - 'ecs:DescribeServices'
+              - 'ecs:UpdateService'
+            Resource: '*'
+
+  # Enable autoscaling for the service
+  ScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: 'ecs'
+      ScalableDimension: 'ecs:service:DesiredCount'
+      ResourceId: !Sub 'service/${ClusterName}/${ServiceName}'
+      MinCapacity: 2
+      MaxCapacity: 10
+      RoleARN: !GetAtt AutoscalingRole.Arn
+
+  # Create scaling policies that describe how to scale the service up and down.
+  ScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn: ScalableTarget
+    Properties:
+      PolicyName: !Sub scale-${ClusterName}-${ServiceName}
+      PolicyType: TargetTrackingScaling
+      ResourceId: !Sub 'service/${ClusterName}/${ServiceName}'
+      ScalableDimension: 'ecs:service:DesiredCount'
+      ServiceNamespace: 'ecs'
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 70
+        DisableScaleIn: false
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization

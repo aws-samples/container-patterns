@@ -1,0 +1,27 @@
+resources:
+  repository:
+    type: awsx:ecr:Repository
+  image:
+    type: awsx:ecr:Image
+    properties:
+      repositoryUrl: ${repository.url}
+      path: "./app"
+  cluster:
+    type: aws:ecs:Cluster
+  lb:
+    type: awsx:lb:ApplicationLoadBalancer
+  service:
+    type: awsx:ecs:FargateService
+    properties:
+      cluster: ${cluster.arn}
+      assignPublicIp: true
+      taskDefinitionArgs:
+        container:
+          image: ${image.imageUri}
+          cpu: 512
+          memory: 128
+          essential: true
+          portMappings:
+            - targetGroup: ${lb.defaultTargetGroup}
+outputs:
+  url: ${lb.loadBalancer.dnsName}

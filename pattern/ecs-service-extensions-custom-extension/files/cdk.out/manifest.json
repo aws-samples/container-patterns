@@ -1,0 +1,262 @@
+{
+  "version": "16.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "custom-ecs-service-extension.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "custom-ecs-service-extension.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "custom-ecs-service-extension": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "custom-ecs-service-extension.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ac58d0cd7e234741cd9fb63aae9ee7d5aed919303cb3bcaf226f2100f521a726.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "custom-ecs-service-extension.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "custom-ecs-service-extension.assets"
+      ],
+      "metadata": {
+        "/custom-ecs-service-extension/test-environment-environment-vpc/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcCEC3622D"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1Subnet3D14E9ED"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1RouteTable2B08B96E"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1RouteTableAssociation9D7C7765"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1DefaultRouteBB70E04B"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1EIP5BAB6BE4"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet1/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet1NATGateway5B0537AD"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2SubnetFDFAAD1D"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2RouteTable40EBFC6D"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2RouteTableAssociation8A3CEF7B"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2DefaultRouteF7DF3524"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/EIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2EIPE6528402"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PublicSubnet2/NATGateway": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPublicSubnet2NATGateway0DF824A6"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet1Subnet17F0A975"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet1RouteTable760E87FE"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet1RouteTableAssociation6DC98516"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet1DefaultRoute551EF7E2"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet2SubnetB8A881E1"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet2RouteTable52C73A13"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet2RouteTableAssociation798FD406"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/PrivateSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcPrivateSubnet2DefaultRoute85DB5B1E"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcIGW22841E79"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-vpc/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentvpcVPCGWCC0F6E77"
+          }
+        ],
+        "/custom-ecs-service-extension/test-environment-environment-cluster/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testenvironmentenvironmentclusterF01384A4"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-task-definition/TaskRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicetaskdefinitionTaskRoleD4F1D568"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-task-definition/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicetaskdefinition4C7A523E"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-task-definition/cloudwatch-agent/LogGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicetaskdefinitioncloudwatchagentLogGroup5D94F4ED"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-task-definition/ExecutionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicetaskdefinitionExecutionRoleCD18B710"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-task-definition/ExecutionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicetaskdefinitionExecutionRoleDefaultPolicy719FC8D1"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-publish-metrics/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testservicepublishmetrics340BAF54"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-service/Service": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testserviceserviceService8CABA332"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-service/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testserviceserviceSecurityGroup2B09375C"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-service/TaskCount/Target/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testserviceserviceTaskCountTarget966AE5A2"
+          }
+        ],
+        "/custom-ecs-service-extension/test-service-service/TaskCount/Target/CpuScaling/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "testserviceserviceTaskCountTargetCpuScaling54350C24"
+          }
+        ],
+        "/custom-ecs-service-extension/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/custom-ecs-service-extension/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "custom-ecs-service-extension"
+    }
+  }
+}

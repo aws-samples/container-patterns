@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition which has a custom entrypoint
+             and command that overrides the default container image entrypoint
+
+Resources:
+  HeyLoadTestTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: hey-load-test
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: hey
+
+          # Example URI of the image from the Dockerfile above
+          Image: 012345678910.dkr.ecr.us-west-2.amazonaws.com/test-suite/hey:latest
+          Essential: true
+
+          # Keep the existing entrypoint but just pass a custom command
+          Command:
+            # Send 100 concurrent requests at a time
+            - '-c'
+            - '100'
+            # Send 100,000 total requests
+            - '-n'
+            - '100000'
+            # URI to send to
+            - http://your-uri-here

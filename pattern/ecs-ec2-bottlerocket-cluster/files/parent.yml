@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys VPC, Amazon ECS cluster with EC2 instances,
+             and a load balanced ECS service on EC2, in AWS VPC networking mode.
+
+Resources:
+
+  # The networking configuration. This creates an isolated
+  # network specific to this particular environment
+  VpcStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: vpc.yml
+
+  # This stack contains the Amazon ECS cluster itself
+  ClusterStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: cluster.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        SubnetIds: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+
+  # This stack defines the container deployment
+  ServiceStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: service.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        PublicSubnetIds: !GetAtt VpcStack.Outputs.PublicSubnetIds
+        PrivateSubnetIds: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
+        CapacityProvider: !GetAtt ClusterStack.Outputs.CapacityProvider
+
+  # (Optional, comment out if you do not wish to automatically
+  # update your Bottlerocket instances)
+  BottlerocketUpdater:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: bottlerocket-updater.yml
+      Parameters:
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        Subnets: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+        LogGroupName: 'bottlerocket-updater-logs'

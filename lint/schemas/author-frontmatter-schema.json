@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "author"
+    },
+    "authorId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "authorId"
+  ]
+}

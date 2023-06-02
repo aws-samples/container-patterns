@@ -1,0 +1,32 @@
+{
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      },
+      "label": {
+        "type": "string"
+      },
+      "color": {
+        "type": "string"
+      },
+      "checked": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "key",
+      "value",
+      "label",
+      "color",
+      "checked"
+    ]
+  }
+}

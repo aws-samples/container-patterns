@@ -1,0 +1,106 @@
+{
+  "version": "0",
+  "id": "b38a1269-debf-7ada-9576-f69ce2752526",
+  "detail-type": "ECS Task State Change",
+  "source": "aws.ecs",
+  "account": "209640446841",
+  "time": "2022-05-31T20:12:43Z",
+  "region": "us-east-2",
+  "resources": [
+    "arn:aws:ecs:us-east-2:209640446841:task/benchmark-cluster-ECSCluster-TOl9tY939Z2a/0c45c999f51741509482c5829cebb82e"
+  ],
+  "detail": {
+    "attachments": [
+      {
+        "id": "4b01ba81-00ee-471d-99dc-9d215bff56e5",
+        "type": "eni",
+        "status": "DELETED",
+        "details": [
+          {
+            "name": "subnetId",
+            "value": "subnet-04f3a518011557633"
+          },
+          {
+            "name": "networkInterfaceId",
+            "value": "eni-0685196fd7cf97f27"
+          },
+          {
+            "name": "macAddress",
+            "value": "06:a8:e2:77:53:2c"
+          },
+          {
+            "name": "privateDnsName",
+            "value": "ip-10-0-121-242.us-east-2.compute.internal"
+          },
+          {
+            "name": "privateIPv4Address",
+            "value": "10.0.121.242"
+          }
+        ]
+      }
+    ],
+    "attributes": [
+      {
+        "name": "ecs.cpu-architecture",
+        "value": "x86_64"
+      }
+    ],
+    "availabilityZone": "us-east-2b",
+    "capacityProviderName": "FARGATE",
+    "clusterArn": "arn:aws:ecs:us-east-2:209640446841:cluster/benchmark-cluster-ECSCluster-TOl9tY939Z2a",
+    "connectivity": "CONNECTED",
+    "connectivityAt": "2022-05-31T18:08:12.052Z",
+    "containers": [
+      {
+        "containerArn": "arn:aws:ecs:us-east-2:209640446841:container/benchmark-cluster-ECSCluster-TOl9tY939Z2a/0c45c999f51741509482c5829cebb82e/1471ad51-9c53-4d56-82d9-04b26f82369e",
+        "exitCode": 0,
+        "lastStatus": "STOPPED",
+        "name": "stress-ng",
+        "image": "209640446841.dkr.ecr.us-east-2.amazonaws.com/stress-ng:latest",
+        "imageDigest": "sha256:75c15a49ea93c3ac12c73a283cb72eb7e602d9b09fe584440bdf7d888e055288",
+        "runtimeId": "0c45c999f51741509482c5829cebb82e-2413177855",
+        "taskArn": "arn:aws:ecs:us-east-2:209640446841:task/benchmark-cluster-ECSCluster-TOl9tY939Z2a/0c45c999f51741509482c5829cebb82e",
+        "networkInterfaces": [
+          {
+            "attachmentId": "4b01ba81-00ee-471d-99dc-9d215bff56e5",
+            "privateIpv4Address": "10.0.121.242"
+          }
+        ],
+        "cpu": "256",
+        "memory": "512"
+      }
+    ],
+    "cpu": "256",
+    "createdAt": "2022-05-31T18:08:08.011Z",
+    "desiredStatus": "STOPPED",
+    "enableExecuteCommand": false,
+    "ephemeralStorage": {
+      "sizeInGiB": 20
+    },
+    "executionStoppedAt": "2022-05-31T20:12:20.683Z",
+    "group": "service:stress-ng",
+    "launchType": "FARGATE",
+    "lastStatus": "STOPPED",
+    "memory": "512",
+    "overrides": {
+      "containerOverrides": [
+        {
+          "name": "stress-ng"
+        }
+      ]
+    },
+    "platformVersion": "1.4.0",
+    "pullStartedAt": "2022-05-31T18:08:22.205Z",
+    "pullStoppedAt": "2022-05-31T18:08:23.109Z",
+    "startedAt": "2022-05-31T18:08:23.817Z",
+    "startedBy": "ecs-svc/3941167241989127803",
+    "stoppingAt": "2022-05-31T20:12:06.844Z",
+    "stoppedAt": "2022-05-31T20:12:43.412Z",
+    "stoppedReason": "Scaling activity initiated by (deployment ecs-svc/3941167241989127803)",
+    "stopCode": "ServiceSchedulerInitiated",
+    "taskArn": "arn:aws:ecs:us-east-2:209640446841:task/benchmark-cluster-ECSCluster-TOl9tY939Z2a/0c45c999f51741509482c5829cebb82e",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:209640446841:task-definition/stress-ng:2",
+    "updatedAt": "2022-05-31T20:12:43.412Z",
+    "version": 6
+  }
+}

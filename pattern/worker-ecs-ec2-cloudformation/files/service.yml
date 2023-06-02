@@ -1,0 +1,191 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example service that deploys a private service that is
+             only accessible via an ALB that lives in the private subnets of the
+             VPC. Therefore it can only be reached by other services in the same
+             VPC.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  PrivateSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of private subnet ID's that the AWS VPC tasks are in
+  ClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ECSTaskExecutionRole:
+    Type: String
+    Description: The role used to start up an ECS task
+  CapacityProvider:
+    Type: String
+    Description: The cluster capacity provider that the service should use
+                 to request capacity when it wants to start up a task
+  ServiceName:
+    Type: String
+    Default: worker
+    Description: A name for the service
+  ImageUrl:
+    Type: String
+    Default: public.ecr.aws/docker/library/nginx:latest
+    Description: The url of a docker image that contains the application process that
+                 will handle the traffic for this service
+  ContainerCpu:
+    Type: Number
+    Default: 256
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 512
+    Description: How much memory in megabytes to give the container
+  ContainerPort:
+    Type: Number
+    Default: 80
+    Description: What port that the application expects traffic on
+  DesiredCount:
+    Type: Number
+    Default: 2
+    Description: How many copies of the service task to run
+
+Resources:
+
+  # The task definition. This is a simple metadata description of what
+  # container to run, and what resource requirements it has.
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref ServiceName
+      Cpu: !Ref ContainerCpu
+      Memory: !Ref ContainerMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - EC2
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name: !Ref ServiceName
+          Cpu: !Ref ContainerCpu
+          Memory: !Ref ContainerMemory
+          Image: !Ref ImageUrl
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Ref ServiceName
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    # Avoid race condition between ECS service creation and associating
+    # the target group with the LB
+    DependsOn: PrivateLoadBalancerListener
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ClusterName
+      PlacementStrategies:
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: cpu
+          Type: binpack
+      CapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider
+          Weight: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets: !Ref PrivateSubnetIds
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref DesiredCount
+      TaskDefinition: !Ref TaskDefinition
+      LoadBalancers:
+        - ContainerName: !Ref ServiceName
+          ContainerPort: 80
+          TargetGroupArn: !Ref ServiceTargetGroup
+
+  # Security group that limits network access
+  # to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service
+      VpcId: !Ref VpcId
+
+  # Keeps track of the list of tasks for the service
+  ServiceTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: ip
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 10
+      VpcId: !Ref VpcId
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 0
+
+  # A private load balancer, this is used as ingress inside
+  # of the VPC, only allowing services inside of the VPC to
+  # use it.
+  PrivateLoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the private load balancer
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        # Allow access to private ALB from any IP address
+        # Note that this private LB is in the private subnets of the
+        # VPC so it is actually still not accessible to the public
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+  PrivateLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internal
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '30'
+      Subnets: !Ref PrivateSubnetIds
+      SecurityGroups:
+        - !Ref PrivateLoadBalancerSG
+  PrivateLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - PrivateLoadBalancer
+    Properties:
+      DefaultActions:
+        - Type: 'forward'
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !Ref ServiceTargetGroup
+                Weight: 100
+      LoadBalancerArn: !Ref 'PrivateLoadBalancer'
+      Port: 80
+      Protocol: HTTP
+
+  # Open up the service's security group to traffic originating
+  # from the security group of the load balancer.
+  ServiceIngressfromLoadBalancer:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from the private ALB
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'PrivateLoadBalancerSG'
+
+  # This log group stores the stdout logs from this service's containers
+  LogGroup:
+    Type: AWS::Logs::LogGroup

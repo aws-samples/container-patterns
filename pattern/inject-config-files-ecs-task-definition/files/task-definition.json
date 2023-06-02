@@ -1,0 +1,26 @@
+{
+  "family": "nginx-ingress",
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "public.ecr.aws/nginx/nginx:mainline",
+      "cpu": 0,
+      "essential": true,
+      "entryPoint": [
+        "/bin/sh",
+        "-c"
+      ],
+      "command": [
+        "echo \"\n  events {\n    worker_connections  1024;\n  }\n  http\n  {\n    upstream ingress\n    {\n      server $MY_URL_ENV_VARIABLE;\n    }\n    server {\n      listen 8080;\n      location /\n      {\n        proxy_pass http://ingress;\n        proxy_set_header Host \\$host;\n        proxy_pass_request_headers on;\n      }\n    }\n  }\n\" > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
+      ],
+      "environment": [
+        {
+          "name": "MY_URL_ENV_VARIABLE",
+          "value": "http://myupstreamhost.com"
+        }
+      ]
+    }
+  ],
+  "cpu": "256",
+  "memory": "128"
+}

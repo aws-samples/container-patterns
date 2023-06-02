@@ -1,0 +1,16 @@
+{
+  "name": "name",
+  "version": "1.0.0",
+  "description": "Simple microservice that returns a random first name",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3",
+    "faker": "^4.1.0"
+  }
+}

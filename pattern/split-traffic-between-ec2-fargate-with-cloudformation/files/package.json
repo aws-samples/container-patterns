@@ -1,0 +1,16 @@
+{
+  "name": "ecs-metadata",
+  "version": "1.0.0",
+  "description": "Simple microservice that echoes the ECS metadata",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3",
+    "axios": "1.3.6"
+  }
+}

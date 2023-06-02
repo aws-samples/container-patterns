@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition which has a custom entrypoint
+             and command that overrides the default container image entrypoint
+
+Resources:
+  PingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine-ping
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine-ping
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          EntryPoint:
+            - ping
+
+          # Note that separate command line arguments must be
+          # expressed as items in an array, otherwise they will
+          # all by stuffed into the first argument passed to the
+          # entrypoint
+          Command:
+            - "-c"
+            - '4'
+            - amazon.com

@@ -1,0 +1,33 @@
+{
+  "family": "lifespan",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "public.ecr.aws/nginx/nginx:mainline",
+      "essential": true
+    },
+    {
+      "name": "lifespan",
+      "image": "public.ecr.aws/docker/library/busybox:stable",
+      "essential": true,
+      "command": [
+        "sh",
+        "-c",
+        "sleep $LIFESPAN_SECONDS"
+      ],
+      "environment": [
+        {
+          "name": "LIFESPAN_SECONDS",
+          "value": "60"
+        }
+      ]
+    }
+  ]
+}

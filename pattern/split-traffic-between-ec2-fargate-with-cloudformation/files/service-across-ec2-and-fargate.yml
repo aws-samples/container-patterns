@@ -1,0 +1,216 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition that can deployed onto both
+             Amazon EC2 and AWS Fargate
+
+Parameters:
+  ImageURI:
+    Type: String
+    Description: The URI of the image to deploy
+  Cluster:
+    Type: String
+    Description: The name of the ECS cluster to deploy into
+  Ec2CapacityProvider:
+    Type: String
+    Description: The name of an EC2 capacity provider in the cluster.
+  ServiceName:
+    Type: String
+    Default: ecs-metadata
+    Description: Name of the service
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The virtual private network into which to launch all resources
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet IDs where the EC2 instances will be launched
+
+Resources:
+
+  # This task definition has settings which allow it to
+  # be used on both AWS Fargate and Amazon EC2 capacity
+  SampleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ecs-metadata
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+      ExecutionRoleArn: !Ref TaskExecutionRole
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      ContainerDefinitions:
+        - Name: ecs-metadata
+          Image: !Ref ImageURI
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Ref ServiceName
+
+  # Deploy the task definition as a service on EC2 capacity
+  Ec2Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ServiceName}-on-ec2'
+      Cluster: !Ref 'Cluster'
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      CapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref Ec2CapacityProvider
+          Weight: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'SampleTaskDefinition'
+      LoadBalancers:
+        - ContainerName: ecs-metadata
+          ContainerPort: 80
+          TargetGroupArn: !Ref Ec2TargetGroup
+
+  # Deploy the task definition as a service on AWS Fargate capacity
+  FargateService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ServiceName}-on-fargate'
+      Cluster: !Ref 'Cluster'
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+      DesiredCount: 1
+      TaskDefinition: !Ref 'SampleTaskDefinition'
+      LoadBalancers:
+        - ContainerName: ecs-metadata
+          ContainerPort: 80
+          TargetGroupArn: !Ref FargateTargetGroup
+
+  # Keeps track of the list of tasks running on EC2 instances
+  Ec2TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: ip
+      Name: 'ecs-metdata-on-ec2'
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VpcId
+
+  # Keeps track of the list of tasks running in AWS Fargate
+  FargateTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: ip
+      Name: 'ecs-metadata-on-fargate'
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VpcId
+
+  # A public facing load balancer, this is used for accepting traffic from the public
+  # internet
+  PublicLoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the public facing load balancer
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+          # Allow access to ALB from anywhere on the internet
+          - CidrIp: 0.0.0.0/0
+            IpProtocol: -1
+  PublicLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '30'
+      Subnets:
+        # The load balancer is placed into the public subnets, so that traffic
+        # from the internet can reach the load balancer directly via the internet gateway
+        - !Select [ 0, !Ref SubnetIds ]
+        - !Select [ 1, !Ref SubnetIds ]
+      SecurityGroups:
+        - !Ref PublicLoadBalancerSG
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - PublicLoadBalancer
+    Properties:
+      DefaultActions:
+        - Type: 'forward'
+          # Evenly split traffic across the app on EC2 and the app on Fargate
+          # Can adjust weights as needed to balance traffic between the two
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !Ref Ec2TargetGroup
+                Weight: 50
+              - TargetGroupArn: !Ref FargateTargetGroup
+                Weight: 50
+      LoadBalancerArn: !Ref 'PublicLoadBalancer'
+      Port: 80
+      Protocol: HTTP
+
+  # Security group that limits network access
+  # to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service
+      VpcId: !Ref VpcId
+
+  # The services' security group allows inbound
+  # traffic from the public facing ALB
+  ServiceIngressFromPublicALB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from the public ALB
+      GroupId: !Ref 'ServiceSecurityGroup'
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'PublicLoadBalancerSG'
+
+  # This role is used to setup the execution environment for
+  # the task, in this case to connect to the Elastic File System
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  # This log group stores the stdout logs from this service's containers
+  LogGroup:
+    Type: AWS::Logs::LogGroup

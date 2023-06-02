@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition that can deployed onto both
+             Amazon EC2 and AWS Fargate
+
+Parameters:
+  Cluster:
+    Type: String
+    Description: The name of the ECS cluster to deploy into
+  Ec2CapacityProvider:
+    Type: String
+    Description: The name of an EC2 capacity provider in the cluster.
+  ServiceName:
+    Type: String
+    Default: nginx
+    Description: Name of the service
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The virtual private network into which to launch all resources
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet IDs where the EC2 instances will be launched
+
+Resources:
+
+  # This task definition has settings which allow it to
+  # be used on both AWS Fargate and Amazon EC2 capacity
+  SampleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: nginx
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      ContainerDefinitions:
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:mainline
+
+  # Deploy the task definition as a service on EC2 capacity
+  Ec2Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ServiceName}-on-ec2'
+      Cluster: !Ref 'Cluster'
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      CapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref Ec2CapacityProvider
+          Weight: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+      DesiredCount: 2
+      TaskDefinition: !Ref 'SampleTaskDefinition'
+
+  # Deploy the task definition as a service on AWS Fargate capacity
+  FargateService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub '${ServiceName}-on-fargate'
+      Cluster: !Ref 'Cluster'
+      LaunchType: FARGATE
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+      DesiredCount: 2
+      TaskDefinition: !Ref 'SampleTaskDefinition'
+
+  # Security group that limits network access
+  # to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service
+      VpcId: !Ref VpcId

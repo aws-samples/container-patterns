@@ -1,0 +1,16 @@
+{
+  "family": "nginx",
+  "requiresCompatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "public.ecr.aws/nginx/nginx:mainline"
+    }
+  ]
+}

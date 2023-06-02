@@ -1,0 +1,139 @@
+# Deployment tools
+- key: tool
+  value: cloudformation
+  label: AWS CloudFormation
+  color: "#578751"
+  checked: false
+- key: tool
+  value: cdk
+  label: AWS Cloud Development Kit (CDK)
+  color: "#578751"
+  checked: false
+- key: tool
+  value: terraform
+  label: Terraform by HashiCorp
+  color: "#578751"
+  checked: false
+- key: tool
+  value: pulumi
+  label: Pulumi IaC
+  color: "#578751"
+  checked: false
+- key: tool
+  value: copilot
+  label: AWS Copilot CLI
+  color: "#578751"
+  checked: false
+- key: tool
+  value: proton
+  label: AWS Proton
+  color: "#578751"
+  checked: false
+- key: tool
+  value: aws-cli
+  label: AWS CLI
+  color: "#578751"
+  checked: false
+
+# Capacity types
+- key: capacity
+  value: ec2
+  label: EC2 Instances
+  color: "#504e71"
+  checked: false
+- key: capacity
+  value: fargate
+  label: AWS Fargate
+  color: "#504e71"
+  checked: false
+- key: capacity
+  value: anywhere
+  label: ECS Anywhere
+  color: "#504e71"
+  checked: false
+
+# Application types
+- key: app
+  value: website
+  label: Website
+  color: "#6a4c6e"
+  checked: false
+- key: app
+  value: api
+  label: API
+  color: "#6a4c6e"
+  checked: false
+- key: app
+  value: worker
+  label: Background Worker
+  color: "#6a4c6e"
+  checked: false
+- key: app
+  value: batch
+  label: Batch Job
+  color: "#6a4c6e"
+  checked: false
+- key: app
+  value: machine-learning
+  label: Machine Learning
+  color: "#6a4c6e"
+  checked: false
+
+# Features in use
+- key: feature
+  value: service-connect
+  label: ECS Service Connect
+  color: "#a37062"
+  checked: false
+- key: feature
+  value: exec
+  label: ECS Exec
+  color: "#a37062"
+  checked: false
+- key: feature
+  value: efs
+  label: Amazon Elastic File System (EFS)
+  color: "#a37062"
+  checked: false
+- key: feature
+  value: capacity-provider
+  label: ECS Capacity Provider
+  color: "#a37062"
+  checked: false
+- key: feature
+  value: container-insights
+  label: CloudWatch Container Insights
+  color: "#a37062"
+  checked: false
+- key: feature
+  value: aws-firelens
+  label: AWS FireLens
+  color: "#a37062"
+  checked: false
+
+# Type of pattern or content
+- key: type
+  value: pattern
+  label: Infrastructure Pattern
+  color: "#6b96a0"
+  checked: false
+- key: type
+  value: video
+  label: Video
+  color: "#6b96a0"
+  checked: false
+- key: type
+  value: blogpost
+  label: Blog Post
+  color: "#6b96a0"
+  checked: false
+- key: type
+  value: script
+  label: Script
+  color: "#6b96a0"
+  checked: false
+- key: type
+  value: tutorial
+  label: Tutorial
+  color: "#6b96a0"
+  checked: false

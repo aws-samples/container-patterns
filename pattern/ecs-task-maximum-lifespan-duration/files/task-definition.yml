@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition that has a maximum lifespan. After
+             the duration is up, the task automatically stops.
+
+Resources:
+
+  SampleTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: lifespan
+      Cpu: 256
+      Memory: 512
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+
+        # The application container
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:mainline
+          Essential: true
+
+        # Sidecar container that gives this task a lifetime
+        - Name: lifespan
+          Image: public.ecr.aws/docker/library/busybox:stable
+          Command:
+            - "sh"
+            - "-c"
+            - "sleep $LIFESPAN_SECONDS"
+          Environment:
+            - Name: LIFESPAN_SECONDS
+              Value: 60
+          Essential: true

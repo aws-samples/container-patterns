@@ -1,0 +1,10 @@
+- key: tool
+  label: Development Tool
+- key: capacity
+  label: Capacity
+- key: app
+  label: Application Type
+- key: feature
+  label: Feature
+- key: type
+  label: Type

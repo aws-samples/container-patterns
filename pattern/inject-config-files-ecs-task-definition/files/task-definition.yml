@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition which self generates and injects
+             a config file for the running application.
+
+Resources:
+
+  InjectorTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: nginx-ingress
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:mainline
+          EntryPoint:
+            - '/bin/sh'
+            - '-c'
+          Environment:
+            - Name: MY_URL_ENV_VARIABLE
+              Value: http://myupstreamhost.com
+          Command:
+            - >
+              echo "
+                events {
+                  worker_connections  1024;
+                }
+                http
+                {
+                  upstream ingress
+                  {
+                    server $MY_URL_ENV_VARIABLE;
+                  }
+                  server {
+                    listen 8080;
+                    location /
+                    {
+                      proxy_pass http://ingress;
+                      proxy_set_header Host \$host;
+                      proxy_pass_request_headers on;
+                    }
+                  }
+                }
+              " > /etc/nginx/nginx.conf &&
+              exec nginx -g 'daemon off;'

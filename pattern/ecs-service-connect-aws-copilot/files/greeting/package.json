@@ -1,0 +1,17 @@
+{
+  "name": "greeting",
+  "version": "1.0.0",
+  "description": "Simple microservice that returns a random greeting",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
+
+

@@ -1,0 +1,21 @@
+resources:
+  cluster:
+    type: aws:ecs:Cluster
+  lb:
+    type: awsx:lb:ApplicationLoadBalancer
+  service:
+    type: awsx:ecs:FargateService
+    properties:
+      cluster: ${cluster.arn}
+      assignPublicIp: true
+      desiredCount: 2
+      taskDefinitionArgs:
+        container:
+          image: nginx:latest
+          cpu: 512
+          memory: 128
+          essential: true
+          portMappings:
+            - targetGroup: ${lb.defaultTargetGroup}
+outputs:
+  url: ${lb.loadBalancer.dnsName}

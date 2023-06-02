@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example service that deploys onto EC2 capacity with
+             a capacity provider strategy that autoscales the underlying
+             EC2 Capacity as needed by the service
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet IDs the AWS VPC tasks are inside of
+  ClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ECSTaskExecutionRole:
+    Type: String
+    Description: The role used to start up an ECS task
+  CapacityProvider:
+    Type: String
+    Description: The cluster capacity provider that the service should use
+                 to request capacity when it wants to start up a task
+  ServiceName:
+    Type: String
+    Default: example-service
+    Description: A name for the service
+  ImageUrl:
+    Type: String
+    Default: public.ecr.aws/docker/library/busybox:latest
+    Description: The url of a docker image that contains the application process that
+                 will handle the traffic for this service
+  ContainerCpu:
+    Type: Number
+    Default: 256
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 512
+    Description: How much memory in megabytes to give the container
+  Command:
+    Type: String
+    Default: sleep 3600
+    Description: The command to run inside of the container
+  DesiredCount:
+    Type: Number
+    Default: 0
+    Description: How many copies of the service task to run
+
+Resources:
+
+  # The task definition. This is a simple metadata description of what
+  # container to run, and what resource requirements it has.
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref ServiceName
+      Cpu: !Ref ContainerCpu
+      Memory: !Ref ContainerMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - EC2
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ContainerDefinitions:
+        - Name: !Ref ServiceName
+          Cpu: !Ref ContainerCpu
+          Memory: !Ref ContainerMemory
+          Image: !Ref ImageUrl
+          Command: !Split [' ', !Ref 'Command']
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Ref ServiceName
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ClusterName
+      PlacementStrategies:
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: cpu
+          Type: binpack
+      CapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider
+          Weight: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref DesiredCount
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+      TaskDefinition: !Ref TaskDefinition
+
+  # Because we are launching tasks in AWS VPC networking mode
+  # the tasks themselves also have an extra security group that is unique
+  # to them. This is a unique security group just for this service,
+  # to control which things it can talk to, and who can talk to it
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Access to service ${ServiceName}
+      VpcId: !Ref VpcId
+
+  # This log group stores the stdout logs from this service's containers
+  LogGroup:
+    Type: AWS::Logs::LogGroup

@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 ECS cluster that starts out empty, with no EC2 instances yet.
+             An ECS capacity provider automatically launches more EC2 instances
+             as required on the fly when you request ECS to launch services or
+             standalone tasks.
+Parameters:
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: c5.xlarge
+    Description: Class of EC2 instance used to host containers. Choose t2 for testing, m5 for general purpose, c5 for CPU intensive services, and r5 for memory intensive services
+    AllowedValues: [ t2.micro, t2.small, t2.medium, t2.large, t2.xlarge, t2.2xlarge,
+     m5.large, m5.xlarge, m5.2large, m5.4xlarge, m5.12xlarge, m5.24large,
+     c5.large, c5.xlarge, c5.2xlarge, c5.4xlarge, c5.9xlarge, c5.18xlarge,
+     r5.large, r5.xlarge, r5.2xlarge, r5.4xlarge, r5.12xlarge, r5.24xlarge ]
+    ConstraintDescription: Please choose a valid instance type.
+  DesiredCapacity:
+    Type: Number
+    Default: '0'
+    Description: Number of EC2 instances to launch in your ECS cluster.
+  MaxSize:
+    Type: Number
+    Default: '100'
+    Description: Maximum number of EC2 instances that can be launched in your ECS cluster.
+  ECSAMI:
+    Description: AMI ID
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/bottlerocket/aws-ecs-1/x86_64/latest/image_id
+    Description: The Bottlerocket Amazon Machine Image ID used for the cluster
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the ECS cluster is launched
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of subnet IDs where the EC2 instances will be launched
+
+Resources:
+  # This is authorizes ECS to manage resources on your
+  # account on your behalf. This role is likely already created on your account
+  # ECSRole:
+  #  Type: AWS::IAM::ServiceLinkedRole
+  #  Properties:
+  #    AWSServiceName: 'ecs.amazonaws.com'
+
+  # ECS Resources
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # Autoscaling group. This launches the actual EC2 instances that will register
+  # themselves as members of the cluster, and run the docker containers.
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      # This is to ensure that the ASG gets deleted first before these
+      # resources, when it comes to stack teardown.
+      - ECSCluster
+      - EC2Role
+    Properties:
+      VPCZoneIdentifier:
+        - !Select [ 0, !Ref SubnetIds ]
+        - !Select [ 1, !Ref SubnetIds ]
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ContainerInstances
+        Version: !GetAtt ContainerInstances.LatestVersionNumber
+      MinSize: 0
+      MaxSize: !Ref MaxSize
+      DesiredCapacity: !Ref DesiredCapacity
+      NewInstancesProtectedFromScaleIn: true
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: 'true'
+
+  # The config for each instance that is added to the cluster
+  ContainerInstances:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: !Ref ECSAMI
+        InstanceType: !Ref InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref ContainerHostSecurityGroup
+        UserData:
+          # This injected configuration file is how the EC2 instance
+          # knows which ECS cluster on your AWS account it should be joining
+          Fn::Base64: !Sub |
+            [settings.ecs]
+            cluster = "${ECSCluster}"
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2Role
+
+  # Create an ECS capacity provider to attach the ASG to the ECS cluster
+  # so that it autoscales as we launch more containers
+  CapacityProvider:
+    Type: AWS::ECS::CapacityProvider
+    Properties:
+      AutoScalingGroupProvider:
+        AutoScalingGroupArn: !Ref ECSAutoScalingGroup
+        ManagedScaling:
+          InstanceWarmupPeriod: 60
+          MinimumScalingStepSize: 1
+          MaximumScalingStepSize: 100
+          Status: ENABLED
+          # Percentage of cluster reservation to try to maintain
+          TargetCapacity: 100
+        ManagedTerminationProtection: ENABLED
+
+  # Create a cluster capacity provider assocation so that the cluster
+  # will use the capacity provider
+  CapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      CapacityProviders:
+        - !Ref CapacityProvider
+      Cluster: !Ref ECSCluster
+      DefaultCapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider
+          Weight: 1
+
+  # A security group for the EC2 hosts that will run the containers.
+  # This can be used to limit incoming traffic to or outgoing traffic
+  # from the container's host EC2 instance.
+  ContainerHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the EC2 hosts that run containers
+      VpcId: !Ref VpcId
+
+  # Role for the EC2 hosts. This allows the ECS agent on the EC2 hosts
+  # to communciate with the ECS control plane, as well as download the docker
+  # images from ECR to run on your host.
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        # See reference: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonEC2ContainerServiceforEC2Role
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        # This managed policy allows us to connect to the instance using SSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  # This is a role which is used within Fargate to allow the Fargate agent
+  # to download images, and upload logs.
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+
+      # This role enables all features of ECS. See reference:
+      # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonECSTaskExecutionRolePolicy
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+Outputs:
+  ClusterName:
+    Description: The ECS cluster into which to launch resources
+    Value: !Ref ECSCluster
+  ECSTaskExecutionRole:
+    Description: The role used to start up a task
+    Value: !Ref ECSTaskExecutionRole
+  CapacityProvider:
+    Description: The cluster capacity provider that the service should use
+                 to request capacity when it wants to start up a task
+    Value: !Ref CapacityProvider

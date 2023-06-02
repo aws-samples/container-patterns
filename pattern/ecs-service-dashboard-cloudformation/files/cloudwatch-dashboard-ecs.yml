@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template deploys an automatically generated CloudWatch
+             dashboard for the referenced ECS service.
+Transform:
+  - AWS::LanguageExtensions
+
+Parameters:
+  ServiceArn:
+    Type: String
+    Description: The ARN of the service that we want to generate the dashboard from.
+
+Resources:
+  # A CloudWatch log group for persisting the deployment events
+  ServiceEventLog:
+    Type: AWS::Logs::LogGroup
+
+  # Create the EventBridge rule that captures deployment events into the CloudWatch log group
+  CaptureServiceDeploymentEvents:
+    Type: AWS::Events::Rule
+    Properties:
+      Description:
+        Fn::Sub:
+          - 'Capture service deployment events from the ECS service ${ServiceName}'
+          # Scary but working way to get service's human name from it's ARN
+          - ServiceName: !Select [2, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+      EventPattern:
+        source:
+          - aws.ecs
+        detail-type:
+          - "ECS Deployment State Change"
+          - "ECS Service Action"
+        resources:
+          - !Ref ServiceArn
+      # Where to send the events
+      Targets:
+        - Arn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ServiceEventLog}
+          Id: 'CloudWatchLogGroup'
+
+  # Create a log group resource policy that allows EventBridge to put logs into
+  # the log group
+  LogGroupForEventsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: EventBridgeToCWLogsPolicy
+      PolicyDocument: !Sub
+      - >
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventBridgetoCWLogsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "delivery.logs.amazonaws.com",
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": [
+                "${LogArn}"
+              ]
+            }
+          ]
+        }
+      - { LogArn: !GetAtt ServiceEventLog.Arn, RuleArn: !GetAtt CaptureServiceDeploymentEvents.Arn}
+
+  # This resource creates the widgets that will live in the CloudWatch
+  # dashboard, by pulling stats from Container Insights
+  ServiceDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName:
+        Fn::Sub:
+          - "${ServiceName}-dashboard"
+          - ServiceName: !Select [2, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+      DashboardBody:
+        Fn::ToJsonString:
+          widgets:
+            # A table that shows recent deployment events
+            - type: log
+              x: 0
+              y: 0
+              width: 24
+              height: 4
+              properties:
+                region: !Ref AWS::Region
+                title: Service Deployments
+                query: !Sub "SOURCE '${ServiceEventLog}' | fields @timestamp, detail.eventName, detail.deploymentId | sort @timestamp desc | limit 500"
+                view: table
+
+            # A graph showing the running task count over time
+            - type: metric
+              x: 0
+              y: 13
+              width: 24
+              height: 6
+              properties:
+                metrics:
+                - - "ECS/ContainerInsights"
+                  - "RunningTaskCount"
+                  - "ServiceName"
+                  # Extract service name from service ARN
+                  - !Select [2, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+                  - "ClusterName"
+                  # Extract cluster name from service ARN
+                  - !Select [1, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+                - [ ".", "DesiredTaskCount", ".", ".", ".", "." ]
+                view: timeSeries
+                stacked: false
+                region: !Ref AWS::Region
+                stat: Sum
+                period: 60
+                yAxis:
+                  left:
+                    min: 0
+                title: "DesiredTaskCount, RunningTaskCount"
+
+            # A graph showing CPU and Memory utilization over time
+            - type: metric
+              x: 0
+              y: 13
+              width: 24
+              height: 6
+              properties:
+                metrics:
+                - - "ECS/ContainerInsights"
+                  - "CpuUtilized"
+                  - "ServiceName"
+                  # Extract service name from service ARN
+                  - !Select [2, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+                  - "ClusterName"
+                  # Extract cluster name from service ARN
+                  - !Select [1, !Split ['/', !Select [5, !Split [':', !Ref ServiceArn]]]]
+                - [ ".", "MemoryUtilized", ".", ".", ".", "." ]
+                view: timeSeries
+                stacked: false
+                region: !Ref AWS::Region
+                stat: Sum
+                period: 60
+                yAxis:
+                  left:
+                    min: 0
+                title: "CPU Utilization, Memory Utilization"

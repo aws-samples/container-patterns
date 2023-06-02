@@ -1,0 +1,15 @@
+{
+  "name": "container-patterns",
+  "version": "1.0.0",
+  "author": "peckn@amazon.com",
+  "scripts": {
+    "lint": "node lint"
+  },
+  "type": "module",
+  "dependencies": {
+    "front-matter": "^4.0.2",
+    "glob": "^10.2.6",
+    "jsonschema": "^1.4.1",
+    "yaml": "^2.3.1"
+  }
+}

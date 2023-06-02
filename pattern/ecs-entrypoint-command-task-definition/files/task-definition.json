@@ -1,0 +1,21 @@
+{
+  "containerDefinitions": [
+    {
+      "memory": 32,
+      "essential": true,
+      "entryPoint": [
+        "ping"
+      ],
+      "name": "alpine-ping",
+      "readonlyRootFilesystem": true,
+      "image": "public.ecr.aws/docker/library/alpine:latest",
+      "command": [
+        "-c",
+        "4",
+        "amazon.com"
+      ],
+      "cpu": 16
+    }
+  ],
+  "family": "alpine-ping"
+}

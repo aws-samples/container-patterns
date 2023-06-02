@@ -10,8 +10,6 @@ filterDimensions:
     value: pattern
   - key: capacity
     value: ec2
-  - key: another-one
-    value: bad-value
 authors:
   - peckn
 date: Jul 21, 2022

@@ -11,7 +11,7 @@ filterDimensions:
   - key: capacity
     value: ec2
 authors:
-  - peckn
+  - boo
 date: Jul 21, 2022
 ---
 

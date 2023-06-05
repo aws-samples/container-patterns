@@ -21,12 +21,6 @@ date: Jun 1, 2023
 
 <youtube id='Y2cas2I-5bk' />
 
-#### Architecture
-
-Bottlerocket functions using the following architecture:
-
-!!! @/pattern/ecs-ec2-bottlerocket-cluster/bottlerocket.svg
-
 #### Dependencies
 
 This pattern uses AWS SAM CLI for deploying CloudFormation stacks on your account.

@@ -1,14 +1,32 @@
-name: release
+name: Lint and Release
 
 on:
-  # Rerun the release workflow on change to this repo
   push:
-    branches: [ "dev", "main" ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
 
-  # Build the patterns site
+  # First ensure that the contents are valid by running the linter.
+  lint-data:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm run-script lint
+
+  # Dispatch a release request to the central infrastructure repo
   dispatch-release:
+    needs:
+      - lint-data
     runs-on: ubuntu-latest
     steps:
 

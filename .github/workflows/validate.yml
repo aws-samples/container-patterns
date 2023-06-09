@@ -41,16 +41,19 @@ jobs:
       # Use a Github PAT to dispatch a release request to the private infrastructure repo
       - name: Dispatch preview request
         run: |
-          curl --fail -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
+          curl --fail-with-body -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Content-Type: application/json" \
-          --data '{ \
-              "event_type": "Pattern PR preview: ${{ github.event.pull_request.title }}", \
-              "client_payload": { \
-                 "patterns_repo": "${{github.event.pull_request.head.repo.full_name}}", \
-                 "patterns_ref": "${{github.event.pull_request.head.ref}}", \
-                 "pr_id": "${{ github.event.pull_request.id }}" \
-              } \
-            }'
+          --data-binary @- << EOF
+            {
+              "event_type": "Pattern PR preview: ${{ github.event.pull_request.title }}",
+              "client_payload": {
+                 "patterns_repo": "${{github.event.pull_request.head.repo.full_name}}",
+                 "patterns_ref": "${{github.event.pull_request.head.ref}}",
+                 "pr_id": "${{ github.event.pull_request.id }}"
+              }
+            }
+          EOF
+
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

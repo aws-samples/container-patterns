@@ -6,7 +6,7 @@ on:
 
 jobs:
 
-  # First ensure that the contents are valid by running the linter.
+  # First ensure that the contents are valid by running the linter
   lint-data:
 
     runs-on: ubuntu-latest

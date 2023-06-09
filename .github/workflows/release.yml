@@ -44,6 +44,16 @@ jobs:
           curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Content-Type: application/json" \
+          --data-binary @- << EOF
+            {
+              "event_type": "pattern_release",
+              "client_payload": {
+                 "patterns_repo": "${{ github.event.repository }}",
+                 "patterns_ref": "main",
+                 "pr_id": "${{ github.event.pull_request.id }}"
+              }
+            }
+          EOF
           --data '{"event_type": "pattern_release"}'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

@@ -16,6 +16,8 @@ jobs:
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
+          # Can be removed once repo is fully public and forks are public too
+          token: ${{ secrets.PAT }}
 
       # Install Node and NPM dependencies
       - name: Use Node.js v18.x

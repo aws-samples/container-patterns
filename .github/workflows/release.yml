@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # User a Github PAT to dispatch a release request to the private infrastructure repo
+      # Use a Github PAT to dispatch a release request to the private infrastructure repo
       - name: Dispatch release request
         run: |
           curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \

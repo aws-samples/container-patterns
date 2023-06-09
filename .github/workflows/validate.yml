@@ -51,6 +51,7 @@ jobs:
                  "patterns_repo": "${{github.event.pull_request.head.repo.full_name}}",
                  "patterns_ref": "${{github.event.pull_request.head.ref}}",
                  "pr_id": "${{ github.event.pull_request.id }}"
+                 "message": "${{ github.event.pull_request.title }}"
               }
             }
           EOF

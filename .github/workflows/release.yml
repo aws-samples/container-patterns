@@ -50,10 +50,9 @@ jobs:
               "client_payload": {
                  "patterns_repo": "${GITHUB_REPOSITORY}",
                  "patterns_ref": "main",
-                 "pr_id": "${{ github.event.pull_request.id }}"
+                 "message": "Release to production by merge to main"
               }
             }
           EOF
-          --data '{"event_type": "pattern_release"}'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

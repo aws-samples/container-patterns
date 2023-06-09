@@ -1,4 +1,4 @@
-name: Lint and Preview
+name: Validate PR
 
 on:
   pull_request:
@@ -26,15 +26,15 @@ jobs:
       # Run the linter to validate pattern markdown content
       - run: npm run-script lint
 
-  # Dispatch a release request to the central infrastructure repo
-  dispatch-release:
+  # Dispatch a preview request to the infrastructure repo
+  request-preview:
     needs:
       - lint-data
     runs-on: ubuntu-latest
     steps:
 
       # Use a Github PAT to dispatch a release request to the private infrastructure repo
-      - name: Dispatch release request
+      - name: Dispatch preview request
         run: |
           curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \

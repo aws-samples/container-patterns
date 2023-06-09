@@ -1,4 +1,4 @@
-name: Validate PR
+name: Validate PR and create preview environment
 
 on:
   pull_request:

@@ -48,7 +48,7 @@ jobs:
             {
               "event_type": "pattern_release",
               "client_payload": {
-                 "patterns_repo": "${{ github.event.repository }}",
+                 "patterns_repo": "${GITHUB_REPOSITORY}",
                  "patterns_ref": "main",
                  "pr_id": "${{ github.event.pull_request.id }}"
               }

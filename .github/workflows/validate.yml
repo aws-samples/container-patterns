@@ -39,6 +39,6 @@ jobs:
           curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Content-Type: application/json" \
-          --data '{"event_type": "Pattern PR preview: ${{ github.event.head_commit.message }}", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "sha": "'"GITHUB_SHA"'" }}'
+          --data '{"event_type": "Pattern PR preview: ${{ github.event.head_commit.message }}", "client_payload": { "patterns_ref": "'"GITHUB_SHA"'" }}'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

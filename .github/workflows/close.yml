@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        echo PR #${{ github.event.number }} has been closed, can shutdown preview environment
+          echo PR #${{ github.event.number }} has been closed, can shutdown preview environment
 
       # Dispatch a preview request to the infrastructure repo
       # Use a Github PAT to dispatch a release request to the private infrastructure repo

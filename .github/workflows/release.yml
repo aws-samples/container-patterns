@@ -7,7 +7,7 @@ on:
 jobs:
 
   # First ensure that the contents are valid by running the linter.
-  lint-data:
+  lint-and-release:
 
     runs-on: ubuntu-latest
     steps:

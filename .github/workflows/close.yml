@@ -23,7 +23,7 @@ jobs:
           -H "Content-Type: application/json" \
           --data-binary @- << EOF
             {
-              "event_type": "pattern_preview",
+              "event_type": "close_preview",
               "client_payload": {
                  "source_repo": "patterns",
                  "pr_id": "${{ github.event.pull_request.id }}",
@@ -32,6 +32,5 @@ jobs:
               }
             }
           EOF
-
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

@@ -26,20 +26,11 @@ jobs:
       # Run the linter to validate pattern markdown content
       - run: npm run-script lint
 
-  # Dispatch a release request to the central infrastructure repo
-  dispatch-release:
-
-    # The release request will fail anyway if a fork tries to run it
-    # because they won't have the right PAT
-    if: github.repository_owner == 'aws-samples'
-
-    needs:
-      - lint-data
-    runs-on: ubuntu-latest
-    steps:
-
       # Use a Github PAT to dispatch a release request to the private infrastructure repo
       - name: Dispatch release request
+        # The release request will fail anyway if a fork tries to run it
+        # because they won't have the right PAT
+        if: github.repository_owner == 'aws-samples'
         run: |
           curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \

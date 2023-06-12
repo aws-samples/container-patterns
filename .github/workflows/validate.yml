@@ -31,13 +31,7 @@ jobs:
       # Run the linter to validate pattern markdown content
       - run: npm run-script lint
 
-  # Dispatch a preview request to the infrastructure repo
-  request-preview:
-    needs:
-      - lint-data
-    runs-on: ubuntu-latest
-    steps:
-
+      # Dispatch a preview request to the infrastructure repo
       # Use a Github PAT to dispatch a release request to the private infrastructure repo
       - name: Dispatch preview request
         run: |

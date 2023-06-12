@@ -9,8 +9,29 @@ jobs:
   close_preview:
     # this job will not run on forks
     if: github.repository_owner == 'aws-samples'
-
     runs-on: ubuntu-latest
     steps:
-    - run: |
+      - run: |
         echo PR #${{ github.event.number }} has been closed, can shutdown preview environment
+
+      # Dispatch a preview request to the infrastructure repo
+      # Use a Github PAT to dispatch a release request to the private infrastructure repo
+      - name: Dispatch close request
+        run: |
+          curl --fail-with-body -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Content-Type: application/json" \
+          --data-binary @- << EOF
+            {
+              "event_type": "pattern_preview",
+              "client_payload": {
+                 "source_repo": "patterns",
+                 "pr_id": "${{ github.event.pull_request.id }}",
+                 "pr_number": "${{ github.event.pull_request.number }}",
+                 "message": "${{ github.event.pull_request.title }}"
+              }
+            }
+          EOF
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

@@ -1,0 +1,16 @@
+name: Close Pull Request
+
+# only trigger on pull request closed events
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  close_preview:
+    # this job will not run on forks
+    if: github.repository_owner == 'aws-samples'
+
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo PR #${{ github.event.number }} has been closed, can shutdown preview environment

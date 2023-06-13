@@ -1,7 +1,7 @@
 - id: peckn
   name: Nathan Peck
   title: Senior Developer Advocate at AWS
-  image: https://nathanpeck.com/images/nathanpeck.jpg
+  image: /pattern/images/authors/peckn.jpg
   links:
     - type: website
       uri: https://nathanpeck.com
@@ -13,7 +13,7 @@
 - id: sbcoulto
   name: Scott Coulton
   title: Principal Developer Advocate at AWS
-  image: https://d2908q01vomqb2.cloudfront.net/fe2ef495a1152561572949784c16bf23abb28057/2023/02/26/1553905832802.jpeg
+  image: /pattern/images/authors/sbcoulto.jpg
   links:
     - type: twitter
       uri: https://twitter.com/scottcoulton
@@ -21,7 +21,7 @@
 - id: maishsk
   name: Maish Saidel-Keesing
   title: Senior Developer Advocate at AWS
-  image: https://d2908q01vomqb2.cloudfront.net/5b384ce32d8cdef02bc3a139d4cac0a22bb029e8/2020/05/27/Headshot1.jpg
+  image: /pattern/images/authors/maishsk.jpg
   links:
     - type: twitter
       uri: https://twitter.com/maishsk
@@ -34,7 +34,7 @@
 - id: arvsoni
   name: Arvind Soni
   title: WW Head of GTM for ECS at AWS
-  image: https://pbs.twimg.com/profile_images/808785129367683072/TtPMTQsp_400x400.jpg
+  image: /pattern/images/authors/arvsoni.jpg
   links:
     - type: twitter
       uri: https://twitter.com/soniarvind
@@ -44,7 +44,7 @@
 - id: mreferre
   name: Massimo Re Ferrè
   title: Senior Principal Technologist at AWS
-  image: https://avatars.githubusercontent.com/u/4123965?v=4
+  image: /pattern/images/authors/mreferre.jpg
   links:
     - type: blog
       uri: https://it20.info/

@@ -1,4 +1,4 @@
-## Container Patterns
+## Container on AWS
 
 [![](./docs/images/preview.png)](https://containersonaws.com)
 

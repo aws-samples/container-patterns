@@ -1,6 +1,6 @@
 ## Container Patterns
 
-This repository hosts the source content for patterns on https://containeronaws.com
+This repository hosts the source content for patterns on https://containeronaws.com/
 
 ## Security
 

@@ -32,7 +32,7 @@ jobs:
         # because they won't have the right PAT
         if: github.repository_owner == 'aws-samples'
         run: |
-          curl -v -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
+          curl -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Content-Type: application/json" \
           --data-binary @- << EOF

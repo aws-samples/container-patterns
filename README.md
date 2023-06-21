@@ -1,13 +1,18 @@
 ## Container Patterns
 
+[![](./docs/images/preview.png)](https://containersonaws.com)
+
 This repository hosts the source content for patterns on https://containeronaws.com/
+
+If you would like to add your own pattern to the website please read the guide below.
 
 ## Documentation
 
-1. [Understand the repository structure](./docs/structure.md)
-2. [Add yourself as an author](./docs/add-yourself-as-an-author.md)
-3. [Add your pattern](./docs/add-a-pattern.md)
-4. [Add a great SVG diagram for your pattern](./docs/svg-diagram-process.md)
+- [Understand the repository structure](./docs/structure.md)
+- [Add yourself as an author](./docs/add-yourself-as-an-author.md)
+- [Add your pattern](./docs/add-a-pattern.md)
+- [Add a great SVG diagram for your pattern](./docs/svg-diagram-process.md)
+- [General contribution guidelines](./CONTRIBUTING.md)
 
 ## Security
 

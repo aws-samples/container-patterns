@@ -7,6 +7,12 @@
     3. Use only default Arial font for text labels (no Amazon Ember). This SVG is rendering for the web, and Ember will not work.
     4. For arrows and lines, please do not use black. Instead use a neutral gray, blue, or other similar color that shows up well on both dark and light backgrounds
 3. Click and drag to select all elements on your Powerpoint slide, then right click on any element to open the context menu, and click “Save as Picture”
+
+![](./images/select-all.png)
+
 5. Make sure that you select SVG file format under “save as type” in the file dialog.
+
+![](./images/export-as-svg.png)
+
 7. Add both your PPT file and your SVG to the `pattern/<pattern-name>` folder that holds your pattern content. You can now import your SVG into the Markdown content using the following syntax: `!!! @/pattern/<pattern-name>/diagram.svg`
 8. Please make sure to use the dark/light mode toggle to ensure that your SVG looks good on both light and dark backgrounds.

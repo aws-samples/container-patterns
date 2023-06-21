@@ -1,6 +1,6 @@
 # Adding yourself as an author
 
-Check the file at `data/authors.yml` to see if you are already listed as an author.
+Check the file at [`data/authors.yml`](./data/authors.yml) to see if you are already listed as an author.
 
 Authors are represented in YAML format similar to this:
 

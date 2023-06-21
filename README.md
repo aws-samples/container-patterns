@@ -1,4 +1,4 @@
-## Container on AWS
+## Containers on AWS
 
 [![](./docs/images/preview.png)](https://containersonaws.com)
 

@@ -123,11 +123,6 @@
   color: "#547a82"
   checked: false
 - key: type
-  value: blogpost
-  label: Blog Post
-  color: "#547a82"
-  checked: false
-- key: type
   value: script
   label: Script
   color: "#547a82"
@@ -135,5 +130,10 @@
 - key: type
   value: tutorial
   label: Tutorial
+  color: "#547a82"
+  checked: false
+- key: type
+  value: workshop
+  label: Workshop
   color: "#547a82"
   checked: false

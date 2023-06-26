@@ -24,3 +24,9 @@ AWS has launched a new cost management feature called Split Cost Allocation Data
 2. Use the cost and usage report to filter and analyze costs. This provides granular data at the hourly per resource level, with each tag becoming a column in the report.
 3. Use tags in the cost and usage report to allocate costs down to individual services or teams.
 4. Observe actual usage versus reserved usage to optimize cost and try different models and configurations to see which works best from a cost management point of view.
+
+#### Resources
+
+- [Jupyter Notebook demo from the video](https://github.com/arvindsoni80/ecs-ec2-cost-split)
+- [Launch blog for split cost allocation data](https://aws.amazon.com/blogs/aws-cloud-financial-management/la-improve-cost-visibility-of-containerized-applications-with-aws-split-cost-allocation-data-for-ecs-and-batch-jobs/)
+- [How to tag resources in Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html)

@@ -42,7 +42,7 @@ You can find the workshop at:
 <a class='btn btn-primary' href='https://catalog.workshops.aws/serverless-first/en-US/010-introduction/1-serverless'>Serverless First Workshop</a>
 
 :::tip
-Running this workshop on your own requires an AWS account and will results in charges on that account.
+Running this workshop on your own requires an AWS account and will result in charges on that account.
 If you prefer to learn for free, then watch the [AWS Events page](https://aws.amazon.com/events/) for an AWS summit or convention near you. Many AWS events feature workshops such as this one, and workshops run at live events are completely free for attendees.
 :::
 

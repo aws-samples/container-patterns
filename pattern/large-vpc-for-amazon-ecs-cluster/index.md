@@ -42,10 +42,10 @@ For this example VPC the following table shows subnet support for internet acces
 
 | Configuration |     Private Subnets      |  Public Subnets    |
 | ---------------- | ------------------------ | ------------------ |
-| EC2 Bridge mode  | <i style='color: green' class='fas fa-check'></i>       | <i style='color: green' class='fas fa-check'></i>  |
-| EC2 Host mode  | <i style='color: green' class='fas fa-check'></i>        | <i style='color: green' class='fas fa-check'></i>  |
-| EC2 AWS VPC | <i style='color: green' class='fas fa-check'></i>        | <i style='color: red' class='fas fa-times'></i>   |
-| Fargate AWS VPC | <i style='color: green' class='fas fa-check'></i>  | <i style='color: orange' class='fas fa-exclamation'></i> (requires assign public IP) |
+| EC2 Bridge mode  | ✅      | ✅  |
+| EC2 Host mode  | ✅       | ✅  |
+| EC2 AWS VPC | ✅        | ✅   |
+| Fargate AWS VPC | ✅  | ❗ (requires assign public IP) |
 
 ::: danger
 Note that when using AWS VPC networking mode on EC2 it is not supported to place tasks in the public subnet, because the task ENI only has a private IP address. In the public subnet outbound networking traffic will go directly to the internet gateway, however because the task has no public IP address there is no return path to the task.

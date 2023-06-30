@@ -37,10 +37,10 @@ For this example VPC the following table shows subnet support for internet acces
 
 | Configuration |  Public Subnets  |
 | ---------------- | ------------------------ |
-| EC2 Bridge mode  | <i style='color: green' class='fas fa-check'></i>  |
-| EC2 Host mode  | <i style='color: green' class='fas fa-check'></i> |
-| EC2 AWS VPC | <i style='color: red' class='fas fa-times'></i> (not supported) |
-| Fargate AWS VPC | <i style='color: orange' class='fas fa-exclamation'></i> (requires assign public IP) |
+| EC2 Bridge mode  | ✅  |
+| EC2 Host mode  | ✅ |
+| EC2 AWS VPC | ❌ (not supported) |
+| Fargate AWS VPC | ❗ (requires assign public IP) |
 
 ::: danger
 AWS VPC on EC2 will not work in this VPC because task ENI's on EC2 can not be assigned public IP addresses, and therefore the task can not utilize the internet gateway.

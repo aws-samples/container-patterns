@@ -133,4 +133,6 @@ there in the new replacement task.
 
 #### See Also
 
+- If you prefer to use a programming language SDK to interact with your infrastructure then check out the [AWS Cloud Development Kit pattern for Elastic File System attached to a task in AWS Fargate](/elastic-file-system-ecs-cdk)
+- If you like to work on the command line then see the tutorial for [using AWS Copilot to deploy an Elastic File System backed application](/elastic-file-system-aws-copilot)
 - [Tutorial on setting up EFS on ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/tutorial-efs-volumes.html)

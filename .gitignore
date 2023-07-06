@@ -1,1 +1,9 @@
 node_modules
+
+# Exclude Cloud Development Kit generated content
+cdk.out
+
+# Exclude Terraform generated content
+*.tfstate
+*.tfstate.backup
+.terraform*

@@ -1,7 +1,7 @@
 ---
 title: Introduction to Amazon ECS
 description: >-
-  Amazon Elastic Container Service (Amazon ECS) is a fully managed container orchestration service that helps you easily deploy, manage, and scale containerized applications.
+  Amazon Elastic Container Service (Amazon ECS) is a fully managed orchestration service to help you easily manage containerized applications.
 filterDimensions:
   - key: type
     value: video

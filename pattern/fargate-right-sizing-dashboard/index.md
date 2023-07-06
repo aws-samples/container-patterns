@@ -1,7 +1,7 @@
 ---
 title: Optimize Fargate task size to save costs
 description: >-
-  Example CloudWatch Dashboard that uses Container Insights and CloudWatch Log Insights queries to identify AWS Fargate tasks that are sized too large for their utilization.
+  Example CloudWatch Dashboard that uses Container Insights and CloudWatch Log Insights queries to identify AWS Fargate tasks that are sized too large
 filterDimensions:
   - key: type
     value: pattern

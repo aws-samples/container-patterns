@@ -1,8 +1,8 @@
 ---
 title: A deep dive into Amazon ECS cost management
 description: >-
-  How do you track container resource usage back to it's impact on your AWS bill? Watch a demo
-  of how to use ECS resource tags and the AWS Cost and Usage billing report
+  How to track container resource usage back to your AWS bill? Learn how to use
+  ECS resource tags and AWS Cost and Usage billing report
 filterDimensions:
   - key: type
     value: video

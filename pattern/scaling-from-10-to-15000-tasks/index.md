@@ -1,7 +1,7 @@
 ---
 title: Scaling from 10 to 16,000+ tasks in a single ECS Cluster
 description: >-
-  A deep dive into the process of scaling up from 10 tasks to 16k tasks, including networking setup, quotas and limits to be aware of, as well as general tips and tricks.
+  How to scale from 10 tasks to 16k tasks, including networking setup, quotas and limits to be aware of, as well as general tips and tricks.
 filterDimensions:
   - key: type
     value: video

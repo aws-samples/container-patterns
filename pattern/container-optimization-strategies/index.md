@@ -1,7 +1,7 @@
 ---
 title: Container optimization strategies
 description: >-
-  Mike Fiedler, AWS Container Hero discusses some key strategies for optimizing containerized applications, including image optimizations that reduce container startup time.
+  Mike Fiedler, AWS Container Hero discusses key strategies for optimizing containerized applications and reducing container startup time.
 filterDimensions:
   - key: type
     value: video

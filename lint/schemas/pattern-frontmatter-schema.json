@@ -8,7 +8,7 @@
     },
     "description": {
       "type": "string",
-      "maxLength": 180
+      "maxLength": 160
     },
     "authors": {
       "type": "array",

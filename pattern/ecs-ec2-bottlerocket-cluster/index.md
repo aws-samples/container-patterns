@@ -17,7 +17,7 @@ date: Jun 1, 2023
 
 #### About
 
-[Bottlerocket](https://aws.amazon.com/bottlerocket/) is a Linux-based open-source operating system that is purpose-built by Amazon Web Services for running containers. Bottlerocket is designed to have only the bare minimum of software required to run containers. Additionally, it is designed with additional security hardening and an upgrade mechanism designed to reduce the overhead of maintaining large clusters.
+[Bottlerocket](https://bottlerocket.dev/) is a Linux-based open-source operating system that is purpose-built by Amazon Web Services for running containers. Bottlerocket is designed to have only the bare minimum of software required to run containers. Additionally, it is designed with additional security hardening and an upgrade mechanism designed to reduce the overhead of maintaining large clusters.
 
 <youtube id='Y2cas2I-5bk' />
 
@@ -32,7 +32,7 @@ To deploy this pattern you will use the [base pattern that defines a large VPC f
 
 #### Define the cluster
 
-We will use the following CloudFormation template to define a cluster that uses a capacity provider that launches AWS Bottlerocket instances:
+We will use the following CloudFormation template to define a cluster that uses a capacity provider that launches Bottlerocket instances on Amazon EC2:
 
 <<< @/pattern/ecs-ec2-bottlerocket-cluster/files/cluster.yml
 
@@ -87,5 +87,6 @@ sam delete --stack-name bottlerocket-environment
 
 #### Next Steps
 
-* Check out [the Bottlerocket repository](https://github.com/bottlerocket-os/bottlerocket#bottlerocket-os) for more info on the project.
+* Check out [the Bottlerocket repository](https://github.com/bottlerocket-os/bottlerocket#bottlerocket-os) or [the Bottlerocket learning site](https://bottlerocket.dev/) for more info on the project.
+* Don't like CloudFormation? Try out the [Bottlerocket for ECS quicklaunch instructions for the AWS CLI](https://bottlerocket.dev/en/os/1.14.x/install/quickstart/aws/ecs/).
 * Connect to a Bottlerocket host [using SSM and the control container](https://github.com/bottlerocket-os/bottlerocket#control-container).

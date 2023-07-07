@@ -1,0 +1,17 @@
+# https://github.com/actions/labeler
+
+# Add 'repo' label to any root file changes
+repo:
+- '*'
+
+# Add 'pattern' label to any change to blog post files
+pattern:
+- pattern/**
+
+# Add 'author-added' label
+author-added:
+- author/**
+
+# Add 'workflow' label
+workflow:
+- .github/workflows/**

@@ -12,6 +12,10 @@ pattern:
 author-added:
 - author/**
 
+# Add 'lintjs' to any change to lint.js
+lintjs:
+- lint.js
+
 # Add 'workflow' label
 workflow:
 - .github/workflows/**

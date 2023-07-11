@@ -42,6 +42,35 @@
         ]
       }
     },
+    "alternatives": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "description",
+          "id"
+        ]
+      }
+    },
     "license": {
       "type": "object",
       "additionalProperties": false,

@@ -14,13 +14,26 @@ filterDimensions:
 authors:
   - peckn
 date: May 16, 2023
+alternatives:
+  - key: app
+    value: website
+    id: public-facing-web-ecs-ec2-cloudformation
+    description: Want to deploy a more public facing website instead?
+  - key: capacity
+    value: fargate
+    id: public-facing-api-ecs-fargate-cloudformation
+    description: Instead of EC2, consider using serverless Fargate capacity for less management overhead.
+  - key: tool
+    value: terraform
+    id: ecs-blueprint-terraform
+    description: Instead of CloudFormation consider deploying with Terraform by HashiCorp
 ---
 
 #### About
 
 This pattern demonstrates how to host an API service, or other critical internal service which lives in a private portion of your VPC network, yet can still receive traffic from the public internet. The service containers will not have a public IP address, and they will be protected by a custom sercurity group for the service. However, you can still expose them to the public via a load balancer ingress in the public portion of your VPC network.
 
-This pattern is suitable many use cases:
+This pattern is suitable for many use cases:
 
 - An API which is public facing but needs an extra layer of security hardening by not even having a public IP address that an attacker could send a request directly to.
 - A web facing service which needs to be massively horizontally scalable while not being constrained by number of public IP addresses available.

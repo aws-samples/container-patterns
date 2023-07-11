@@ -16,6 +16,12 @@ repositoryLink: https://github.com/aws-ia/ecs-blueprints/tree/main/terraform/far
 license:
   label: Apache 2.0
   link: https://github.com/aws-ia/ecs-blueprints/blob/main/LICENSE
+alternatives:
+  - key: tool
+    value: cloudformation
+    id: public-facing-web-ecs-ec2-cloudformation
+    description: AWS CloudFormation is a YAML based infrastructure as code description. When you deploy a
+                 CloudFormation stack all state is managed inside of your AWS account automatically.
 ---
 
 #### About

@@ -17,6 +17,16 @@ filterDimensions:
 authors:
  - peckn
 date: July 5, 2023
+alternatives:
+  - key: tool
+    value: cdk
+    id: elastic-file-system-ecs-cdk
+    description: AWS Cloud Development Kit is better if you prefer to interact with infrastructure using
+      a programmatic SDK.
+  - key: tool
+    value: cloudformation
+    id: cloudformation-ecs-durable-task-storage-with-efs
+    description: AWS CloudFormation is a YAML format for describing infrastructure as code.
 ---
 
 #### About

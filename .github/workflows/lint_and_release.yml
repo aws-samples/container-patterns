@@ -30,7 +30,7 @@ permissions:
 jobs:
   validate:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    uses: jldeen/infrastructure/.github/workflows/linter.yml@main
+    uses: Project-Gretchen/infrastructure/.github/workflows/linter.yml@main
     with:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
@@ -54,7 +54,7 @@ jobs:
         with:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
-          # GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           append: true
           message: |
             # ${{ github.event.repository.name }} PR Release triggered by ${{ github.event.pull_request.head.user.login }}
@@ -82,11 +82,11 @@ jobs:
         
   deploy:
     needs: [validate, init-deployment]
-    uses: jldeen/infrastructure/.github/workflows/e2e-release.yml@main
+    uses: Project-Gretchen/infrastructure/.github/workflows/e2e-release.yml@main
     with:
       ENVIRONMENT: ${{ needs.init-deployment.outputs.pr-environment || needs.init-deployment.outputs.prod-environment }}
       ENVIRONMENT_ID: ${{ needs.init-deployment.outputs.pr-environment-id || needs.init-deployment.outputs.prod-environment-id }}
-      INFRA_REPO: jldeen/infrastructure
+      INFRA_REPO: Project-Gretchen/infrastructure
       INFRA_REF: 'main'
       PATTERNS_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PATTERNS_REF: ${{ github.event.pull_request.head.ref || 'main' }}
@@ -115,7 +115,9 @@ jobs:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
           append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           message: |
+            ## ✅ Release succeeded
             🔗 **[Link to Preview URL](${{ needs.deploy.outputs.environment_url }})**
       
       - name: Update PR comment for failure
@@ -125,6 +127,7 @@ jobs:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
           append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           message: |
             ## ❌ Release failed
   
@@ -137,6 +140,7 @@ jobs:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
           append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           message: |
             ## ⚠️ PR workflow canceled
   
@@ -169,6 +173,7 @@ jobs:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
           append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           message: |
             ## 📄 PR has been closed.  
             ✅ The Amplify preview environment has been removed. 

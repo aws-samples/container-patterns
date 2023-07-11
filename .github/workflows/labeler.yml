@@ -16,3 +16,4 @@ jobs:
         uses: actions/labeler@v4
         with:
           sync-labels: true
+          repo-token: ${{ secrets.PAT }}

@@ -14,6 +14,15 @@ filterDimensions:
 authors:
   - peckn
 date: May 17, 2023
+alternatives:
+  - key: app
+    value: api
+    id: public-facing-api-ecs-fargate-cloudformation
+    description: An API service with private networking configured.
+  - key: capacity
+    value: ec2
+    id: public-facing-web-ecs-ec2-cloudformation
+    description: Consider EC2 instances for very large deployments.
 ---
 
 #### About

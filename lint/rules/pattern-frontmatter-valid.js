@@ -36,6 +36,13 @@ export default function (state) {
   // Find all matching markdown files
   const markdownFiles = globSync('./pattern/*/index.md');
 
+  // Generate a hash map of all the valid pattern ID's for future usage
+  state.patternsMap = {};
+  for (let file of markdownFiles) {
+    const patternId = file.substring(8, file.length - 9);
+    state.patternsMap[patternId] = true;
+  }
+
   for (let file of markdownFiles) {
     validateFile(file, state);
   }
@@ -119,7 +126,15 @@ function validateFile(filename, state) {
     }
   }
 
-
+  // Now make sure that referenced alternatives actually exist
+  if (frontmatter.alternatives) {
+    for (let alternative of frontmatter.alternatives) {
+      if (!state.patternsMap[alternative.id]) {
+        console.error(`❌ ${filename} alternative pattern '${alternative.id}' was not found, check the pattern ID again`);
+        totalErrors++;
+      }
+    }
+  }
 
   if (totalErrors == 0) {
     console.log(`✅ ${filename} looks good`);

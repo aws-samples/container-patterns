@@ -17,6 +17,15 @@ filterDimensions:
 authors:
  - peckn
 date: Jun 29, 2023
+alternatives:
+  - key: tool
+    value: copilot
+    id: elastic-file-system-aws-copilot
+    description: AWS Copilot is a command line tool for developers that want to go from Dockerfile to deployment without touching infrastructure.
+  - key: tool
+    value: cloudformation
+    id: cloudformation-ecs-durable-task-storage-with-efs
+    description: AWS CloudFormation is a YAML format for describing infrastructure as code.
 ---
 
 #### About

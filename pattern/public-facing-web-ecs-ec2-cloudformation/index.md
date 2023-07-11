@@ -14,6 +14,24 @@ filterDimensions:
 authors:
   - peckn
 date: May 12, 2023
+alternatives:
+  - key: app
+    value: api
+    id: public-facing-api-ecs-ec2-cloudformation
+    description: An API service with private networking configured.
+  - key: capacity
+    value: fargate
+    id: public-facing-web-ecs-fargate-cloudformation
+    description: Consider serverless Fargate capacity for less management overhead.
+  - key: tool
+    value: terraform
+    id: ecs-blueprint-terraform
+    description: Instead of CloudFormation consider deploying with Terraform by HashiCorp
+  - key: tool
+    value: cdk
+    id: advanced-public-facing-service-cdk
+    description: If you don't like writing and managing CloudFormation YAML by hand, try out
+                 AWS Cloud Development Kit
 ---
 
 #### About

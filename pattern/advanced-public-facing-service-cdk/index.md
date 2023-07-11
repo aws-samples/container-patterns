@@ -13,6 +13,13 @@ filterDimensions:
 authors:
   - peckn
 date: Jul 21, 2022
+alternatives:
+  - key: tool
+    value: cloudformation
+    id: public-facing-web-ecs-ec2-cloudformation
+    description: Instead of programmatic generation of CloudFormation YAML,
+                 you can use CloudFormation directly.
+
 ---
 
 #### About

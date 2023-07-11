@@ -39,13 +39,13 @@ jobs:
           token: ${{ secrets.PAT }}
           path: infrastructure
 
-  # validate:
-  #   if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-  #   uses: ./infrastructure/.github/workflows/linter.yml@main
-  #   with:
-  #     PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-  #     PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
-  #   secrets: inherit
+  validate:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    uses: ./infrastructure/.github/workflows/linter.yml
+    with:
+      PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
+    secrets: inherit
 
   # init-deployment:
   #   needs: [validate]

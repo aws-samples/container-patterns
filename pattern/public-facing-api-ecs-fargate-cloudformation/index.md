@@ -14,6 +14,15 @@ filterDimensions:
 authors:
   - peckn
 date: May 18, 2023
+alternatives:
+  - key: app
+    value: website
+    id: public-facing-web-ecs-fargate-cloudformation
+    description: Want to deploy a more public facing website instead?
+  - key: capacity
+    value: ec2
+    id: public-facing-web-ecs-ec2-cloudformation
+    description: Host really large deployments on EC2 instances.
 ---
 
 #### About

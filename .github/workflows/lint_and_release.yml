@@ -28,33 +28,13 @@ permissions:
   contents: read
 
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Infra Repo
-        uses: actions/checkout@v3
-        with:
-          repository: 'project-gretchen/infrastructure'
-          ref: 'main'
-          token: ${{ secrets.PAT }}
-          path: infrastructure
-  
-  test:
-    runs-on: ubuntu-latest
-    needs: [checkout]
-    steps:
-      - name:
-        run: |
-          ls -la
-          ls -la ./infrastructure
-
-  # validate:
-  #   if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-  #   uses: ./infrastructure/.github/workflows/linter.yml
-  #   with:
-  #     PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-  #     PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
-  #   secrets: inherit
+  validate:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    uses: jldeen/actions-templates/linter.yml@main
+    with:
+      PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
+    secrets: inherit
 
   # init-deployment:
   #   needs: [validate]
@@ -102,7 +82,7 @@ jobs:
         
   # deploy:
   #   needs: [validate, init-deployment]
-  #   uses: ./infrastructure/.github/workflows/e2e-release.yml@main
+  #   uses: Project-Gretchen/infrastructure/.github/workflows/e2e-release.yml@main
   #   with:
   #     ENVIRONMENT: ${{ needs.init-deployment.outputs.pr-environment || needs.init-deployment.outputs.prod-environment }}
   #     ENVIRONMENT_ID: ${{ needs.init-deployment.outputs.pr-environment-id || needs.init-deployment.outputs.prod-environment-id }}

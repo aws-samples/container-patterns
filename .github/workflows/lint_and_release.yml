@@ -1,0 +1,182 @@
+name: "Lint and Release"
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/labeler.yml'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request-template.md'
+      - 'README.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/labeler.yml'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request-template.md'
+      - 'README.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+
+permissions:
+  pull-requests: write
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    uses: jldeen/actions-templates/.github/workflows/linter.yml@main
+    with:
+      PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
+
+  init-deployment:
+    needs: [validate]
+    runs-on: ubuntu-latest
+    outputs:
+      # Get pull_request/prod environment if trigger is a PR
+      pr-environment: ${{ steps.pr-environment.outputs.environment }}
+      prod-environment: ${{ steps.prod-environment.outputs.environment }}
+
+      # Get pr-id / main if trigger is merge to main
+      pr-environment-id: ${{ steps.pr-environment.outputs.environment_id }}
+      prod-environment-id: ${{ steps.prod-environment.outputs.environment_id }}
+    steps:
+      - name: Create PR comment
+        if: github.event.pull_request.head.ref != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          append: true
+          message: |
+            # ${{ github.event.repository.name }} PR Release triggered by ${{ github.event.pull_request.head.user.login }}
+
+            👋 Thank you for your PR! Preview environment release has started. This conversation will be updated with a preview URL soon.
+
+            🔗 **[Link to Action run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**
+
+            Commit ref: ${{ github.event.pull_request.head.ref }}
+            Commit sha: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set PR Environment ID
+        id: pr-environment
+        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        run: |
+          echo "environment=pull_request" >> $GITHUB_OUTPUT
+          echo "environment_id=${{ github.event.repository.name }}-${{ github.event.pull_request.id }}" >> $GITHUB_OUTPUT
+
+      - name: Set Main Environment ID
+        id: prod-environment
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "environment=Production" >> $GITHUB_OUTPUT
+          echo "environment_id=main" >> $GITHUB_OUTPUT
+        
+  deploy:
+    needs: [validate, init-deployment]
+    uses: jldeen/actions-templates/.github/workflows/e2e-release.yml@main
+    with:
+      ENVIRONMENT: ${{ needs.init-deployment.outputs.pr-environment || needs.init-deployment.outputs.prod-environment }}
+      ENVIRONMENT_ID: ${{ needs.init-deployment.outputs.pr-environment-id || needs.init-deployment.outputs.prod-environment-id }}
+      INFRA_REPO: Project-Gretchen/infrastructure
+      INFRA_REF: 'main'
+      PATTERNS_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      PATTERNS_REF: ${{ github.event.pull_request.head.ref || 'main' }}
+    secrets:
+      PAT: ${{ secrets.PAT }}
+
+  post-deploy:
+    if: always() && github.event_name == 'pull_request' && github.event.action != 'closed'
+    needs: [validate, deploy]
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the code of this own repo      
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Check called jobs status
+        if: needs.validate.result || needs.deploy.result
+        id: lastJobStatus
+        run: |
+          echo "Testing validate result: ${{ needs.validate.result }}"
+          echo "Testing deploy result: ${{ needs.deploy.result }}"
+
+      - name: Update PR comment for success
+        if: needs.validate.result && needs.deploy.result == 'success'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+          append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          message: |
+            ## ✅ Release succeeded
+            🔗 **[Link to Preview URL](${{ needs.deploy.outputs.environment_url }})**
+      
+      - name: Update PR comment for failure
+        if: needs.validate.result == 'failure' || needs.deploy.result == 'failure'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+          append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          message: |
+            ## ❌ Release failed
+  
+            Please check the logs for details on the error.
+      
+      - name: Update PR comment for cancellation
+        if: needs.validate.result == 'cancelled' || needs.deploy.result == 'cancelled'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+          append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          message: |
+            ## ⚠️ PR workflow canceled
+  
+            The Action has been canceled
+      
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      # Connect to the Isengard account that hosts the site
+      # See: https://github.com/aws-actions/configure-aws-credentials
+      # See Also: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ vars.RELEASE_ROLE }}
+          role-session-name: WebRelease
+          aws-region: us-east-2
+      
+      # Clean up PR Environment
+      - name: 'Destroy CloudFormation stack'
+        run: |
+          aws cloudformation delete-stack \
+          --stack-name ${{ github.event.repository.name }}-${{ github.event.pull_request.id }}-app
+      
+      - name: Update PR comment for close
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
+          number: ${{ github.event.pull_request.number }}
+          append: true
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          message: |
+            ## 📄 PR has been closed.  
+            ✅ The Amplify preview environment has been removed. 
+            ✅ Working branch has been deleted according to policy.

@@ -150,7 +150,7 @@ Now deploy the changes by going back to the terminal running AWS Copilot and ent
 
 #### Hydrate volume
 
-Once the application deploys you can open it's URL in your browser, but all you will see is a 403 Forbidden error. This is because the EFS filesystem starts out empty. Let's fix that.
+Once the application deploys you can open it's URL in your browser, but all you will see is a 403 Forbidden error. This is because the EFS filesystem starts out empty. Let's fix that now.
 
 Use the following command to open a shell to a task from the service:
 

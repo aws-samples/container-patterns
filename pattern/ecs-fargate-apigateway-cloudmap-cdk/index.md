@@ -18,6 +18,8 @@ date: July 17 2023
 
 `ApiGatewayLoadBalancedFargateService` is a L3 construct of AWS Cloud Development Kit(CDK) that allows you to deploy a Fargate service with Amazon API Gateway and pass the traffic through VPC link to the Fargate service running in the VPC private subnets. No application or network load balancer is required. The service discovery capability is achieved by the [AWS Cloud Map](https://aws.amazon.com/cloud-map/) service that comes with ECS [service connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html).
 
+!!! @/pattern/ecs-fargate-apigateway-cloudmap-cdk/diagram.svg
+
 
 #### Setup Cloud Development Kit
 
@@ -72,14 +74,17 @@ Deploy the stack:
 npx cdk deploy
 ```
 
-You will see an `Outputs` section that shows the DNS name of the load balancer that provides ingress to the service. When you load up that URL you should see a random name, and the address of the container instance, similar to this:
-
-```txt
-Catalina (ip-10-0-199-15.us-east-2.compute.internal)
+You will see an `Outputs` section that shows the endpoint URL of the API Gateway. When you load up that URL you should see the nyancat demo animation.
 ```
 
 #### Next Steps
 
+As this sample comes with a L3 construct `ApiGatewayLoadBalancedFargateService`, you can modify the typescript under `files/src` to create your own CDK application and instanciate this contruct with custom properties. For example, if you create your sample app and save as `sample.ts`, run this command in files to deploy your CDK app in `sample.ts`:
+
+```sh
+npx cdk -a 'npx ts-node --prefer-ts-exts src/sample.ts' diff
+npx cdk -a 'npx ts-node --prefer-ts-exts src/sample.ts' deploy
+```
 
 
 #### Clean Up

@@ -1,0 +1,33 @@
+{
+  "name": "ecs-service-extensions-cdk-efs",
+  "version": "1.0.0",
+  "description": "A container application with Elastic File System attached",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com",
+    "organization": true
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^8.10.38",
+    "aws-cdk": "*",
+    "typescript": "~4.6.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.19.0",
+    "constructs": "^10.0.0",
+    "@aws-cdk-containers/ecs-service-extensions": "^2.0.0"
+  },
+  "overrides": {
+    "@aws-cdk-containers/ecs-service-extensions": {
+      "aws-cdk-lib": "2.19.0"
+    }
+  }
+}

@@ -30,9 +30,9 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 
 </tab>
 
-<tab label='tsconfig.json'>
+<tab label='tsconfig.dev.json'>
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/tsconfig.json
+<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/tsconfig.dev.json
 
 </tab>
 
@@ -46,7 +46,7 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 The files above serve the following purpose:
 
 - `package.json` - This file is used by NPM or Yarn to identify and install all the required dependencies:
-- `tsconfig.json` - Configures the TypeScript settings for the project:
+- `tsconfig.dev.json` - Configures the TypeScript settings for the project:
 - `cdk.json` - Tells CDK what command to run, and provides a place to pass other contextual settings to CDK.
 
 Run the following commands to install dependencies and setup your AWS account for the deployment:

@@ -21,7 +21,7 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.19.0",
+    "aws-cdk-lib": "2.80.0",
     "constructs": "^10.0.0",
     "@aws-cdk-containers/ecs-service-extensions": "^2.0.0"
   },

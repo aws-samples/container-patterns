@@ -16,6 +16,6 @@ jobs:
         uses: actions/labeler@v4
         with:
           sync-labels: true
-          repo-token: ${{ secrets.FORK }}
+          # repo-token: ${{ secrets.FORK }}
         env:
           GITHUB_TOKEN: ${{ secrets.FORK }}

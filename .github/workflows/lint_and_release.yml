@@ -35,7 +35,7 @@ jobs:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
     secrets:
-      PAT: ${{ secrets.PAT }}
+      PAT: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
   init-deployment:
     needs: [validate]

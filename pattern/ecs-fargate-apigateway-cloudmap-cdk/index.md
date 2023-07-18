@@ -9,6 +9,10 @@ filterDimensions:
     value: pattern
   - key: app
     value: website
+  - key: capacity
+    value: fargate
+  - key: feature
+    value: service-connect
 authors:
   - pahud
 date: July 17 2023

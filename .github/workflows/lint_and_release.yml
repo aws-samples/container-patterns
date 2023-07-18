@@ -24,6 +24,8 @@ on:
   
   pull_request_target:
 
+  workflow_run:
+
 permissions:
   pull-requests: write
   id-token: write

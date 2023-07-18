@@ -2,7 +2,7 @@
 
 [![](./docs/images/preview.png)](https://containersonaws.com)
 
-This repository hosts the source content for patterns on https://containeronaws.com/
+This repository hosts the source content for patterns on https://containersonaws.com/
 
 If you would like to add your own pattern to the website please read the guide below.
 

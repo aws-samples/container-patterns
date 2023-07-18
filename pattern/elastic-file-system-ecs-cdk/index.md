@@ -26,6 +26,11 @@ alternatives:
     value: cloudformation
     id: cloudformation-ecs-durable-task-storage-with-efs
     description: AWS CloudFormation is a YAML format for describing infrastructure as code.
+  - key: tool
+    value: cdk
+    id: ecs-service-extensions-cdk-efs-volume
+    description: ECS Service Extensions enables smaller, reusable extensions for common
+      configurations such as attaching a durable file system volume.
 ---
 
 #### About

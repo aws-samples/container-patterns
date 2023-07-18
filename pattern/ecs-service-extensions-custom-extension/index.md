@@ -282,3 +282,4 @@ npm run-script cdk destroy
 - Read through the [repository for ECS Service Extensions](https://github.com/cdklabs/cdk-ecs-service-extensions)
 - Check out the [built-in AWS FireLens extension](/ecs-service-extensions-firelens-cdk)
 - See how to use the built-in [HTTP Load balancer extension](/ecs-service-extensions-load-balancer-cdk)
+- See an example of how to [attach an EFS File System volume to a task using ECS Service Extensions](/ecs-service-extensions-cdk-efs-volume)

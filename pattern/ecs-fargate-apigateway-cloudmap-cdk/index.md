@@ -24,6 +24,31 @@ date: July 17 2023
 
 !!! @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/diagram.svg
 
+### Sample
+
+```ts
+const taskDefinition = new ecs.FargateTaskDefinition(stack, 'Task', {
+  memoryLimitMiB: 512,
+  cpu: 256,
+});
+
+taskDefinition.addContainer('nyancat', {
+  image: ecs.ContainerImage.fromRegistry('public.ecr.aws/pahudnet/nyancat-docker-image:latest'),
+  portMappings: [{ containerPort: 80, name: 'default' }],
+  healthCheck: {
+    command: ['CMD-SHELL', 'curl -f http://localhost/ || exit 1'],
+  },
+});
+
+new ApiGatewayLoadBalancedFargateService(stack, 'DemoService', {
+  vpc,
+  cluster,
+  taskDefinition,
+  desiredCount: 2,
+  vpcLinkIntegration: VpcLinkIntegration.CLOUDMAP,
+});
+```
+
 
 #### Setup Cloud Development Kit
 

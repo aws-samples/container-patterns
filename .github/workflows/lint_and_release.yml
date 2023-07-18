@@ -34,7 +34,8 @@ jobs:
     with:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
-    secrets: inherit
+    secrets:
+      PAT: ${{ secrets.FORK }}
 
   init-deployment:
     needs: [validate]

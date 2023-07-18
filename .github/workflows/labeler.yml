@@ -17,3 +17,5 @@ jobs:
         with:
           sync-labels: true
           repo-token: ${{ secrets.FORK }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.FORK }}

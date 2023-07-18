@@ -21,6 +21,8 @@ on:
       - 'README.md'
       - 'CODE_OF_CONDUCT.md'
       - 'CONTRIBUTING.md'
+  
+  pull_request_target:
 
 permissions:
   pull-requests: write

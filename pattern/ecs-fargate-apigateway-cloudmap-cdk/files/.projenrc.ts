@@ -9,15 +9,15 @@ const project = new awscdk.AwsCdkConstructLibrary({
   projenrcTs: true,
   repositoryUrl: 'https://github.com/aws-samples/container-patterns.git',
   deps: [
-    '@aws-cdk/aws-apigatewayv2-alpha@^2.80.0-alpha.0',
-    '@aws-cdk/aws-lambda-python-alpha@^2.80.0-alpha.0',
+    '@aws-cdk/aws-apigatewayv2-alpha@2.80.0-alpha.0',
+    '@aws-cdk/aws-lambda-python-alpha@2.80.0-alpha.0',
   ],
   peerDeps: [
-    '@aws-cdk/aws-apigatewayv2-alpha@^2.80.0-alpha.0',
-    '@aws-cdk/aws-lambda-python-alpha@^2.80.0-alpha.0',
+    '@aws-cdk/aws-apigatewayv2-alpha@2.80.0-alpha.0',
+    '@aws-cdk/aws-lambda-python-alpha@2.80.0-alpha.0',
   ],
   devDeps: [
-    'aws-cdk@^2.80.0',
+    'aws-cdk@2.80.0',
   ],
 });
 

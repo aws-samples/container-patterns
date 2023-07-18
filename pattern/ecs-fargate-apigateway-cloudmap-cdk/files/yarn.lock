@@ -30,12 +30,12 @@
   resolved "https://registry.yarnpkg.com/@aws-cdk/asset-node-proxy-agent-v5/-/asset-node-proxy-agent-v5-2.0.165.tgz#c169599d83beceea7e638082ef9833997f04c85d"
   integrity sha512-bsyLQD/vqXQcc9RDmlM1XqiFNO/yewgVFXmkMcQkndJbmE/jgYkzewwYGrBlfL725hGLQipXq19+jwWwdsXQqg==
 
-"@aws-cdk/aws-apigatewayv2-alpha@^2.80.0-alpha.0":
+"@aws-cdk/aws-apigatewayv2-alpha@2.80.0-alpha.0":
   version "2.80.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-apigatewayv2-alpha/-/aws-apigatewayv2-alpha-2.80.0-alpha.0.tgz#37a1c2ef166aea24bcf58b3efa776511c6b8569a"
   integrity sha512-XBvDiay46ThYP5hoPcwVfzE9egPiwHMGUpVepg6qJ+HQwCmLesbArwurmG2TXcfRbO06uXrAWmWpAqQmh7nstw==
 
-"@aws-cdk/aws-lambda-python-alpha@^2.80.0-alpha.0":
+"@aws-cdk/aws-lambda-python-alpha@2.80.0-alpha.0":
   version "2.80.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda-python-alpha/-/aws-lambda-python-alpha-2.80.0-alpha.0.tgz#7ecdfbf67c826516233a093db353176d8ac4024a"
   integrity sha512-TGyf+0QBDJqX2kfDdDvnNnClghTjVtv1lXbYkbPuZ6qOAziWUQpAcUq65fyO/j9RnDtcmvySiyLxJJqACozD5A==
@@ -1413,10 +1413,10 @@ aws-cdk-lib@2.80.0:
     table "^6.8.1"
     yaml "1.10.2"
 
-aws-cdk@^2.80.0:
-  version "2.87.0"
-  resolved "https://registry.yarnpkg.com/aws-cdk/-/aws-cdk-2.87.0.tgz#916febc4477119b7a6b799001ea890f78043dc92"
-  integrity sha512-dBm74nl3dMUxoAzgjcfKnzJyoVNIV//B1sqDN11cC3LXEflYapcBxPxZHAyGcRXg5dW3m14dMdKVQfmt4N970g==
+aws-cdk@2.80.0:
+  version "2.80.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk/-/aws-cdk-2.80.0.tgz#fef040f2b01df6551fba828a9df350c4c792baba"
+  integrity sha512-SKMZ/sGlNmFV37Lk40HHe4QJ2hJZmD0PrkScBmkr33xzEqjyKhN3jIHC4PYqTUeUK/qYemq3Y5OpXKQuWTCoKA==
   optionalDependencies:
     fsevents "2.3.2"
 

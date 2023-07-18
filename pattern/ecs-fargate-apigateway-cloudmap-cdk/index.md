@@ -20,7 +20,7 @@ date: July 17 2023
 
 #### About
 
-`ApiGatewayLoadBalancedFargateService` is a L3 construct of AWS Cloud Development Kit(CDK) that allows you to deploy a Fargate service with Amazon API Gateway and pass the traffic through VPC link to the Fargate service running in the VPC private subnets. No application or network load balancer is required. The service discovery capability is achieved by the [AWS Cloud Map](https://aws.amazon.com/cloud-map/) service that comes with ECS [service connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html).
+`ApiGatewayLoadBalancedFargateService` is an AWS Cloud Development Kit(CDK) L3 construct that allows you to deploy a web service with Amazon API Gateway and route the traffic through VPC link to the Fargate service running in the VPC private subnets. No application or network load balancer is required. The service discovery capability is provided by the [AWS Cloud Map](https://aws.amazon.com/cloud-map/) service that comes with ECS [service connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html).
 
 !!! @/pattern/ecs-fargate-apigateway-cloudmap-cdk/diagram.svg
 
@@ -83,7 +83,7 @@ You will see an `Outputs` section that shows the endpoint URL of the API Gateway
 
 #### Next Steps
 
-As this sample comes with a L3 construct `ApiGatewayLoadBalancedFargateService`, you can modify the typescript under `files/src` to create your own CDK application and instanciate this contruct with custom properties. For example, if you create your sample app and save as `sample.ts`, run this command in files to deploy your CDK app in `sample.ts`:
+As this sample comes with a L3 construct `ApiGatewayLoadBalancedFargateService`, you can modify the typescript under `files/src` to create your own CDK application using the provided contruct with custom properties. For example, if you create your sample app and save as `sample.ts`, run this command in `files` to deploy your CDK app in `sample.ts`:
 
 ```sh
 npx cdk -a 'npx ts-node --prefer-ts-exts src/sample.ts' diff

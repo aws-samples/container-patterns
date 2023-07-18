@@ -35,7 +35,7 @@ jobs:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}
     secrets:
-      PAT: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+      PAT: ${{ secrets.PAT || secrets.FORK_PAT }}
 
   init-deployment:
     needs: [validate]
@@ -55,7 +55,7 @@ jobs:
         with:
           header: ${{ github.run_id }}-PR_RELEASE-${{ github.event.repository.name }}
           number: ${{ github.event.pull_request.number }}
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT || secrets.FORK_PAT}}
           append: true
           message: |
             # ${{ github.event.repository.name }} PR Release triggered by ${{ github.event.pull_request.head.user.login }}

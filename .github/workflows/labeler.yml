@@ -16,4 +16,4 @@ jobs:
         uses: actions/labeler@v4
         with:
           sync-labels: true
-          repo-token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.PAT || secrets.FORK_PAT }}

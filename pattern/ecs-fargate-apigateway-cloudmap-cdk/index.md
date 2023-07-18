@@ -61,7 +61,7 @@ npx cdk bootstrap
 #### Deploy the sample App
 
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/src/index.default.ts
+<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/src/integ.default.ts
 
 
 ```sh

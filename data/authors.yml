@@ -50,3 +50,13 @@
       uri: https://it20.info/
     - type: github
       uri: https://github.com/mreferre
+
+- id: pahud
+  name: Pahud Hsieh
+  title: Senior SA at AWS
+  image: /pattern/images/authors/pahud.jpg
+  links:
+    - type: twitter
+      uri: https://twitter.com/pahudnet
+    - type: github
+      uri: https://github.com/pahud

@@ -22,7 +22,7 @@ date: July 17 2023
 
 `ApiGatewayLoadBalancedFargateService` is an AWS Cloud Development Kit(CDK) L3 construct that allows you to deploy a web service with Amazon API Gateway and route the traffic through VPC link to the Fargate service running in the VPC private subnets. No application or network load balancer is required. The service discovery capability is provided by the [AWS Cloud Map](https://aws.amazon.com/cloud-map/) service that comes with ECS [service connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html).
 
-!!! @/pattern/ecs-fargate-apigateway-cloudmap-cdk/diagram.svg
+!!! @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/diagram.svg
 
 
 #### Setup Cloud Development Kit

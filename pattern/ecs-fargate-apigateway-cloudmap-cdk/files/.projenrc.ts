@@ -36,7 +36,7 @@ new JsonFile(project, 'cdk.json', {
   },
 });
 
-const common_exclude = ['cdk.out', 'cdk.context.json', 'yarn-error.log', '.github', '.mergify.yml', 'LICENSE', 'README.md'];
+const common_exclude = ['cdk.out', 'cdk.context.json', 'yarn-error.log', '.github', '.mergify.yml', 'LICENSE'];
 project.npmignore?.exclude(...common_exclude);
 project.gitignore.exclude(...common_exclude);
 

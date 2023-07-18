@@ -1,8 +1,3 @@
-# apigateway-patterns
-
-A curated collection of CDK L3 constructs for Amazon API Gateway.
-
-
 # ApiGatewayLoadBalancedFargateService
 
 Amazon API Gateway allows you to integrate with VPC link and route traffic to services in VPC through Cloud Map, Application Load Balancers(ALB) or Network Load Balancers(NLB).
@@ -20,7 +15,7 @@ The default capacity provider strategy for the service is:
 This means the first 2 tasks will always be `FARGATE_SPOT` and 50-50 afterwards. You can customize that in the `capacityProviderStrategies` property.
 
 
-<img src=./images/apig-lb-fargate-service.svg>
+<img src=./diagram.svg>
 
 ## Example
 

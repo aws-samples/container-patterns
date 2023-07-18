@@ -11,7 +11,7 @@ on:
       - 'CODE_OF_CONDUCT.md'
       - 'CONTRIBUTING.md'
 
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, closed]
     branches: [ main ]
     paths-ignore:
@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   validate:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: github.event_name == 'push' || (github.event_name == 'pull_request_target' && github.event.action != 'closed')
     uses: jldeen/actions-templates/.github/workflows/linter.yml@main
     with:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
@@ -48,6 +48,7 @@ jobs:
       # Get pr-id / main if trigger is merge to main
       pr-environment-id: ${{ steps.pr-environment.outputs.environment_id }}
       prod-environment-id: ${{ steps.prod-environment.outputs.environment_id }}
+
     steps:
       - name: Create PR comment
         if: github.event.pull_request.head.ref != ''
@@ -69,7 +70,7 @@ jobs:
 
       - name: Set PR Environment ID
         id: pr-environment
-        if: github.event_name == 'pull_request' && github.event.action != 'closed'
+        if: github.event_name == 'pull_request_target' && github.event.action != 'closed'
         run: |
           echo "environment=pull_request" >> $GITHUB_OUTPUT
           echo "environment_id=${{ github.event.repository.name }}-${{ github.event.pull_request.id }}" >> $GITHUB_OUTPUT
@@ -95,7 +96,7 @@ jobs:
       PAT: ${{ secrets.PAT }}
 
   post-deploy:
-    if: always() && github.event_name == 'pull_request' && github.event.action != 'closed'
+    if: always() && github.event_name == 'pull_request_target' && github.event.action != 'closed'
     needs: [validate, deploy]
     runs-on: ubuntu-latest
     steps:
@@ -149,7 +150,7 @@ jobs:
             The Action has been canceled
       
   close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    if: github.event_name == 'pull_request_target' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:

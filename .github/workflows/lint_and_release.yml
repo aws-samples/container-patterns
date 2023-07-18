@@ -24,7 +24,7 @@ on:
   
   pull_request_target:
 
-  workflow_run:
+  workflow_dispatch:
 
 permissions:
   pull-requests: write

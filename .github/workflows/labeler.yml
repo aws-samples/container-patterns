@@ -3,6 +3,7 @@ name: "Pull Request Labeler"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  pull_request_target:
 
 permissions:
   contents: read
@@ -16,6 +17,6 @@ jobs:
         uses: actions/labeler@v4
         with:
           sync-labels: true
-          # repo-token: ${{ secrets.FORK }}
+          repo-token: ${{ secrets.PAT }}
         env:
           GITHUB_TOKEN: ${{ secrets.FORK }}

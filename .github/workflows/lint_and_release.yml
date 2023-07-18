@@ -30,7 +30,7 @@ permissions:
 jobs:
   validate:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    uses: jldeen/actions-templates/.github/workflows/linter.yml@main
+    uses: jldeen/actions-templates/.github/workflows/linter.yml@test-fork
     with:
       PR_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
       PR_REF: ${{ github.event.pull_request.head.ref || 'main' }}

@@ -88,12 +88,6 @@ You will see an `Outputs` section that shows the DNS name of the load balancer t
 Catalina (ip-10-0-199-15.us-east-2.compute.internal)
 ```
 
-#### Next Steps
-
-* You can use the `ecs.ContainerImage.fromAsset()` SDK call to have Cloud Development Kit automatically build your own local Dockerfile into an image to deploy.
-* Try using [ECS Service Extensions to add the AWS FireLens log router](/ecs-service-extensions-firelens-cdk), for high performance log routing
-* Learn how to [build your own custom ECS Service Extension](/ecs-service-extensions-custom-extension)
-
 #### Clean Up
 
 You can tear down the stack using the following command:
@@ -101,3 +95,10 @@ You can tear down the stack using the following command:
 ```sh
 npm run-script cdk destroy
 ```
+
+#### Next Steps
+
+* You can use the `ecs.ContainerImage.fromAsset()` SDK call to have Cloud Development Kit automatically build your own local Dockerfile into an image to deploy.
+* Try using [ECS Service Extensions to add the AWS FireLens log router](/ecs-service-extensions-firelens-cdk), for high performance log routing
+* Learn how to [build your own custom ECS Service Extension](/ecs-service-extensions-custom-extension)
+* Instead of building static content into the image consider using a dynamic [EFS File System volume to web content across multiple tasks](/ecs-service-extensions-cdk-efs-volume)

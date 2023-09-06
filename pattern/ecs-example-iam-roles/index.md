@@ -1,7 +1,8 @@
 ---
 title: Example IAM task execution roles for ECS and Fargate
 description: >-
-  IAM statements for ECS task execution roles
+  IAM policies for the ECS task execution role. Guidance on ECS task execution
+  best practices.
 filterDimensions:
   - key: tool
     value: cloudformation

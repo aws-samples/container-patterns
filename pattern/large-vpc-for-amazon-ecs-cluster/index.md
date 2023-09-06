@@ -44,7 +44,7 @@ For this example VPC the following table shows subnet support for internet acces
 | ---------------- | ------------------------ | ------------------ |
 | EC2 Bridge mode  | ✅      | ✅  |
 | EC2 Host mode  | ✅       | ✅  |
-| EC2 AWS VPC | ✅        | ✅   |
+| EC2 AWS VPC | ✅        |  ❌ (not supported, EC2 tasks don't have public IP's)  |
 | Fargate AWS VPC | ✅  | ❗ (requires assign public IP) |
 
 ::: danger

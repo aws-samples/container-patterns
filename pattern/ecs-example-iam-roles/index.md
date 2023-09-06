@@ -23,7 +23,7 @@ To better understand the relationship between these two roles consider the follo
 
 The task execution role is used at the host level, by the ECS agent. The ECS agent uses the role to set up an execution environment for your container. The task role is used inside of the container, by your own code which is running inside of the container.
 
-### Starter ECS task execution role
+#### Starter ECS task execution role
 
 AWS provides an example managed policy for starting out. You can access this AWS managed policy via its name `AmazonECSTaskExecutionRolePolicy`. It contains the following statements:
 
@@ -69,7 +69,7 @@ You can use this starter policy by attaching it to a role. For example in CloudF
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 ```
 
-### Minimal surface area task execution role
+#### Minimal surface area task execution role
 
 The basic starter task execution role limits the types of actions that ECS can do, but does not
 impose any additional limits on the destinations for those actions. You may wish to further limit
@@ -87,7 +87,7 @@ For example:
         "ecr:GetDownloadUrlForLayer",
         "ecr:BatchGetImage"
       ],
-      "Resource": "arn:aws:ecr:us-west-1:209640446841:repository/my-repo/my-tag",
+      "Resource": "arn:aws:ecr:us-west-1:209640446841:repository/my-repo/*",
       "Effect": "Allow"
     },
     {
@@ -109,8 +109,29 @@ For example:
 
 The IAM policy above shows how you can limit ECS so that it can only download a specific image from ECR, and it can only upload logs to a specific log group.
 
-### One shared task execution policy, or task execution policy per task?
+#### Turning on additional Amazon ECS features
+
+The default `AmazonECSTaskExecutionRolePolicy` task execution policy does not enable every feature of Amazon ECS. In specific there are several additional features you may wish to enable:
+
+* [Task execution policy for attaching secrets in AWS Secret Manager](/task-execution-iam-role-secrets-manager)
+* [Task execution policy for attaching an AWS Elastic File System](/task-execution-iam-role-efs)
+
+#### Should you use a shared task execution policy?
 
 When deciding whether to limit the surface area of a task exeuction policy, you must also decide whether
-you want to create a single shared task execution policy that is used for launching all tasks, or whether
-you want each task to have its own unique task execution policy.
+you want to create a single shared task execution policy that is used for launching multiple types of tasks, or whether you want each task to have its own unique task execution policy. There are advantages and disadvantages in both approaches.
+
+A single shared task execution role can be very convenient and easy to understand when getting started.
+However the shared task execution will need to be able to access a wider range of AWS resources. You can use a broad role like `AmazonECSTaskExecutionRolePolicy` which does not limit the resource ARN's of images or log groups. Or you can choose to have your shared task role enumerate a list of images and log groups.
+
+The advantage of giving each type of task its own dedicated task execution role is that it allows you to
+build fine grained access permissions for each type of task. ECS will use the appropriate level of access for
+each task, and will only have permission to do exactly what it needs to do in that moment, and nothing more.
+However, this will be more complicated to build out, and will require ongoing updates in the future if you decide
+to turn on new features or make changes to images.
+
+In general, it is better to use per task execution roles if you are running multiple tasks that have their own secrets. For example, you can have a task execution role for your API service which allows it to fetch the database password, but run another service that has no access to the database password secret.
+
+#### See Also
+
+- More info on [ECS task execution roles in the official AWS documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)

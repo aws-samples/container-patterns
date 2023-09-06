@@ -31,6 +31,7 @@ date: Sep 6 2023
 The following CloudFormation example shows how to write a task execution role for Amazon Elastic File System (ECS) which allows ECS to mount an Elastic File System to a task.
 
 ```yaml
+# Base task execution role
 TaskExecutionRole:
   Type: AWS::IAM::Role
   Properties:
@@ -43,18 +44,24 @@ TaskExecutionRole:
           Action: sts:AssumeRole
     ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-    Policies:
-      - PolicyName: EFSAccess
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - elasticfilesystem:ClientMount
-                - elasticfilesystem:ClientWrite
-                - elasticfilesystem:DescribeMountTargets
-                - elasticfilesystem:DescribeFileSystems
-              Resource: !GetAtt EFSFileSystem.Arn
+
+# Grant additional ability to access Elastic File System
+TaskAccessToEFS:
+  Type: AWS::IAM::Policy
+  Properties:
+    Roles:
+      - !Ref TaskExecutionRole
+    PolicyName: AccessSecret
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Action:
+            - elasticfilesystem:ClientMount
+            - elasticfilesystem:ClientWrite
+            - elasticfilesystem:DescribeMountTargets
+            - elasticfilesystem:DescribeFileSystems
+          Resource: !GetAtt EFSFileSystem.Arn
 ```
 
 This role starts out based on the default `AmazonECSTaskExecutionRolePolicy` managed policy provided by

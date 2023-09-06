@@ -172,7 +172,7 @@ Resources:
           Action: ['sts:AssumeRole']
       Path: /
 
-      # This role enables all features of ECS. See reference:
+      # This role enables basic features of ECS. See reference:
       # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonECSTaskExecutionRolePolicy
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy

@@ -23,7 +23,7 @@
   "dependencies": {
     "aws-cdk-lib": "2.19.0",
     "constructs": "^10.0.0",
-    "@aws-cdk-containers/ecs-service-extensions": "^2.0.0"
+    "@aws-cdk-containers/ecs-service-extensions": "^2.0.1-alpha.145"
   },
   "overrides": {
     "@aws-cdk-containers/ecs-service-extensions": {

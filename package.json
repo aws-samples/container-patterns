@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "author": "peckn@amazon.com",
   "scripts": {
-    "lint": "node lint"
+    "postinstall": "pip install cfn-lint",
+    "lint": "node lint && echo \"Linting CloudFormation with cfn-lint\" && cfn-lint"
   },
   "type": "module",
   "dependencies": {

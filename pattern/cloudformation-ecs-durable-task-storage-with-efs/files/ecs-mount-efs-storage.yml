@@ -124,7 +124,6 @@ Resources:
   # to mount the Elastic File System into the container
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
-    UpdateReplacePolicy: Retain
     Properties:
       Family: my-ecs-task
       TaskRoleArn: !GetAtt TaskRole.Arn

@@ -71,7 +71,7 @@ Resources:
           Memory: !Ref ContainerMemory
           Image: !Ref ImageUrl
           PortMappings:
-            - ContainerPort: 80
+            - ContainerPort: !Ref ContainerPort
               HostPort: 0 # Dynamic port mapping to random port from ephemeral range
           LogConfiguration:
             LogDriver: 'awslogs'
@@ -107,7 +107,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
         - ContainerName: !Ref ServiceName
-          ContainerPort: 80
+          ContainerPort: !Ref ContainerPort
           TargetGroupArn: !Ref ServiceTargetGroup
 
   # Keeps track of the list of tasks for the service
@@ -120,7 +120,7 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       TargetType: instance
-      Port: 80 # Port will be ignored in this case because of bridge networking mode
+      Port:  !Ref ContainerPort # Port will be ignored in this case because of bridge networking mode
       Protocol: HTTP
       UnhealthyThresholdCount: 10
       VpcId: !Ref VpcId
@@ -151,8 +151,6 @@ Resources:
         - !Ref PublicLoadBalancerSG
   PublicLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
-    DependsOn:
-      - PublicLoadBalancer
     Properties:
       DefaultActions:
         - Type: 'forward'

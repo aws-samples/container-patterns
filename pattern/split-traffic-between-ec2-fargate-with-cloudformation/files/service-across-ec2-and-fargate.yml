@@ -34,7 +34,7 @@ Resources:
       RequiresCompatibilities:
         - EC2
         - FARGATE
-      ExecutionRoleArn: !Ref TaskExecutionRole
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       NetworkMode: awsvpc
       Cpu: 256
       Memory: 512
@@ -161,8 +161,6 @@ Resources:
         - !Ref PublicLoadBalancerSG
   PublicLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
-    DependsOn:
-      - PublicLoadBalancer
     Properties:
       DefaultActions:
         - Type: 'forward'

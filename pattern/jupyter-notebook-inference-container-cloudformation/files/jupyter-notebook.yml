@@ -243,8 +243,6 @@ Resources:
         - !Ref PublicLoadBalancerSG
   PublicLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
-    DependsOn:
-      - PublicLoadBalancer
     Properties:
       DefaultActions:
         - Type: 'forward'

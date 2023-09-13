@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "author": "peckn@amazon.com",
   "scripts": {
-    "postinstall": "pip install cfn-lint",
     "lint": "./lint.sh"
   },
   "type": "module",

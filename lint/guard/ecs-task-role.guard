@@ -1,0 +1,27 @@
+#
+# The following rule ensures that all ECS task roles are
+# protected from the "confused deputy" attack. From the docs:
+# When creating your task IAM role, it is recommended that you use
+# the aws:SourceAccount or aws:SourceArn condition keys in either
+# the trust relationship or the IAM policy associated with the role
+# to prevent the confused deputy security issue.
+# To learn more about the confused deputy problem and how to protect your
+# AWS account, see The confused deputy problem in the IAM User Guide.
+# https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html
+#
+rule ecs_task_role_trust_policy_condition {
+  Resources.*[
+    Type == 'AWS::IAM::Role'
+    some Properties.AssumeRolePolicyDocument.Statement[*] {
+      some Principal.Service[*] == 'ecs-tasks.amazonaws.com'
+    }
+  ].Properties.AssumeRolePolicyDocument.Statement[0].Condition == {
+      "ArnLike":{
+        "aws:SourceArn":{
+          "Fn::Sub":"arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*"
+        }
+      },
+      "StringEquals": {"aws:SourceAccount":{"Ref":"AWS::AccountId"}
+    }
+  }
+}

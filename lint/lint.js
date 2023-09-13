@@ -1,9 +1,9 @@
-import authorsYamlValid from './lint/rules/authors-yaml-valid.js';
-import filtersYamlValid from './lint/rules/filters-yaml-valid.js';
-import filterGroupsYamlValid from './lint/rules/filter-groups-yaml-valid.js';
-import filterGroupingCoherent from './lint/rules/filter-grouping-coherent.js';
-import patternFrontmatterValid from './lint/rules/pattern-frontmatter-valid.js';
-import authorFrontmatterValid from './lint/rules/author-frontmatter-valid.js';
+import authorsYamlValid from './rules/authors-yaml-valid.js';
+import filtersYamlValid from './rules/filters-yaml-valid.js';
+import filterGroupsYamlValid from './rules/filter-groups-yaml-valid.js';
+import filterGroupingCoherent from './rules/filter-grouping-coherent.js';
+import patternFrontmatterValid from './rules/pattern-frontmatter-valid.js';
+import authorFrontmatterValid from './rules/author-frontmatter-valid.js';
 
 const state = {
   errors: 0

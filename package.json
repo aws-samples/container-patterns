@@ -4,7 +4,7 @@
   "author": "peckn@amazon.com",
   "scripts": {
     "postinstall": "pip install cfn-lint",
-    "lint": "node lint && echo \"Linting CloudFormation with cfn-lint\" && cfn-lint"
+    "lint": "./lint.sh"
   },
   "type": "module",
   "dependencies": {

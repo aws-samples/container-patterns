@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "peckn@amazon.com",
   "scripts": {
-    "lint": "node lint"
+    "lint": "./lint.sh"
   },
   "type": "module",
   "dependencies": {

@@ -67,8 +67,8 @@ Resources:
           Memory: !Ref ContainerMemory
           Image: !Ref ImageUrl
           PortMappings:
-            - ContainerPort: 80
-              HostPort: 80
+            - ContainerPort: !Ref ContainerPort
+              HostPort: !Ref ContainerPort
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:
@@ -108,7 +108,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
         - ContainerName: !Ref ServiceName
-          ContainerPort: 80
+          ContainerPort: !Ref ContainerPort
           TargetGroupArn: !Ref ServiceTargetGroup
 
   # Security group that limits network access
@@ -129,7 +129,7 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       TargetType: ip
-      Port: 80
+      Port: !Ref ContainerPort
       Protocol: HTTP
       UnhealthyThresholdCount: 10
       VpcId: !Ref VpcId
@@ -163,8 +163,6 @@ Resources:
         - !Ref PrivateLoadBalancerSG
   PrivateLoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
-    DependsOn:
-      - PrivateLoadBalancer
     Properties:
       DefaultActions:
         - Type: 'forward'

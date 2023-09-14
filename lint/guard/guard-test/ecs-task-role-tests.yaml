@@ -1,0 +1,45 @@
+---
+- name: ECS Role Trust Policy with protective conditions should pass
+  input:
+    Resources:
+      ECSTaskExecutionRole:
+        Type: AWS::IAM::Role
+        Properties:
+          AssumeRolePolicyDocument:
+            Statement:
+              - Effect: Allow
+                Principal:
+                  Service: [ecs-tasks.amazonaws.com]
+                Action: ['sts:AssumeRole']
+                Condition:
+                  ArnLike:
+                    aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+                  StringEquals:
+                    aws:SourceAccount: !Ref AWS::AccountId
+          Path: /
+          ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  expectations:
+    rules:
+      ecs_task_role_trust_policy_condition: PASS
+
+- name: ECS Role Trust Policy with no protective conditions should fail
+  input:
+    Resources:
+      ECSTaskExecutionRole:
+        Type: AWS::IAM::Role
+        Properties:
+          AssumeRolePolicyDocument:
+            Statement:
+              - Effect: Allow
+                Principal:
+                  Service: [ecs-tasks.amazonaws.com]
+                Action: ['sts:AssumeRole']
+          Path: /
+          ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  expectations:
+     rules:
+       ecs_task_role_trust_policy_condition: FAIL

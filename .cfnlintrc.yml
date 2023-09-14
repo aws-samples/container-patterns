@@ -1,0 +1,10 @@
+templates:
+  # Target all YAML files in all patterns
+  - ./pattern/**/files/*.yml
+ignore_templates:
+  # Pulumi patterns have some YAML that is not CloudFormation
+  - ./pattern/pulumi**/files/*.yml
+ignore_checks:
+  # See https://github.com/aws-cloudformation/cfn-lint/blob/main/docs/rules.md for
+  # a mapping of descriptions of the rules
+  - W3002

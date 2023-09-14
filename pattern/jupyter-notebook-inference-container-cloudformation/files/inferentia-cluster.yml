@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ECS Cluster optimized for machine learning inference workloads
 Parameters:
   InstanceType:
-    Description: Inferentia Instance Type
     Type: String
     Default: inf2.8xlarge
     Description: Class of AWS Inferentia instance used to run containers.
@@ -18,7 +17,6 @@ Parameters:
     Default: '2'
     Description: Maximum number of instances that can be launched in your ECS cluster.
   ECSAMI:
-    Description: AMI ID
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ecs/optimized-ami/amazon-linux-2/inf/recommended/image_id
     Description: The Amazon Machine Image ID used for the cluster, leave it as the default value to get the latest Inferentia optimized AMI
@@ -161,10 +159,15 @@ Resources:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-        - Effect: Allow
-          Principal:
-            Service: [ecs-tasks.amazonaws.com]
-          Action: ['sts:AssumeRole']
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
       Path: /
 
       # This role enables basic features of ECS. See reference:

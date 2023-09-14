@@ -4,10 +4,10 @@ Description: This template deploys an Amazon EventBridge rule that captures
 
 Parameters:
   ServiceName:
-    Type: string
+    Type: String
     Description: The name of the ECS service that you would like to capture events from
   ServiceArn:
-    Type: string
+    Type: String
     Description: The full ARN of the service that you would like to capture events from
 
 Resources:
@@ -67,4 +67,4 @@ Resources:
             }
           ]
         }
-      - { LogArn: !GetAtt ServiceEventLog.Arn, RuleArn: !GetAtt CaptureServiceDeploymentEvents.Arn}
+      - { LogArn: !GetAtt ServiceEventLog.Arn }

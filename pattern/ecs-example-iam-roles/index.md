@@ -55,20 +55,7 @@ These statements authorize the ECS agent running on a host to do the following t
 
 You can use this starter policy by attaching it to a role. For example in CloudFormation:
 
-```yaml
-  ECSTaskExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [ecs-tasks.amazonaws.com]
-          Action: ['sts:AssumeRole']
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-```
+<<< @/pattern/ecs-example-iam-roles/files/ecs-task-execution-role.yml
 
 #### Minimal surface area task execution role
 

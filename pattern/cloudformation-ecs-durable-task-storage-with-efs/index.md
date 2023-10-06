@@ -45,7 +45,7 @@ The template begins with defining parameters that will be passed into the CloudF
 
 - `VpcId` - A virtual private cloud ID. This can be the default VPC that comes with your AWS account. Example value: `vpc-79508710`
 - `SubnetOne` - A public subnet inside of that VPC. Example value: `subnet-b4676dfe`
-- `SubnetTwo` - Another public subnet isnide of that VPC. Example value: `subnet-c71ebfae`
+- `SubnetTwo` - Another public subnet inside of that VPC. Example value: `subnet-c71ebfae`
 
 ::: tip
 When using the CloudFormation web console it will suggest appropriate parameter values in the drop down on each parameter field, if you are not certain what to enter for each parameter.

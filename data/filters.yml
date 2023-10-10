@@ -81,6 +81,11 @@
   color: "#885b4f"
   checked: false
 - key: feature
+  value: cloudmap
+  label: AWS Cloud Map
+  color: "#885b4f"
+  checked: false
+- key: feature
   value: exec
   label: ECS Exec
   color: "#885b4f"

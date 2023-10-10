@@ -5,19 +5,15 @@ import fetch from 'node-fetch';
 import retry from 'async-retry';
 import { Resolver } from 'node:dns/promises'
 const resolver = new Resolver();
+const app = express()
 
 const HOSTNAME = os.hostname();
-
 const PORT = process.env.PORT || 3000;
 const NAME_SERVER = process.env.NAME_SERVER;
-
 const NAME_URL = url.parse(NAME_SERVER);
-
 if (!NAME_SERVER) {
   throw new Error('Expected environment variable NAME_SERVER');
 }
-
-const app = express()
 
 // Logic for looking up the DNS based service discovery record
 // and selecting a random record from it.

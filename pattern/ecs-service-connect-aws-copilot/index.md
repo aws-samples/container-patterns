@@ -14,6 +14,13 @@ filterDimensions:
 authors:
   - peckn
 date: April 21 2023
+alternatives:
+  - key: feature
+    value: cloudmap
+    id: service-discovery-fargate-microservice-cloud-map
+    description: Cloud Map based service discovery gives you a more direct, more customizable way to do direct
+      peer to peer communciations between containers. Although more complex to use, you may prefer Cloud Map
+      based service discovery if you want more control over retry behaviors and traffic shaping and routing.
 ---
 
 #### About

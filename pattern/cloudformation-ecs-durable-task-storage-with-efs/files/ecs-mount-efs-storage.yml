@@ -13,7 +13,7 @@ Parameters:
                  EFS access
   SubnetTwo:
     Type: AWS::EC2::Subnet::Id
-    Description: The first subnet across which to distribute the application and
+    Description: The second subnet across which to distribute the application and
                  EFS access
 
 Resources:

@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys an AWS Fargate service discovery example.
+
+Resources:
+
+  # The networking configuration. This creates an isolated
+  # network specific to this particular environment
+  VpcStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: vpc.yml
+
+  # This stack contains the Amazon ECS cluster itself
+  ClusterStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: cluster.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+
+  # Deploy the name server as a service
+  NameService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: name.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
+        ServiceDiscoveryNamespaceId: !GetAtt ClusterStack.Outputs.ServiceDiscoveryNamespaceId
+
+  # Deploy the hello server as a service
+  HelloService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: hello.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        PublicSubnetIds: !GetAtt VpcStack.Outputs.PublicSubnetIds
+        PrivateSubnetIds: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
+        NameServiceSecurityGroup: !GetAtt NameService.Outputs.ServiceSecurityGroup

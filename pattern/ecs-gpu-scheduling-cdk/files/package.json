@@ -16,12 +16,12 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^8.10.38",
-    "aws-cdk": "*",
+    "aws-cdk": "2.102.0",
     "typescript": "~4.6.0",
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.0.0",
+    "aws-cdk-lib": "2.102.0",
     "constructs": "^10.0.0"
   }
 }

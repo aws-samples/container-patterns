@@ -125,6 +125,6 @@ Outputs:
   ServiceSecurityGroup:
     Description: The security group of the service
     Value: !Ref ServiceSecurityGroup
-  ServiceDiscoveryService:
+  ServiceDiscoveryServiceArn:
     Description: ARN of the CloudMap service
     Value: !GetAtt ServiceDiscoveryService.Arn

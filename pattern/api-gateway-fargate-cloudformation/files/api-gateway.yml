@@ -11,6 +11,9 @@ Parameters:
   ServiceSecurityGroup:
     Type: String
     Description: The service's security group
+  ServiceDiscoveryServiceArn:
+    Type: String
+    Description: The ARN of the service's Cloud Map service
 
 Resources:
 
@@ -20,12 +23,6 @@ Resources:
     Properties:
       Name: fargate-api-gateway
       ProtocolType: HTTP
-
-  #ApiGatewayRoute:
-  #  Type: AWS::ApiGatewayV2::Route
-  #  Properties:
-  #    ApiId: !Ref ApiGateway
-  #    RouteKey:
 
   # This allows the AWS managed API Gateway to
   # communicate to resources inside of your own VPC
@@ -45,7 +42,39 @@ Resources:
       ConnectionId: !Ref ApiGatewayVpcLink
       ConnectionType: VPC_LINK
       IntegrationType: HTTP_PROXY
-      IntegrationUri: http://web.internal:3000
+      IntegrationUri: !Ref ServiceDiscoveryServiceArn
+      PayloadFormatVersion: 1.0
+      IntegrationMethod: ANY
+
+  # An API gateway stage (production)
+  ApiGatewayStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ApiGateway
+      StageName: "$default"
+      AutoDeploy: true
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: true
+      AccessLogSettings:
+        DestinationArn: !GetAtt LogGroup.Arn
+        Format: >-
+          {"requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller",
+          "user":"$context.identity.user","requestTime":"$context.requestTime",
+          "routeKey":"$context.routeKey",
+          "status":"$context.status"}
+
+  # The route that sends traffic to the integration
+  ApiGatewayRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: "$default"
+      Target: !Sub "integrations/${ApiGatewayVpcLinkIntegration}"
+
+  # This log group stores the access logs from the API Gateway
+  LogGroup:
+    Type: AWS::Logs::LogGroup
 
   # This security group is used by the VPC link, so that
   # you can control which resources in the VPC the VPC link is
@@ -62,51 +91,7 @@ Resources:
   ServiceIngressFromApiGateway:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow API Gateway to communiate to the service
+      Description: Allow API Gateway to communicate to the service
       GroupId: !Ref ServiceSecurityGroup
-      FromPort: 3000
-      ToPort: 3000
       IpProtocol: -1
       SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
-
-#   RootMethodGet:
-#     Type: AWS::ApiGateway::Method
-#     Properties:
-#       RestApiId: !Ref AppApi
-#       ResourceId: !GetAtt AppApi.RootResourceId
-#       HttpMethod: GET
-#       AuthorizationType: NONE
-#       Integration:
-#         Type: HTTP_PROXY
-#         ConnectionType: VPC_LINK
-#         IntegrationHttpMethod: GET
-#         ConnectionId: !Ref VPCLinkRestNlbInternal
-#         Uri: !Sub http://${NlbInternalDns}
-
-#   Deployment:
-#     Type: AWS::ApiGateway::Deployment
-#     DependsOn:
-#     - RootMethodGet
-#     Properties:
-#       RestApiId: !Ref AppApi
-
-#   Stage:
-#     Type: AWS::ApiGateway::Stage
-#     Properties:
-#       StageName: Prod
-#       RestApiId: !Ref AppApi
-#       DeploymentId: !Ref Deployment
-
-#   VPCLinkRestNlbInternal:
-#     Type: AWS::ApiGateway::VpcLink
-#     Properties:
-#       Name: VPCLinkRestNlbInternal
-#       TargetArns:
-#         - !Ref NlbInternalArn
-
-# Outputs:
-
-#   # API Gateway endpoint to be used during tests
-#   AppApiEndpoint:
-#     Description: API Endpoint
-#     Value: !Sub "https://${AppApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

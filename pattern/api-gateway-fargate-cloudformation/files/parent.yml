@@ -42,3 +42,4 @@ Resources:
         VpcId: !GetAtt VpcStack.Outputs.VpcId
         PublicSubnetIds: !GetAtt VpcStack.Outputs.PublicSubnetIds
         ServiceSecurityGroup: !GetAtt ServiceStack.Outputs.ServiceSecurityGroup
+        ServiceDiscoveryServiceArn: !GetAtt ServiceStack.Outputs.ServiceDiscoveryServiceArn

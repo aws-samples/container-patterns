@@ -45,7 +45,7 @@ The following diagram shows the architecture that will be deployed:
 :::tip
 API Gateway pricing has no minimum fees or upfront commitments. Instead you pay per API call you receive, and for the amount of outgoing data. This makes API Gateway less expensive than Application Load Balancer for many low traffic applications.
 
-On the other hand if your server side application receives a very large number of small API calls from a large number of connected clients, then you may find the [Application Load Balancer pattern for AWS Fargate](public-facing-web-ecs-fargate-cloudformation) to be more cost efficient. Application Load Balancer has a constantly hourly charge that gives it a higher baseline cost, but the ALB can handle a large number of requests at a lower per request added cost.
+On the other hand if your server side application receives a very large number of small API calls from a large number of connected clients, then you may find the [Application Load Balancer pattern for AWS Fargate](public-facing-web-ecs-fargate-cloudformation) to be more cost efficient. Application Load Balancer has a constant hourly charge that gives it a higher baseline cost, but the ALB can handle a large number of requests at a lower per request added cost.
 :::
 
 #### Dependencies

@@ -95,3 +95,8 @@ Resources:
       GroupId: !Ref ServiceSecurityGroup
       IpProtocol: -1
       SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+
+Outputs:
+  ApiGatewayUri:
+    Description: The URI at which you can send traffic to your Fargate service
+    Value: !GetAtt ApiGateway.ApiEndpoint

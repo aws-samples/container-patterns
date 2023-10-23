@@ -23,6 +23,10 @@ alternatives:
     value: ec2
     id: public-facing-web-ecs-ec2-cloudformation
     description: Consider EC2 instances for very large deployments.
+  - key: app
+    value: website
+    id: api-gateway-fargate-cloudformation
+    description: Application Load Balancer has a constant hourly charge that gives it a relatively higher baseline cost. If you have a very low traffic service you may prefer to use API Gateway as a serverless ingress with no baseline cost, just per request, pay as you go pricing.
 ---
 
 #### About
@@ -56,6 +60,12 @@ All resources run in a public subnet of the VPC. This means there is no NAT gate
 AWS Fargate provisions Elastic Network Interfaces (ENIs) for each task. The ENI has both a public and a private IP address. This allows the task to initiate outbound communications directly to the internet via the VPC's internet gateway.
 
 In order to protect the task from unauthorized inbound access it has a security group which is configured to reject all inbound traffic that did not originate from the security group of the load balancer.
+
+:::tip
+Application Load Balancer has a constant hourly charge, which gives it a baseline cost, even if your application receives no traffic.
+
+If you expect your website to receive very low traffic, or intermittent traffic, then you may prefer to use the [API Gateway pattern for AWS Fargate](api-gateway-fargate-cloudformation). Amazon API Gateway charges per request, with no minimum fee. However, this can add up to a higher per request cost if you do receive large amounts of traffic.
+:::
 
 #### Dependencies
 

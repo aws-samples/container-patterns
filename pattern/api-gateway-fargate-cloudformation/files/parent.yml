@@ -1,8 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Parent stack that deploys VPC, Amazon ECS cluster for AWS Fargate,
-             and a serverless Amazon ECS service deployment that hosts
-             the task containers on AWS Fargate
+             a serverless Amazon ECS service deployment that hosts
+             the task containers on AWS Fargate, and an API Gateway that forwards
+             traffic to the deployed containers.
 
 Resources:
 
@@ -43,3 +44,9 @@ Resources:
         PublicSubnetIds: !GetAtt VpcStack.Outputs.PublicSubnetIds
         ServiceSecurityGroup: !GetAtt ServiceStack.Outputs.ServiceSecurityGroup
         ServiceDiscoveryServiceArn: !GetAtt ServiceStack.Outputs.ServiceDiscoveryServiceArn
+
+# The public facing URI of the deployed service
+Outputs:
+  ApiGatewayUri:
+    Description: The URI at which you can send traffic to your Fargate service
+    Value: !GetAtt ApiGatewayStack.Outputs.ApiGatewayUri

@@ -55,6 +55,12 @@ The public facing subnet hosts a couple resources:
 - Public facing load balancer: Accepts inbound connections on specific ports, and forwards acceptable traffic to resources inside the private subnet.
 - NAT gateway: A networking bridge to allow resources inside the private subnet to initiate outbound communications to the internet, while not allowing inbound connections.
 
+:::tip
+Application Load Balancer has a constant hourly charge, which gives it a baseline cost, even if your application receives no traffic.
+
+If you expect your API to receive very low traffic, or intermittent traffic, then you may prefer to use the [API Gateway pattern for AWS Fargate](api-gateway-fargate-cloudformation). Amazon API Gateway charges per request, with no minimum fee. However, this can add up to a higher per request cost if you do receive large amounts of traffic.
+:::
+
 #### Dependencies
 
 This pattern requires that you have an AWS account, and that you use AWS Serverless Application Model (SAM) CLI. If not already installed then please [install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) for your system.

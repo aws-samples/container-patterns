@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy an API Gateway ingress for an AWS Fargate hosted service
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  PublicSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of public subnet ID's to put the API gateway link in
+  ServiceSecurityGroup:
+    Type: String
+    Description: The service's security group
+  ServiceDiscoveryServiceArn:
+    Type: String
+    Description: The ARN of the service's Cloud Map service
+
+Resources:
+
+  # The API Gateway itself
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: fargate-api-gateway
+      ProtocolType: HTTP
+
+  # This allows the AWS managed API Gateway to
+  # communicate to resources inside of your own VPC
+  ApiGatewayVpcLink:
+    Type: AWS::ApiGatewayV2::VpcLink
+    Properties:
+      Name: fargate-vpc-link
+      SecurityGroupIds:
+        - !Ref ApiGatewaySecurityGroup
+      SubnetIds: !Ref PublicSubnetIds
+
+  # Setup the integration between the API Gateway and the VPC Link
+  ApiGatewayVpcLinkIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGateway
+      ConnectionId: !Ref ApiGatewayVpcLink
+      ConnectionType: VPC_LINK
+      IntegrationType: HTTP_PROXY
+      IntegrationUri: !Ref ServiceDiscoveryServiceArn
+      PayloadFormatVersion: 1.0
+      IntegrationMethod: ANY
+
+  # An API gateway stage (production)
+  ApiGatewayStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ApiGateway
+      StageName: "$default"
+      AutoDeploy: true
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: true
+      AccessLogSettings:
+        DestinationArn: !GetAtt LogGroup.Arn
+        Format: >-
+          {"requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller",
+          "user":"$context.identity.user","requestTime":"$context.requestTime",
+          "routeKey":"$context.routeKey",
+          "status":"$context.status"}
+
+  # The route that sends traffic to the integration
+  ApiGatewayRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: "$default"
+      Target: !Sub "integrations/${ApiGatewayVpcLinkIntegration}"
+
+  # This log group stores the access logs from the API Gateway
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+
+  # This security group is used by the VPC link, so that
+  # you can control which resources in the VPC the VPC link is
+  # allowed to communicate with.
+  ApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API gateway
+      VpcId: !Ref VpcId
+
+  # Configure the security group of the service to accept
+  # inbound traffic originating from the security group of
+  # the API gateway's VPC link
+  ServiceIngressFromApiGateway:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow API Gateway to communicate to the service
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+
+Outputs:
+  ApiGatewayUri:
+    Description: The URI at which you can send traffic to your Fargate service
+    Value: !GetAtt ApiGateway.ApiEndpoint

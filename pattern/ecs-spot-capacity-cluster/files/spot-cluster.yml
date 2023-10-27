@@ -81,7 +81,7 @@ Resources:
       MinSize: 0
       MaxSize: !Ref MaxSize
       DesiredCapacity: !Ref DesiredCapacity
-      NewInstancesProtectedFromScaleIn: true
+      NewInstancesProtectedFromScaleIn: false
 
       # This policy sets up rules which allow the ASG to launch
       # a variety of mixed spot instance types

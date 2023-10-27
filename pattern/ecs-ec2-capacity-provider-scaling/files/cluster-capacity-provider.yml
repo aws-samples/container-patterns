@@ -64,7 +64,7 @@ Resources:
       MinSize: 0
       MaxSize: !Ref MaxSize
       DesiredCapacity: !Ref DesiredCapacity
-      NewInstancesProtectedFromScaleIn: true
+      NewInstancesProtectedFromScaleIn: false
     UpdatePolicy:
       AutoScalingReplacingUpdate:
         WillReplace: 'true'

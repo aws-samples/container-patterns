@@ -39,6 +39,8 @@ ECS task definitions revisions themselves are fundamentally immutable. You can n
 
 Over time you will create a library of task definition revisions that point at uniquely tagged, point in time snapshots of the container image. It's okay to collect a lot of task definition revisions. By default you can store up to 1 million task definition revisions in a task definition family.
 
+When you use a unique task definition revision and unique image tag for each release it becomes possible to use ECS features such as [deployment circuit breakers](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-circuit-breaker.html). When ECS is rolling out a new version of your code and it sees that the application is unhealthy, it can automatically roll back to the previous healthy task definition and it's container image.
+
 #### Setup an image repository
 
 Before deployment you must create an Amazon Elastic Container Registry to store your container image inside of:

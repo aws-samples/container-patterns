@@ -31,7 +31,7 @@ alternatives:
 
 #### About
 
-This pattern demonstrates how to host an API service, or other critical internal service which lives in a private portion of your VPC network, yet can still receive traffic from the public internet. The service containers will not have a public IP address, and they will be protected by a custom sercurity group for the service. However, you can still expose them to the public via a load balancer ingress in the public portion of your VPC network.
+This pattern demonstrates how to host an API service, or other critical internal service which lives in a private portion of your VPC network, yet can still receive traffic from the public internet. The service containers will not have a public IP address, and they will be protected by a custom security group for the service. However, you can still expose them to the public via a load balancer ingress in the public portion of your VPC network.
 
 This pattern is suitable for many use cases:
 

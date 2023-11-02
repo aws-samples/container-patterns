@@ -68,7 +68,7 @@ Download the `vpc.yml` file from your chosen pattern, but do not deploy it yet. 
 
 The following AWS CloudFormation template creates a simple Amazon ECS cluster for usage with AWS Fargate. It also creates an AWS Cloud Map namespace for keeping track of tasks in the cluster.
 
-<<< @/pattern/api-gateway-fargate-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 Note the `AWS::ServiceDiscovery::PrivateDnsNamespace`. This is an AWS Cloud Map powered service discovery namespace that will be used to keep track of the tasks running in AWS Fargate.
 
@@ -76,7 +76,7 @@ Note the `AWS::ServiceDiscovery::PrivateDnsNamespace`. This is an AWS Cloud Map 
 
 The following AWS CloudFormation template defines a basic NGINX task that runs in AWS Fargate, orchestrated by Amazon ECS. Amazon ECS also registers the running tasks into AWS Cloud Map for service discovery.
 
-<<< @/pattern/api-gateway-fargate-cloudformation/files/service.yml
+<<< files/service.yml
 
 Important things to note:
 
@@ -86,7 +86,7 @@ Important things to note:
 
 The following AWS CloudFormation template defines an API Gateway that can access a VPC. It uses AWS Cloud Map to locate targets to send traffic to.
 
-<<< @/pattern/api-gateway-fargate-cloudformation/files/api-gateway.yml
+<<< files/api-gateway.yml
 
 Things to look for in this template:
 
@@ -105,7 +105,7 @@ At this point you should have the following CloudFormation templates:
 
 Use the following parent stack to deploy all four templates at once:
 
-<<< @/pattern/api-gateway-fargate-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 You can use the following command to deploy this parent stack and it's child stacks:
 

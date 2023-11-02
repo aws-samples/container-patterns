@@ -37,7 +37,7 @@ In this example you will deploy two NGINX web server tasks that have a shared du
 
 #### Deploy the CloudFormation
 
-<<< @/pattern/cloudformation-ecs-durable-task-storage-with-efs/files/ecs-mount-efs-storage.yml
+<<< files/ecs-mount-efs-storage.yml
 
 This CloudFormation template provisions an Elastic File System (EFS) and mounts it to an ECS task running in AWS Fargate.
 

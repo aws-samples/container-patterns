@@ -34,7 +34,7 @@ To deploy this pattern you will use the [base pattern that defines a large VPC f
 
 We will use the following CloudFormation template to define a cluster that uses a capacity provider that launches Bottlerocket instances on Amazon EC2:
 
-<<< @/pattern/ecs-ec2-bottlerocket-cluster/files/cluster.yml
+<<< files/cluster.yml
 
 A few specific things to note in this template are:
 
@@ -53,19 +53,19 @@ Bottlerocket is designed to be run in a hardened mode that does not have any SSH
 
 The following template defines a service that uses the capacity provider to request Bottlerocket capacity to run on. Containers will be launched onto the Bottlerocket instances as they come online:
 
-<<< @/pattern/ecs-ec2-bottlerocket-cluster/files/service.yml
+<<< files/service.yml
 
 #### (Optional) Deploy the cluster auto updater
 
 Bottlerocket has it's own automatic updater process which can update the Bottlerocket operating system in waves across your cluster, with automatic task draining to avoid downtime during restarts. You can find the [full source code for the automatic updater on Github](https://github.com/bottlerocket-os/bottlerocket-ecs-updater). Or you can use the following embedded stack to setup the updater:
 
-<<< @/pattern/ecs-ec2-bottlerocket-cluster/files/bottlerocket-updater.yml
+<<< files/bottlerocket-updater.yml
 
 #### Deploy it all
 
 Use the following parent stack to deploy all the child stacks:
 
-<<< @/pattern/ecs-ec2-bottlerocket-cluster/files/parent.yml
+<<< files/parent.yml
 
 You can deploy this parent stack using AWS SAM CLI via the following command:
 

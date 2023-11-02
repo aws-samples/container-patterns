@@ -31,19 +31,19 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/ecs-gpu-scheduling-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/ecs-gpu-scheduling-cdk/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/ecs-gpu-scheduling-cdk/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -65,7 +65,7 @@ npm run-script cdk bootstrap
 
 Now create the following file to define the CDK application itself:
 
-<<< @/pattern/ecs-gpu-scheduling-cdk/files/index.ts
+<<< files/index.ts
 
 Some things to note in this application:
 

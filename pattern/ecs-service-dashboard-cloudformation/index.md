@@ -57,7 +57,7 @@ Once Container Insights has been enabled you will start to get high cardinality 
 
 The following template demonstrates how to setup a custom CloudWatch dashboard for a single ECS service.
 
-<<< @/pattern/ecs-service-dashboard-cloudformation/files/cloudwatch-dashboard-ecs.yml
+<<< files/cloudwatch-dashboard-ecs.yml
 
 This template only requires a single input variable:
 

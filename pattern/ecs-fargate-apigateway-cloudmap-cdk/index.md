@@ -44,19 +44,19 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.dev.json'>
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/tsconfig.dev.json
+<<< files/tsconfig.dev.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -77,7 +77,7 @@ npx cdk bootstrap
 #### Deploy the sample App
 
 
-<<< @/pattern/ecs-fargate-apigateway-cloudmap-cdk/files/src/integ.default.ts
+<<< files/src/integ.default.ts
 
 
 ```sh

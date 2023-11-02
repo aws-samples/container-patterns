@@ -24,7 +24,7 @@ The following task defintions launch a standard [Alpine Linux container](https:/
 
 <tab label='AWS CloudFormation'>
 
-<<< @/pattern/ecs-entrypoint-command-task-definition/files/task-definition.yml
+<<< files/task-definition.yml
 
 Deploy the CloudFormation template above by using the AWS CloudFormation web console.
 Alternatively you can deploy from the command line with:
@@ -39,7 +39,7 @@ aws cloudformation deploy \
 
 <tab label='Raw JSON'>
 
-<<< @/pattern/ecs-entrypoint-command-task-definition/files/task-definition.json
+<<< files/task-definition.json
 
 In the ECS console, click "Create new task definition with JSON" and paste the
 JSON into the task definition editor.
@@ -71,7 +71,7 @@ ENTRYPOINT [ "/usr/bin/hey" ]
 
 Next create a task definition that keeps the existing entrypoint from the image, but sets a custom command to run against that entrypoint:
 
-<<< @/pattern/ecs-entrypoint-command-task-definition/files/load-test-task-definition.yml
+<<< files/load-test-task-definition.yml
 
 The resulting task definition can now be launched with ECS `RunTask` API to start a containerized instance of `hey` with the given load test parameters.
 

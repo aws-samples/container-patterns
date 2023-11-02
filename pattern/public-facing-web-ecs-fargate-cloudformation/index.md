@@ -86,7 +86,7 @@ Download the `vpc.yml` file from your chosen pattern, but do not deploy it yet. 
 
 The following AWS CloudFormation template creates a simple Amazon ECS cluster that is setup for serverless usage with AWS Fargate.
 
-<<< @/pattern/public-facing-web-ecs-fargate-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 You will notice that this cluster is extremely minimal. It has no EC2 capacity, nor EC2 capacity provider because it is intended to be used exclusively with AWS Fargate capacity. If you wish to deploy EC2 instances take a look at the similar patter for [an ECS managed web service on EC2 instances](/public-facing-web-ecs-ec2-cloudformation).
 
@@ -94,7 +94,7 @@ You will notice that this cluster is extremely minimal. It has no EC2 capacity, 
 
 Next we need to define an Amazon ECS service that deploys a container using AWS Fargate:
 
-<<< @/pattern/public-facing-web-ecs-fargate-cloudformation/files/service.yml
+<<< files/service.yml
 
 #### Deploy it all
 
@@ -106,7 +106,7 @@ You should have the following three files:
 
 Use the following parent stack to deploy all three stacks:
 
-<<< @/pattern/public-facing-web-ecs-fargate-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use the following command to deploy all three stacks:
 

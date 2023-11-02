@@ -109,7 +109,7 @@ If you get a `401 Unauthorized` error then make sure you have installed the [Ama
 
 The following CloudFormation file defines a VPC for the workload.
 
-<<< @/pattern/jupyter-notebook-inference-container-cloudformation/files/vpc.yml
+<<< files/vpc.yml
 
 For more info about this VPC see the pattern ["Large sized AWS VPC for an Amazon ECS cluster"](/large-vpc-for-amazon-ecs-cluster).
 
@@ -117,7 +117,7 @@ For more info about this VPC see the pattern ["Large sized AWS VPC for an Amazon
 
 The following CloudFormation file defines an Amazon ECS cluster that launches AWS Inferentia instances as capacity for running containers. These instances have hardware acceleration that is optimized for running machine learning inference jobs.
 
-<<< @/pattern/jupyter-notebook-inference-container-cloudformation/files/inferentia-cluster.yml
+<<< files/inferentia-cluster.yml
 
 By default this template deploys `inf2.xlarge` instances. You can launch additional tasks in the Amazon ECS cluster to automatically scale out the number of AWS Inferentia instances. If you plan to run containers that do not need machine learning acceleration, then do not use this pattern, and instead deploy a cluster that uses a less expensive EC2 instance that is compute optimized instead of machine learning optimized.
 
@@ -125,7 +125,7 @@ By default this template deploys `inf2.xlarge` instances. You can launch additio
 
 The following CloudFormation template deploys a Jupyter Notebook task under Amazon ECS orchestration:
 
-<<< @/pattern/jupyter-notebook-inference-container-cloudformation/files/jupyter-notebook.yml
+<<< files/jupyter-notebook.yml
 
 Some things to note:
 
@@ -143,7 +143,7 @@ This task definition creates an EFS filesystem and mounts it to the path `/home`
 
 We can use the following parent stack to deploy all three child CloudFormation templates:
 
-<<< @/pattern/jupyter-notebook-inference-container-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use AWS SAM CLI to deploy the parent stack with a command like this one. You will need to substitute in your own `ImageUrl` value from the container image that you built and pushed earlier:
 

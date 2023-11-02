@@ -69,7 +69,7 @@ An extension may wish to modify the properties of the [`ecs.TaskDefinitionProps`
 
 For example the following extension implements an interface for enforcing three standardized ECS task sizes for your company.
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/task-size.ts
+<<< files/task-size.ts
 
 Now this reusable extension can be imported and added to any service in order to resize the task:
 
@@ -90,7 +90,7 @@ Some extensions may wish to use the [`ecs.TaskDefinition`](https://docs.aws.amaz
 
 To demonstrate, let's say that you want to add the CloudWatch agent as a sidecar to all tasks. The following extension adds the CloudWatch Agent container to your task, and it also adds an IAM policy to your task that allows the CloudWatch Agent to communicate with CloudWatch:
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/cloudwatch-agent.ts
+<<< files/cloudwatch-agent.ts
 
 Now anyone who wants the CloudWatch agent in their task can use the extension to auto inject the sidecar and setup the right permissions in one statement:
 
@@ -107,7 +107,7 @@ This hook is for extensions that wish to modify the initial values of
 
 As an example here is a custom extension that gives the ECS service a long grace period on startup:
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/long-startup-grace-period.ts
+<<< files/long-startup-grace-period.ts
 
 Consumers of this example extension can add this behavior to their service like this:
 
@@ -123,7 +123,7 @@ Extensions that wish to use the [`ecs.Ec2Service`](https://docs.aws.amazon.com/c
 
 For example, here is an extension that implements a custom autoscaling policy for the service:
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/spiky-autoscaling-policy.ts
+<<< files/spiky-autoscaling-policy.ts
 
 This example extension is called `SpikyCpuScalingPolicy` and it tries to keep the CPU utilization at around 50%, so that there is plenty of overhead CPU in case of an incoming spike of requests. You can imagine that it would be possible to create a `BudgetCpuScalingPolicy` that tries to keep CPU utilization above 90% in order to save money. Creators of an ECS service can consume extensions based on the name of the behavior they would like to add to the service, without needing to know or understand the underlying numbers and implementation behind the extension.
 
@@ -137,7 +137,7 @@ This can be accomplished by building an extension that implements the `addHooks(
 
 For example, let's say that you wanted to configure a healthcheck on the main container of the application. Here is how you might create a `HealthCheckTrafficPort` extension:
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/healthcheck-traffic-port.ts
+<<< files/healthcheck-traffic-port.ts
 
 The extension defines a container mutating hook which takes an existing container definition and modifies it to have a Docker healthcheck which verifies that the container is accepting traffic on a given port.
 
@@ -175,7 +175,7 @@ Now the `CloudWatchAgentSidecar` adds itself as a dependency on the main service
 
 Now that you have learned about the different hooks available, and seen many examples of custom service extensions, let's see how it looks when you put all the custom extensions from above together in one application:
 
-<<< @/pattern/ecs-service-extensions-custom-extension/files/index.ts
+<<< files/index.ts
 
 The CDK app can import each individual extension, and then use `.add()` statements to attach all the extensions to the service:
 

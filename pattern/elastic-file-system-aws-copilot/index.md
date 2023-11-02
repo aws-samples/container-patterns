@@ -138,7 +138,7 @@ Open up the file `copilot/efs-service/manifest.yml`. We need to modify this file
 
 Use the following `manifest.yml` file as a template:
 
-<<< @/pattern/elastic-file-system-aws-copilot/files/copilot/efs-service/manifest.yml
+<<< files/copilot/efs-service/manifest.yml
 
 Important things to note:
 

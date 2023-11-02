@@ -54,7 +54,7 @@ The last view ("all ECS services") is a special view that aggregates all tasks t
 
 To import the dashboard download the following JSON dashboard definition:
 
-<<< @/pattern/fargate-right-sizing-dashboard/files/fargate-right-sizing.json
+<<< files/fargate-right-sizing.json
 
 At this point you will need to configure the source of each widget to point to the log group for the cluster you intend to track. For example, for an ECS cluster named `cluster-prod` that has been configured to use CW Container Insights, there will be a log group called `/aws/ecs/containerinsights/cluster-prod/performance`.
 

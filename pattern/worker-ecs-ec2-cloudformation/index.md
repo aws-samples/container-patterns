@@ -51,13 +51,13 @@ To deploy this pattern you will use the [base pattern that defines a large VPC f
 
 The following CloudFormation defines an ECS cluster that has a capacity provider that launches EC2 instances on demand as you request for ECS to deploy containers. The instances will be launched in the public subnet.
 
-<<< @/pattern/worker-ecs-ec2-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 #### Define the service
 
 Next we need to define an ECS service which is configured to use AWS VPC networking mode, and launch itself in the ECS cluster, while making use of the capacity provider to request EC2 capacity for itself:
 
-<<< @/pattern/worker-ecs-ec2-cloudformation/files/service.yml
+<<< files/service.yml
 
 #### Deploy it all
 
@@ -69,7 +69,7 @@ You should have the following three files:
 
 Use the following parent stack to deploy all three stacks:
 
-<<< @/pattern/public-facing-web-ecs-ec2-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use the following command to deploy all three stacks:
 

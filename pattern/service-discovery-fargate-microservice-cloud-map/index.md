@@ -63,7 +63,7 @@ For this architecture we are going to use private networking for the backend ser
 
 The following template defines an ECS cluster and a Cloud Map namespace that will be used to store information about the tasks in the cluster:
 
-<<< @/pattern/service-discovery-fargate-microservice-cloud-map/files/cluster.yml
+<<< files/cluster.yml
 
 Some things to note in this template:
 
@@ -74,7 +74,7 @@ Some things to note in this template:
 Because the `hello` service depends on the `name` service, it makes sense to define the `name` service first. This
 service will be deploying a public sample image located at `public.ecr.aws/ecs-sample-image/name-server`.
 
-<<< @/pattern/service-discovery-fargate-microservice-cloud-map/files/name.yml
+<<< files/name.yml
 
 Note the following things from the template above:
 
@@ -87,7 +87,7 @@ Note the following things from the template above:
 
 Now we need to define the `hello` service. It will be based on the public sample image `public.ecr.aws/ecs-sample-image/hello-server:node`:
 
-<<< @/pattern/service-discovery-fargate-microservice-cloud-map/files/hello.yml
+<<< files/hello.yml
 
 Some things to note in this template:
 
@@ -99,7 +99,7 @@ Some things to note in this template:
 Properly using DNS based service discovery requires some client side implementation.
 Let's look at the source for the `hello` service.
 
-<<< @/pattern/service-discovery-fargate-microservice-cloud-map/files/hello-node/index.js
+<<< files/hello-node/index.js
 
 Things to note:
 
@@ -125,7 +125,7 @@ You should have the following three files:
 
 Use the following parent stack to deploy all three stacks:
 
-<<< @/pattern/service-discovery-fargate-microservice-cloud-map/files/parent.yml
+<<< files/parent.yml
 
 Use the following command to deploy all three stacks:
 

@@ -87,7 +87,7 @@ To deploy this pattern you will use the [base pattern that defines a large VPC f
 
 The following CloudFormation defines an ECS cluster that has a capacity provider that launches EC2 instances on demand as you request for ECS to deploy containers. The instances will be launched in the private subnet.
 
-<<< @/pattern/public-facing-api-ecs-ec2-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 Parameters to note are:
 
@@ -101,7 +101,7 @@ Parameters to note are:
 
 Next we need to define an ECS service which is configured to use AWS VPC networking mode, and launch itself in the ECS cluster, while making use of the capacity provider to request EC2 capacity for itself:
 
-<<< @/pattern/public-facing-api-ecs-ec2-cloudformation/files/service.yml
+<<< files/service.yml
 
 Parameters to note are:
 
@@ -118,7 +118,7 @@ As before you can also choose to use the AWS CloudFormation web console to launc
 
 Download the following parent stack. It will be used to glue all three stacks together into one deployment and pass values from one stack to the next:
 
-<<< @/pattern/public-facing-api-ecs-ec2-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use the following AWS SAM CLI command to the parent stack and its child stacks:
 

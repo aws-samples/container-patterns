@@ -28,7 +28,7 @@ Create a task definition using one of the following methods:
 
 <tab label='AWS CloudFormation'>
 
-<<< @/pattern/ecs-task-maximum-lifespan-duration/files/task-definition.yml
+<<< files/task-definition.yml
 
 Deploy the CloudFormation template above by using the AWS CloudFormation web console.
 Alternatively you can deploy from the command line with:
@@ -43,7 +43,7 @@ aws cloudformation deploy \
 
 <tab label='Raw JSON'>
 
-<<< @/pattern/ecs-task-maximum-lifespan-duration/files/task-definition.json
+<<< files/task-definition.json
 
 In the ECS console, click "Create new task definition with JSON" and paste the
 JSON into the task definition editor.

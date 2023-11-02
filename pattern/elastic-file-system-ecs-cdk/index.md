@@ -73,19 +73,19 @@ Once all tools are installed, create the following files:
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/elastic-file-system-ecs-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/elastic-file-system-ecs-cdk/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/elastic-file-system-ecs-cdk/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -100,7 +100,7 @@ The files above serve the following purpose:
 
 Now you can create an `index.ts` file that has the actual code for the CDK application:
 
-<<< @/pattern/elastic-file-system-ecs-cdk/files/index.ts
+<<< files/index.ts
 
 You can now use the following commands to preview infrastruture to be created, and then deploy the CDK application:
 

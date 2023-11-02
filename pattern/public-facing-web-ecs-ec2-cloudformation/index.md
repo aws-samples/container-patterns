@@ -93,13 +93,13 @@ Download the `vpc.yml` file from your chosen pattern, but do not deploy it yet. 
 
 The following CloudFormation defines an ECS cluster that has a capacity provider that launches EC2 instances on demand as you request for ECS to deploy containers. The instances will be launched in the public subnet.
 
-<<< @/pattern/public-facing-web-ecs-ec2-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 #### Define the service
 
 The following CloudFormation defines a service and it's load balancer that will provide ingress to the service.
 
-<<< @/pattern/public-facing-web-ecs-ec2-cloudformation/files/service.yml
+<<< files/service.yml
 
 #### Deploy it all
 
@@ -111,7 +111,7 @@ You should have the following three files:
 
 Use the following parent stack to deploy all three stacks:
 
-<<< @/pattern/public-facing-web-ecs-ec2-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use the following command to deploy all three stacks:
 

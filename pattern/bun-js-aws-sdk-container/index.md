@@ -57,13 +57,13 @@ Download the following files to define a simple JavaScript application:
 
 <tab label='index.ts'>
 
-<<< @/pattern/bun-js-aws-sdk-container/files/index.ts
+<<< files/index.ts
 
 </tab>
 
 <tab label="package.json">
 
-<<< @/pattern/bun-js-aws-sdk-container/files/package.json
+<<< files/package.json
 
 </tab>
 

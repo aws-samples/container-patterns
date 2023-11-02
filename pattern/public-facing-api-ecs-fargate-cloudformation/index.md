@@ -73,13 +73,13 @@ To deploy this pattern you will use the [base pattern that defines a large VPC f
 
 The following AWS CloudFormation template creates a simple Amazon ECS cluster that is setup for serverless usage with AWS Fargate.
 
-<<< @/pattern/public-facing-api-ecs-fargate-cloudformation/files/cluster.yml
+<<< files/cluster.yml
 
 #### Define the service
 
 Next we need to define an Amazon ECS service that deploys a container using AWS Fargate. The following template deploys an Application Load Balancer into the VPC public subnet, while deploying the containers themselves into AWS Fargate in the private subnet:
 
-<<< @/pattern/public-facing-api-ecs-fargate-cloudformation/files/service.yml
+<<< files/service.yml
 
 #### Deploy it all
 
@@ -91,7 +91,7 @@ You should now have the following three files:
 
 Use the following parent stack to deploy all three stacks:
 
-<<< @/pattern/public-facing-api-ecs-fargate-cloudformation/files/parent.yml
+<<< files/parent.yml
 
 Use the following command to deploy all three stacks:
 

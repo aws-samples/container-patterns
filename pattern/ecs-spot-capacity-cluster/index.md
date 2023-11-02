@@ -34,7 +34,7 @@ This cluster template demonstrates how to configure an autoscaling group to laun
 with mixed types. A variety of EC2 instances of different sizes will be launched.
 However, Amazon ECS can gracefully handle this and adjust container density on each individual instance to match the size of that instance.
 
-<<< @/pattern/ecs-spot-capacity-cluster/files/spot-cluster.yml
+<<< files/spot-cluster.yml
 
 A couple important things to note in this template:
 
@@ -61,7 +61,7 @@ Additionally you can modify the following parameters:
 This template deploys an ECS service that uses the Spot capacity provider. ECS will automatically
 adapt to launch as many mixed EC2 instances as necessary to host the service tasks.
 
-<<< @/pattern/ecs-spot-capacity-cluster/files/service.yml
+<<< files/service.yml
 
 Most parameters in this stack will be supplied by a parent stack that passes in
 resources from the capacity provider stack. However you may be interested
@@ -79,7 +79,7 @@ in overriding the following parameters:
 This stack deploys both stacks as nested stacks, for ease of grouping and
 passing parameters from one stack to the next.
 
-<<< @/pattern/ecs-spot-capacity-cluster/files/parent.yml
+<<< files/parent.yml
 
 This parent stack requires the following parameters:
 

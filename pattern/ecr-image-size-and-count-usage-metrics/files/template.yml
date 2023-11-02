@@ -1,7 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: ECR Metrics
+Description: Deploy an ECR Metrics tracker
+
 Resources:
+
+  # Lambda function that captures the metrics into CloudWatch
   EcrMetrics:
     Type: AWS::Serverless::Function
     Properties:
@@ -16,6 +19,11 @@ Resources:
               - ecr:DescribeImages
               - cloudwatch:PutMetricData
             Resource: '*'
+      Events:
+        CronEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(30 minutes)
     Metadata:
       DockerContext: .
       Dockerfile: Dockerfile

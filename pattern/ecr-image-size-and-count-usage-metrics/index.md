@@ -33,7 +33,7 @@ You will deploy the following infrastructure:
 This pattern uses AWS SAM CLI for deploying CloudFormation stacks on your account.
 You should follow the appropriate [steps for installing SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
-Additionally, you need to clone the following open source git repo:
+Additionally, you need to clone the following [open source git repo](https://github.com/miketheman/ecr-metrics):
 
 ```
 git clone https://github.com/miketheman/ecr-metrics.git

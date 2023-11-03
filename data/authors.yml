@@ -60,3 +60,13 @@
       uri: https://twitter.com/pahudnet
     - type: github
       uri: https://github.com/pahud
+
+- id: mike-fiedler
+  name: Mike Fiedler
+  title: AWS Hero
+  image: /pattern/images/authors/mike-fiedler.jpg
+  links:
+    - type: blog
+      uri: https://mike.fiedler.me/
+    - type: github
+      uri: https://github.com/miketheman

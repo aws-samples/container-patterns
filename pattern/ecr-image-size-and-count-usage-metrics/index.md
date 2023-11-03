@@ -39,54 +39,81 @@ Additionally, you need to clone the following [open source git repo](https://git
 git clone https://github.com/miketheman/ecr-metrics.git
 ```
 
-#### Define the serverless application
+#### Dig into the application
 
-In order to deploy this open source project you will add two pieces:
+This open source project is a Python project with the following structure:
 
-First, a `Dockerfile` defines how to build and package this open source code into a container image that can run in AWS Lambda.
+```sh
+$ tree ecr-metrics
+
+ecr-metrics
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── TODO.md
+├── poetry.lock
+├── pyproject.toml
+├── src
+│   └── ecr_metrics
+│       └── main.py
+├── template.yml
+└── tests
+    ├── responses.md
+    └── test_main.py
+
+3 directories, 10 files
+```
+
+`src` contains the code for the Lambda function that actually iterates through ECR repositories, gets the metric values, and then puts those metric values into CloudWatch Metrics.
+
+Let's look at a couple of the files in specific:
+
+`Dockerfile` defines how to build and package this open source code into a container image that can run in AWS Lambda.
 
 <<< @/pattern/ecr-image-size-and-count-usage-metrics/files/Dockerfile{Dockerfile}
 
-Second, a SAM template defines how to deploy the container image as a serverless Lambda function that runs on a cron schedule.
+`template.yml` is a SAM template defines how to deploy the container image as a serverless Lambda function that runs on a cron schedule.
 
 <<< @/pattern/ecr-image-size-and-count-usage-metrics/files/template.yml
 
 Note the `rate(30 minutes)`. You can change this depending on how frequently developers push images to ECR, and how granular you would like the metric to be.
-
-Place both of these files in the same folder as your cloned repo. The directory structure should look like this:
-
-```
-.
-├── Dockerfile
-├── ecr-metrics
-│   ├── README.md
-│   ├── TODO.md
-│   ├── poetry.lock
-│   ├── pyproject.toml
-│   ├── src
-│   │   └── ecr_metrics
-│   │       └── main.py
-│   └── tests
-│       ├── responses.md
-│       └── test_main.py
-└── template.yml
-
-4 directories, 9 files
-```
 
 #### Build the application
 
 First, use SAM to build the container image.
 
 ```sh
+cd ecr-metrics
 sam build
 ```
 
-To verify it worked, look for the `.aws-sam` folder in your current working directory.
+To verify it worked, look for the `.aws-sam` folder that was created. This folder contains a version of the template that references the actual Docker image that was built.
+
+You can also use the following command to run the Lambda function locally:
+
+```sh
+sam local invoke
+```
+
+You will see output similar to this:
+
+```txt
+$ sam local invoke
+Invoking Container created from ecrmetrics:latest
+Building image.................
+Using local image: ecrmetrics:rapid-x86_64.
+
+START RequestId: 8bdd3544-6d26-437b-9a7c-f877ec408909 Version: $LATEST
+END RequestId: 8bdd3544-6d26-437b-9a7c-f877ec408909
+REPORT RequestId: 8bdd3544-6d26-437b-9a7c-f877ec408909  Init Duration: 0.12 ms  Duration: 1332.63 ms Billed Duration: 1333 ms        Memory Size: 128 MB     Max Memory Used: 128 MB
+null
+```
+
+Now that we know it works, it's time to deploy the live version to your AWS account.
 
 #### Deploy the application
 
-Next use the SAM template to deploy the built container image and setup the scheduled Lambda function:
+You can use the SAM template to deploy the built container image and setup the scheduled Lambda function on your AWS account:
 
 ```
 sam deploy \
@@ -98,7 +125,7 @@ sam deploy \
 
 #### Test it Out
 
-Wait a few minutes and then check inside of CloudWatch Metrics. You should see a new custom namespace called "ECR" with metrics for each of your ECR repositories, similar to the following screenshot:
+Wait a few minutes and then check inside of CloudWatch Metrics. You will see a new custom namespace called "ECR" with metrics for each of your ECR repositories, similar to the following screenshot:
 
 ![](./screenshot.png)
 

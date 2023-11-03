@@ -35,7 +35,7 @@ You should follow the appropriate [steps for installing SAM CLI](https://docs.aw
 
 Additionally, you need to clone the following [open source git repo](https://github.com/miketheman/ecr-metrics):
 
-```shellsession
+```sh
 git clone https://github.com/miketheman/ecr-metrics.git
 ```
 
@@ -43,7 +43,7 @@ git clone https://github.com/miketheman/ecr-metrics.git
 
 This open source project is a Python project with the following structure:
 
-```sh
+```shellsession
 $ tree ecr-metrics
 
 ecr-metrics

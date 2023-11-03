@@ -115,7 +115,7 @@ Now that we know it works, it's time to deploy the live version to your AWS acco
 
 You can use the SAM template to deploy the built container image and setup the scheduled Lambda function on your AWS account:
 
-```
+```sh
 sam deploy \
   --capabilities CAPABILITY_IAM \
   --resolve-s3 \

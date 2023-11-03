@@ -20,37 +20,37 @@ Pulumi is an infrastructure as code framework for software engineers. Instead of
 <tabs>
 <tab label="TypeScript">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.ts
+<<< files/load-balanced-ecs.ts
 
 </tab>
 
 <tab label="Python">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.py
+<<< files/load-balanced-ecs.py
 
 </tab>
 
 <tab label="Go">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.go
+<<< files/load-balanced-ecs.go
 
 </tab>
 
 <tab label="Java">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.java
+<<< files/load-balanced-ecs.java
 
 </tab>
 
 <tab label="YAML">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.yml
+<<< files/load-balanced-ecs.yml
 
 </tab>
 
 <tab label="C#">
 
-<<< @/pattern/pulumi-load-balanced-ecs-service/files/load-balanced-ecs.cs
+<<< files/load-balanced-ecs.cs
 
 </tab>
 

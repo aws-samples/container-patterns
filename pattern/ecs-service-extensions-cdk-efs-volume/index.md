@@ -64,19 +64,19 @@ To use this pattern you need [Node.js](https://nodejs.org/en) installed. First, 
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -101,19 +101,19 @@ We will use the following three files to define three service extensions that wi
 <tabs>
 <tab label="efs-volume.ts">
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/efs-volume.ts
+<<< files/efs-volume.ts
 
 </tab>
 
 <tab label='static-scale.ts'>
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/static-scale.ts
+<<< files/static-scale.ts
 
 </tab>
 
 <tab label='ecs-exec.ts'>
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/ecs-exec.ts
+<<< files/ecs-exec.ts
 
 </tab>
 </tabs>
@@ -128,7 +128,7 @@ These extensions serve the following purpose:
 
 Now create the following file to define the basic CDK application:
 
-<<< @/pattern/ecs-service-extensions-cdk-efs-volume/files/index.ts
+<<< files/index.ts
 
 This file attaches the service extensions to a `ServiceDescription` and launches it into a `Service` running inside of an `Environment`.
 

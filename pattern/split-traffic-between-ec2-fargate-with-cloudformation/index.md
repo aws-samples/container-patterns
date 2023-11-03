@@ -34,30 +34,19 @@ Create the following three files:
 <tabs>
 <tab label="index.js">
 
-<<< @/pattern/split-traffic-between-ec2-fargate-with-cloudformation/files/index.js
+<<< files/index.js
 
 </tab>
 
 <tab label='package.json'>
 
-<<< @/pattern/split-traffic-between-ec2-fargate-with-cloudformation/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='Dockerfile'>
 
-```Dockerfile
-FROM public.ecr.aws/docker/library/node:18 AS build
-WORKDIR /srv
-ADD package.json .
-RUN npm install
-
-FROM public.ecr.aws/docker/library/node:18-slim
-COPY --from=build /srv .
-ADD ./index.js ./index.js
-EXPOSE 3000
-CMD ["node", "index.js"]
-```
+<<< files/Dockerfile{Dockerfile}
 
 </tab>
 </tabs>
@@ -84,7 +73,7 @@ In order to run this sample template you will need an ECS cluster with an EC2 ca
 
 The following template will deploy the sample `ecs-metadata` application (or any other image that you pass to it). The image will be deployed twice: once on EC2 and one of AWS Fargate. Finally an Application Load Balancer is provisioned which sends 50% of the traffic to the EC2 service, and 50% of the traffic to the AWS Fargate service.
 
-<<< @/pattern/split-traffic-between-ec2-fargate-with-cloudformation/files/service-across-ec2-and-fargate.yml
+<<< files/service-across-ec2-and-fargate.yml
 
 The template requires the following input parameters:
 

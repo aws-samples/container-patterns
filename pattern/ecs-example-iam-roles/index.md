@@ -55,7 +55,7 @@ These statements authorize the ECS agent running on a host to do the following t
 
 You can use this starter policy by attaching it to a role. For example in CloudFormation:
 
-<<< @/pattern/ecs-example-iam-roles/files/ecs-task-execution-role.yml
+<<< files/ecs-task-execution-role.yml
 
 #### Minimal surface area task execution role
 

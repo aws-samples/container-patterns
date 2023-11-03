@@ -57,13 +57,13 @@ Download the following files to define a simple JavaScript application:
 
 <tab label='index.ts'>
 
-<<< @/pattern/bun-js-aws-sdk-container/files/index.ts
+<<< files/index.ts
 
 </tab>
 
 <tab label="package.json">
 
-<<< @/pattern/bun-js-aws-sdk-container/files/package.json
+<<< files/package.json
 
 </tab>
 
@@ -79,20 +79,7 @@ The files above serve the following purpose:
 Now we can use the following `Dockerfile` to describe how to package this application up
 and run it with the Bun JavaScript runtime:
 
-```Dockerfile
-FROM oven/bun
-WORKDIR /srv
-
-# Add the package manifest and install packages
-ADD package.json .
-RUN bun install
-
-# Add the application code
-ADD index.ts .
-
-# Specify the command to run when launching the container
-CMD bun index.ts
-```
+<<< files/Dockerfile{Dockerfile}
 
 Build and push the application container image to a private Amazon ECR container registry
 using the following commands:
@@ -122,13 +109,13 @@ Download the `vpc.yml` file from your chosen pattern, but do not deploy it yet. 
 
 The following AWS CloudFormation template creates a simple Amazon ECS cluster that is setup for serverless usage with AWS Fargate.
 
-<<< @/pattern/bun-js-aws-sdk-container/files/cluster.yml
+<<< files/cluster.yml
 
 #### Define the service
 
 Now we will define the service itself and it's dependencies.
 
-<<< @/pattern/bun-js-aws-sdk-container/files/service.yml
+<<< files/service.yml
 
 Some things to note in this template:
 
@@ -144,7 +131,7 @@ Some things to note in this template:
 You can use the following `parent.yml` with AWS SAM CLI to deploy
 all the defined components at once:
 
-<<< @/pattern/bun-js-aws-sdk-container/files/parent.yml
+<<< files/parent.yml
 
 You should now have the following four YAML files:
 

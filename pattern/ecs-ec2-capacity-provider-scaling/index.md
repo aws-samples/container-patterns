@@ -34,7 +34,7 @@ This CloudFormation template deploys an ECS cluster that has a capacity provider
 linked to an EC2 Autoscaling Group. The Autoscaling Group starts out completely
 empty.
 
-<<< @/pattern/ecs-ec2-capacity-provider-scaling/files/cluster-capacity-provider.yml
+<<< files/cluster-capacity-provider.yml
 
 This stack accepts the following parameters that can used to adjust its behavior:
 
@@ -51,7 +51,7 @@ This CloudFormation template deploys an ECS service in a cluster, with a
 capacity provider strategy setup. The service will signal the capacity provider
 to request capacity, and the capacity provider will scale up the EC2 Autoscaling Group automatically.
 
-<<< @/pattern/ecs-ec2-capacity-provider-scaling/files/service-capacity-provider.yml
+<<< files/service-capacity-provider.yml
 
 Most parameters in this stack will be supplied by a parent stack that passes in
 resources from the capacity provider stack. However you may be interested
@@ -69,7 +69,7 @@ in overriding the following parameters:
 This stack deploys both stacks as nested stacks, for ease of grouping and
 passing parameters from one stack to the next.
 
-<<< @/pattern/ecs-ec2-capacity-provider-scaling/files/parent.yml
+<<< files/parent.yml
 
 This parent stack requires the following parameters:
 

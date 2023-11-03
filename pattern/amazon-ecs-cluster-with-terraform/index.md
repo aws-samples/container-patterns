@@ -66,17 +66,17 @@ Download the following three files that define the core infrastructure:
 <tab label="main.tf">
 
 <!-- https://raw.githubusercontent.com/aws-ia/ecs-blueprints/36fb85bd4ffabf057c25a193fcf4c8d1ebd2c60d/terraform/fargate-examples/core-infra/main.tf -->
-<<< @/pattern/amazon-ecs-cluster-with-terraform/files/main.tf
+<<< files/main.tf
 
 </tab>
 <tab label="outputs.tf">
 
-<<< @/pattern/amazon-ecs-cluster-with-terraform/files/outputs.tf
+<<< files/outputs.tf
 
 </tab>
 <tab label="versions.tf">
 
-<<< @/pattern/amazon-ecs-cluster-with-terraform/files/versions.tf
+<<< files/versions.tf
 
 </tab>
 </tabs>

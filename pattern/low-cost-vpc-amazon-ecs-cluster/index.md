@@ -54,7 +54,7 @@ AWS Fargate tasks must be launched with "assign public IP" turned on. This allow
 
 Deploy the following CloudFormation template to create the VPC:
 
-<<< @/pattern/low-cost-vpc-amazon-ecs-cluster/files/vpc.yml
+<<< files/vpc.yml
 
 Some things to note:
 

@@ -20,37 +20,37 @@ Pulumi is an infrastructure as code framework for software engineers. Instead of
 <tabs>
 <tab label="TypeScript">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.ts
+<<< files/service-in-vpc.ts
 
 </tab>
 
 <tab label="Python">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.py
+<<< files/service-in-vpc.py
 
 </tab>
 
 <tab label="Go">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.go
+<<< files/service-in-vpc.go
 
 </tab>
 
 <tab label="Java">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.java
+<<< files/service-in-vpc.java
 
 </tab>
 
 <tab label="YAML">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.yaml
+<<< files/service-in-vpc.yaml
 
 </tab>
 
 <tab label="C#">
 
-<<< @/pattern/pulumi-ecs-service-in-vpc/files/service-in-vpc.cs
+<<< files/service-in-vpc.cs
 
 </tab>
 

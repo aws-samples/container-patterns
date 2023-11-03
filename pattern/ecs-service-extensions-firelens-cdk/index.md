@@ -29,19 +29,19 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/ecs-service-extensions-firelens-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/ecs-service-extensions-firelens-cdk/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/ecs-service-extensions-firelens-cdk/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -63,7 +63,7 @@ npm run-script cdk bootstrap
 
 Now create the following file to define a basic CDK application:
 
-<<< @/pattern/ecs-service-extensions-firelens-cdk/files/index.ts
+<<< files/index.ts
 
 FireLens is added to the deployed application by importing the `FireLensExtension` class, and then calling `ServiceDescription.add()` to add an instance of the `FireLensExtension` to the `ServiceDescription`.
 

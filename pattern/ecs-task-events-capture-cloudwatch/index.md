@@ -154,7 +154,7 @@ In addition to the raw telemetry, Amazon ECS produces events which can be captur
 
 The following CloudFormation will setup an EventBridge rule that captures events for a task into CloudWatch Logs:
 
-<<< @/pattern/ecs-task-events-capture-cloudwatch/files/eventbridge-ecs-task-events.yml
+<<< files/eventbridge-ecs-task-events.yml
 
 The template requires input parameters:
 
@@ -177,7 +177,7 @@ aws cloudformation deploy \
 
 Once deployed, Amazon EventBridge will start capturing ECS events into Amazon CloudWatch. Each event will be a full point in time snapshot of the ECS task's state. The following JSON is an example of what the event will look like:
 
-<<< @/pattern/ecs-task-events-capture-cloudwatch/files/sample-ecs-event.json
+<<< files/sample-ecs-event.json
 
 Similar to telemetry, these task events can be queried using Amazon CloudWatch Log Insights. The following sample query will fetch task state change history for a single task:
 

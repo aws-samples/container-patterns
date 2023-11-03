@@ -37,7 +37,7 @@ to JSON](https://mikefarah.gitbook.io/yq/usage/convert#encode-json-simple) for t
 
 <tab label='AWS CloudFormation'>
 
-<<< @/pattern/inject-config-files-ecs-task-definition/files/task-definition.yml
+<<< files/task-definition.yml
 
 Deploy the CloudFormation template above by using the AWS CloudFormation web console.
 Alternatively you can deploy from the command line with:
@@ -52,7 +52,7 @@ aws cloudformation deploy \
 
 <tab label='Raw JSON'>
 
-<<< @/pattern/inject-config-files-ecs-task-definition/files/task-definition.json
+<<< files/task-definition.json
 
 In the ECS console, click "Create new task definition with JSON" and paste the
 JSON into the task definition editor.

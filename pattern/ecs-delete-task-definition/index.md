@@ -22,7 +22,7 @@ chmod +x delete-tasks.sh
 
 #### Script
 
-<<< @/pattern/ecs-delete-task-definition/files/delete-tasks.sh
+<<< files/delete-tasks.sh
 
 #### Usage
 

@@ -151,7 +151,7 @@ Would you like to deploy a test environment? [? for help] (y/N)
 While the service deploys let's take a look at the generated service's
 configuration at `copilot/name-service/manifest.yml`:
 
-<<< @/pattern/ecs-service-connect-aws-copilot/files/copilot/name-service/manifest.yml
+<<< files/copilot/name-service/manifest.yml
 
 Some things to note:
 

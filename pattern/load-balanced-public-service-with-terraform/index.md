@@ -74,17 +74,17 @@ Download the following three files that define the load balanced service
 <tab label="main.tf">
 
 <!-- https://github.com/aws-ia/ecs-blueprints/blob/main/terraform/fargate-examples/lb-service/main.tf -->
-<<< @/pattern/load-balanced-public-service-with-terraform/files/main.tf
+<<< files/main.tf
 
 </tab>
 <tab label="outputs.tf">
 
-<<< @/pattern/load-balanced-public-service-with-terraform/files/outputs.tf
+<<< files/outputs.tf
 
 </tab>
 <tab label="versions.tf">
 
-<<< @/pattern/load-balanced-public-service-with-terraform/files/versions.tf
+<<< files/versions.tf
 
 </tab>
 </tabs>

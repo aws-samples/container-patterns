@@ -34,13 +34,13 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/advanced-public-facing-service-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/advanced-public-facing-service-cdk/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
@@ -65,7 +65,7 @@ The files above serve the following purpose:
 
 Now you can create an `index.ts` file that has the actual code for the CDK application:
 
-<<< @/pattern/advanced-public-facing-service-cdk/files/index.ts
+<<< files/index.ts
 
 Use the following commands to interact with your CDK application:
 

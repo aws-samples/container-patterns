@@ -18,7 +18,7 @@ This script demonstrates the use of a Bash [here document](https://en.wikipedia.
 
 #### Example deploy script
 
-<<< @/pattern/generate-task-definition-json-cli/files/script.sh
+<<< files/script.sh
 
 #### Installation
 

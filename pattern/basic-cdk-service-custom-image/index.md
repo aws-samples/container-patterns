@@ -30,13 +30,13 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/basic-cdk-service-custom-image/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/basic-cdk-service-custom-image/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
@@ -61,7 +61,7 @@ The files above serve the following purpose:
 
 Now you can create an `index.ts` file that has the actual code for the CDK application:
 
-<<< @/pattern/basic-cdk-service-custom-image/files/index.ts
+<<< files/index.ts
 
 There are three core resource types you will see in this CDK application:
 

@@ -27,19 +27,19 @@ To use this pattern you need TypeScript and Node. First, ensure that you have No
 <tabs>
 <tab label="package.json">
 
-<<< @/pattern/ecs-service-extensions-load-balancer-cdk/files/package.json
+<<< files/package.json
 
 </tab>
 
 <tab label='tsconfig.json'>
 
-<<< @/pattern/ecs-service-extensions-load-balancer-cdk/files/tsconfig.json
+<<< files/tsconfig.json
 
 </tab>
 
 <tab label='cdk.json'>
 
-<<< @/pattern/ecs-service-extensions-load-balancer-cdk/files/cdk.json
+<<< files/cdk.json
 
 </tab>
 </tabs>
@@ -61,7 +61,7 @@ npm run-script cdk bootstrap
 
 Now create the following file to define the CDK application itself:
 
-<<< @/pattern/ecs-service-extensions-load-balancer-cdk/files/index.ts
+<<< files/index.ts
 
 The ECS Service Extensions library simplifies container deployment
 by providing an `Environment` resource which automatically creates the networking stack and ECS cluster on your behalf.

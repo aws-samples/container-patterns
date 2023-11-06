@@ -28,37 +28,37 @@ Then you can use the built image in a load balanced service like this:
 <tabs>
 <tab label="TypeScript">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.ts
+<<< files/build-image.ts
 
 </tab>
 
 <tab label="Python">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.py
+<<< files/build-image.py
 
 </tab>
 
 <tab label="Go">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.go
+<<< files/build-image.go
 
 </tab>
 
 <tab label="Java">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.java
+<<< files/build-image.java
 
 </tab>
 
 <tab label="YAML">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.yml
+<<< files/build-image.yml
 
 </tab>
 
 <tab label="C#">
 
-<<< @/pattern/pulumi-automate-image-build/files/build-image.cs
+<<< files/build-image.cs
 
 </tab>
 

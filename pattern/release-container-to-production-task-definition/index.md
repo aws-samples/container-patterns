@@ -61,7 +61,7 @@ The following script assumes that you already have the [Amazon ECR credential he
 
 You can use the following `deploy.sh` script as a template for your own deploy process:
 
-<<< @/pattern/release-container-to-production-task-definition/files/deploy.sh
+<<< files/deploy.sh
 
 After downloading the file above you can run it using the following commands:
 

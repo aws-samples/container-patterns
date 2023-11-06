@@ -36,7 +36,7 @@ This is how auto scaling works:
 
 The following template automatically sets up CloudWatch alarms, auto scaling policies, and attaches them to an ECS service.
 
-<<< @/pattern/target-tracking-scale-ecs-service-cloudformation/files/target-tracking-scale.yml
+<<< files/target-tracking-scale.yml
 
 The template requires the following input parameters:
 

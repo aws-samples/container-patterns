@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example service that deploys in AWS VPC networking mode
+             on AWS Fargate. Service runs with networking in public
+             subnets and public IP addresses
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  PublicSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of public subnet ID's to put the load balancer and tasks in
+  ClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ECSTaskExecutionRole:
+    Type: String
+    Description: The role used to start up an ECS task
+  ServiceName:
+    Type: String
+    Default: web
+    Description: A name for the service
+  AppImageUrl:
+    Type: String
+    Description: The url of a docker image that contains the application process that
+                 will handle the traffic for this service
+  NginxImageUrl:
+    Type: String
+    Description: The url of a docker image that provides the NGINX reverse proxy
+  ContainerCpu:
+    Type: Number
+    Default: 1024
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 2048
+    Description: How much memory in megabytes to give the container
+  ContainerPort:
+    Type: Number
+    Default: 80
+    Description: What port that the application expects traffic on
+  DesiredCount:
+    Type: Number
+    Default: 2
+    Description: How many copies of the service task to run
+
+Resources:
+
+  # The task definition. This is a simple metadata description of what
+  # container(s) to run, and what resource requirements the task has
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref ServiceName
+      Cpu: !Ref ContainerCpu
+      Memory: !Ref ContainerMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ContainerDefinitions:
+        # NGINX sidecar for the task
+        - Name: nginx
+          Image: !Ref NginxImageUrl
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              HostPort: !Ref ContainerPort
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref NginxLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub "${ServiceName}/nginx"
+        # Application container
+        - Name: app
+          Image: !Ref AppImageUrl
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref AppLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub "${ServiceName}/app"
+
+  # The service. The service is a resource which allows you to run multiple
+  # copies of a type of task, and gather up their logs and metrics, as well
+  # as monitor the number of running tasks and replace any that have crashed
+  Service:
+    Type: AWS::ECS::Service
+    # Avoid race condition between ECS service creation and associating
+    # the target group with the LB
+    DependsOn: PublicLoadBalancerListener
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ClusterName
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets: !Ref PublicSubnetIds
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref DesiredCount
+      TaskDefinition: !Ref TaskDefinition
+      LoadBalancers:
+        - ContainerName: !Ref ServiceName
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref ServiceTargetGroup
+
+  # Security group that limits network access
+  # to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service
+      VpcId: !Ref VpcId
+
+  # Keeps track of the list of tasks for the service
+  ServiceTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: ip
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      UnhealthyThresholdCount: 10
+      VpcId: !Ref VpcId
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 0
+
+  # A public facing load balancer, this is used as ingress for
+  # public facing internet traffic.
+  PublicLoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the public facing load balancer
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        # Allow access to public facing ALB from any IP address
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+  PublicLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: '30'
+      Subnets: !Ref PublicSubnetIds
+      SecurityGroups:
+        - !Ref PublicLoadBalancerSG
+  PublicLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: 'forward'
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !Ref ServiceTargetGroup
+                Weight: 100
+      LoadBalancerArn: !Ref 'PublicLoadBalancer'
+      Port: 80
+      Protocol: HTTP
+
+  # Open up the service's security group to traffic originating
+  # from the security group of the load balancer.
+  ServiceIngressfromLoadBalancer:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from the public ALB
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'PublicLoadBalancerSG'
+
+  # This log group stores the stdout logs from the app
+  AppLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  # This log group stores the access logs from NGINX
+  NginxLogGroup:
+    Type: AWS::Logs::LogGroup

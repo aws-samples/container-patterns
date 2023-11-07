@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Empty ECS cluster that has no EC2 instances. It is designed
+             to be used with AWS Fargate serverless capacity
+
+Resources:
+  # This is authorizes ECS to manage resources on your
+  # account on your behalf. This role is likely already created on your account
+  # ECSRole:
+  #  Type: AWS::IAM::ServiceLinkedRole
+  #  Properties:
+  #    AWSServiceName: 'ecs.amazonaws.com'
+
+  # ECS Resources
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # This is a role which is used within Fargate to allow the Fargate agent
+  # to download images, and upload logs.
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Path: /
+
+      # This role enables basic features of ECS. See reference:
+      # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonECSTaskExecutionRolePolicy
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+Outputs:
+  ClusterName:
+    Description: The ECS cluster into which to launch resources
+    Value: !Ref ECSCluster
+  ECSTaskExecutionRole:
+    Description: The role used to start up a task
+    Value: !Ref ECSTaskExecutionRole

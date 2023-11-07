@@ -67,6 +67,13 @@ Resources:
           PortMappings:
             - ContainerPort: !Ref ContainerPort
               HostPort: !Ref ContainerPort
+          HealthCheck:
+            Command:
+              - "CMD-SHELL"
+              - "curl -f http://localhost/ || exit 1"
+            Interval: 5
+            Retries: 2
+            Timeout: 3
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:

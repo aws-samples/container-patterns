@@ -81,6 +81,7 @@ The following AWS CloudFormation template defines a basic NGINX task that runs i
 Important things to note:
 
 - The `AWS::ServiceDiscovery::Service` must use a [DNS record type of SRV](https://en.wikipedia.org/wiki/SRV_record). SRV records keep track of both the IP address as well as the port. This is required for API Gateway to be able to locate the task and send it traffic on the right port.
+- Container image must have the curl command installed in order to evaluate the Container Health Check commands.
 
 #### Define the API Gateway
 

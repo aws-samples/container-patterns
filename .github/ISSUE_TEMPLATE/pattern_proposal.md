@@ -1,6 +1,6 @@
 ---
 name: Proposal
-about: Submit a patern proposal
+about: Submit a pattern proposal
 title: ''
 labels: pattern/proposal
 assignees: ''

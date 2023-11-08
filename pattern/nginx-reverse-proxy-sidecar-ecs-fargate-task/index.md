@@ -1,7 +1,7 @@
 ---
-title: NGINX reverse proxy sidecar for a container hosted with Amazon ECS and AWS Fargate
+title: NGINX reverse proxy sidecar for a web container hosted with Amazon ECS and AWS Fargate
 description: >-
-  How to run a sidecar NGINX reverse proxy to offload heavy work and protect your containerized application from bad traffic.
+  How to run a sidecar NGINX reverse proxy to offload static file serving and protect your dynamic application code from bad traffic.
 filterDimensions:
   - key: tool
     value: cloudformation
@@ -63,13 +63,13 @@ In addition to hacking tools scanning your servers you can also end up receiving
 
 Anyone running a web server connected to the internet has to assume the responsibility of handling and rejecting potentially malicious traffic or unwanted traffic. Ideally the web server is capable of rejecting this traffic as early as possible, before it actually reaches your core application code. A reverse proxy is one way to provide an extra layer of protection for your application server. It can be configured to reject these requests before they reach your application server.
 
-Another potential benefit of using a reverse proxy is that you can offload some static responses from the application itself. In this pattern you will also notice that the healthcheck requests that the load balancer send to the task, are also being offloaded onto NGINX instead of going all the way to the application code.
+Another potential benefit of using a reverse proxy is that you can offload some static responses from the application itself. In this pattern you will notice that the healthcheck requests that the Application Load Balancer sends to the task are also being offloaded onto NGINX instead of going all the way to the application code. You could use a similar approach to host your own static HTML webpage, or other static content that you wish to serve to the internet.
 
 #### Dependencies
 
 This pattern requires that you have an AWS account and the following tools locally:
 
-- Docker or similar OCI compatible container image builder
+- [Docker](https://www.docker.com/) or similar OCI compatible container image builder
 - AWS Serverless Application Model (SAM) CLI - If not already installed then please [install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) for your system.
 
 #### Build the application

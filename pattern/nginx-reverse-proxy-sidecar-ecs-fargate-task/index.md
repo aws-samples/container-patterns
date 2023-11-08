@@ -1,5 +1,5 @@
 ---
-title: NGINX reverse proxy sidecar for a container in Amazon ECS and AWS Fargate
+title: NGINX reverse proxy sidecar for a container hosted with Amazon ECS and AWS Fargate
 description: >-
   How to run a sidecar NGINX reverse proxy to offload heavy work and protect your containerized application from bad traffic.
 filterDimensions:
@@ -22,9 +22,19 @@ date: Nov 16, 2023
 
 This pattern will show how to deploy open source NGINX as a reverse proxy container in front of your application container.
 
-#### Why?
+#### Architecture
 
-A reverse proxy fetches resources from another server on behalf of a client. One of the challenges of running a web server that serves resources to the public is that you can expect to receive quite a lot of unwanted traffic every day. Some of this traffic is relatively benign scans by researchers and tools such as Shodan or nmap:
+This pattern will deploy the following architecture:
+
+!!! @/pattern/nginx-reverse-proxy-sidecar-ecs-fargate-task/diagram.svg
+
+1. An ECS task runs in AWS Fargate. The task has two containers: an NGINX sidecar, and a simple JavaScript webserver
+2. The task only accepts inbound traffic on the NGINX traffic port. The NGINX server filters out bad traffic, and forwards good traffic to the backend task on it's local port.
+3. The NGINX server responds back to clients, returning the response from the application server. The NGINX server can also transform responses, such as doing compression of plaintext responses. This offloads work from the application itself.
+
+#### Why use a reverse proxy?
+
+A reverse proxy fetches resources from another server on behalf of a client. One of the challenges of running a web server that serves requests from the public is that you can expect to receive quite a lot of unwanted traffic every day. Some of this traffic is relatively benign scans by researchers and tools such as Shodan or nmap:
 
 ```txt
 [18/May/2017:15:10:10 +0000] "GET /YesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScanningForResearchPurposePleaseHaveALookAtTheUserAgentTHXYesThisIsAReallyLongRequestURLbutWeAreDoingItOnPurposeWeAreScann HTTP/1.1" 404 1389 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36
@@ -53,17 +63,14 @@ In addition to hacking tools scanning your servers you can also end up receiving
 
 Anyone running a web server connected to the internet has to assume the responsibility of handling and rejecting potentially malicious traffic or unwanted traffic. Ideally the web server is capable of rejecting this traffic as early as possible, before it actually reaches your core application code. A reverse proxy is one way to provide an extra layer of protection for your application server. It can be configured to reject these requests before they reach your application server.
 
-#### Architecture
-
-This pattern will deploy the following architecture:
-
-1. An ECS task runs in AWS Fargate. The task has two containers: an NGINX sidecar, and a simple JavaScript webserver
-2. The task only accepts inbound traffic on the NGINX traffic port. The NGINX server filters out bad traffic, and forward good traffic to the backend task on it's local port.
-3. The NGINX server responds back to clients, returning the response from the application server. The NGINX server can also transform responses, such as doing compression of plaintext responses. This offloads work from the application itself.
+Another potential benefit of using a reverse proxy is that you can offload some static responses from the application itself. In this pattern you will also notice that the healthcheck requests that the load balancer send to the task, are also being offloaded onto NGINX instead of going all the way to the application code.
 
 #### Dependencies
 
-This pattern requires that you have an AWS account, and that you use AWS Serverless Application Model (SAM) CLI. If not already installed then please [install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) for your system.
+This pattern requires that you have an AWS account and the following tools locally:
+
+- Docker or similar OCI compatible container image builder
+- AWS Serverless Application Model (SAM) CLI - If not already installed then please [install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) for your system.
 
 #### Build the application
 
@@ -119,11 +126,17 @@ Create a folder `nginx` and put the following files in the folder:
 <<< files/nginx/Dockerfile{Dockerfile}
 
 </tab>
+<tab label="index.html">
+
+<<< files/nginx/index.html
+
+</tab>
 </tabs>
 
 You should now have an `nginx` directory with two files in it:
 
 - `nginx.conf` - Defines the proxy configuration
+- `index.html` - Basic file that we will use as a healthcheck response
 - `Dockerfile` - Defines how to apply the proxy configuration on top of a generic NGINX image from the Elastic Conatiner Registry Public Gallery.
 
 Some things to note in the `nginx.conf`:
@@ -200,6 +213,35 @@ sam deploy \
 
 #### Test it out
 
+Open your Amazon ECS console, and locate the ECS service that you just deployed. You can find the public address of the service on the "Networking" tab, under the DNS names section. Click "open address" to open this URI in your browser.
 
+You will see a message:
+
+```txt
+Service is healthy
+```
+
+This response is coming from NGINX, which is serving the contents of the `index.html` file.
+
+Now try sending a request to the same URI but add `/api/users/1` to the end of the URI. You will see a response like:
+
+```txt
+User 1 found!
+```
+
+This response is coming from the application container, via NGINX. The NGINX reverse proxy has forwarded the request to the app container since it matched the pattern `/api`, and then returned the application container's response to the client.
+
+Try sending a request to a URL like `/web/phpmyadmin`. You will see a `404 Not Found` message coming back from NGINX. The reverse proxy has answered the request without burdening the application container at all.
 
 #### Tear it down
+
+When you are done experimenting with this stack you can run the following command to tear everything done:
+
+```shell
+sam delete --stack-name nginx-reverse-proxy
+```
+
+#### See Also
+
+- Consider using a [serverless API Gateway Ingress](api-gateway-fargate-cloudformation) instead of Application Load Balancer.
+- Add [target tracking auto scaling](target-tracking-scale-ecs-service-cloudformation) to your service, so that it can handle bursts of traffic better.

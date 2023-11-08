@@ -37,7 +37,7 @@ Note the following settings, which enable cross compatability in the task defini
   * `Cpu` and `Memory` - The requested task size much match a valid AWS Fargate task size
 
 
-<<< @/pattern/task-definition-across-ec2-and-fargate/files/task-definition.yml
+<<< files/task-definition.yml
 
 This template requires the following parameters:
 
@@ -67,7 +67,7 @@ aws cloudformation deploy \
 If you prefer to create the ECS task definition using JSON, then this snippet
 is a minimal example of the properties necessary for a task definition to be compatible across both AWS Fargate and Amazon EC2:
 
-<<< @/pattern/task-definition-across-ec2-and-fargate/files/task-definition.json
+<<< files/task-definition.json
 
 Register this task definition using the following command:
 

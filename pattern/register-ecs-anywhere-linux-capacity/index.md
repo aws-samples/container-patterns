@@ -31,7 +31,7 @@ curl --proto "https" -o "/tmp/ecs-anywhere-install.sh" "https://amazon-ecs-agent
 
 The referenced install script which is downloaded from S3 is also embedded here for your review. This script handles the installation of Docker, the AWS Systems Manager agent, and the Elastic Container Service Agent:
 
-<<< @/pattern/register-ecs-anywhere-linux-capacity/files/ecs-anywhere-install-latest.sh
+<<< files/ecs-anywhere-install-latest.sh
 
 #### See also
 

@@ -120,7 +120,7 @@ Last but not least type `y` when Copilot asks if you are ready to deploy a test 
 
 Take a look at the generated manifest file `copilot/cron-job/manifest.yml`:
 
-<<< @/pattern/scheduled-cron-job-container-ecs-copilot/files/copilot/cron-job/manifest.yml
+<<< files/copilot/cron-job/manifest.yml
 
 Some extra configuration that you can customize:
 

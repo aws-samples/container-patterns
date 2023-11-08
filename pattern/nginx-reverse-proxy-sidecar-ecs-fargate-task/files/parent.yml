@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys a serverless AWS Fargate web service.
+             The service tasks use an NGINX reverse proxy in front of the application.
+Parameters:
+  AppImageUrl:
+    Type: String
+    Description: The url of a docker image that contains the application process that
+                 will handle the traffic for this service
+  NginxImageUrl:
+    Type: String
+    Description: The url of a docker image that provides the NGINX reverse proxy
+
+Resources:
+
+  # The networking configuration. This creates an isolated
+  # network specific to this particular environment
+  VpcStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: vpc.yml
+
+  # This stack contains the Amazon ECS cluster itself
+  ClusterStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: cluster.yml
+
+  # This stack contains the container deployment
+  ServiceStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: service.yml
+      Parameters:
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        PublicSubnetIds: !GetAtt VpcStack.Outputs.PublicSubnetIds
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
+        AppImageUrl: !Ref AppImageUrl
+        NginxImageUrl: !Ref NginxImageUrl

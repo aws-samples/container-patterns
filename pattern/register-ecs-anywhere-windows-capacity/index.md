@@ -31,7 +31,7 @@ Invoke-RestMethod -URI "https://amazon-ecs-agent.s3.amazonaws.com/ecs-anywhere-i
 
 The referenced install script which is downloaded from S3 is also embedded here for your review. This script handles the installation of Docker, the AWS Systems Manager agent, and the Elastic Container Service Agent:
 
-<<< @/pattern/register-ecs-anywhere-windows-capacity/files/ecs-anywhere-install.ps1
+<<< files/ecs-anywhere-install.ps1
 
 #### See also
 

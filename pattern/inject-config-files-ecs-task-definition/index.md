@@ -10,7 +10,7 @@ filterDimensions:
     value: pattern
 authors:
   - peckn
-date: Dec 2022
+date: Dec 1, 2022
 ---
 
 The following snippet shows how to do runtime file generation and injection in an ECS task definition.

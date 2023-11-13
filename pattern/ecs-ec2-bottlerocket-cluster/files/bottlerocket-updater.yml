@@ -135,6 +135,8 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
+              mode: non-blocking
+              max-buffer-size: 25m
               awslogs-create-group: 'true'
               awslogs-region: !Ref AWS::Region
               awslogs-group: !Ref LogGroupName

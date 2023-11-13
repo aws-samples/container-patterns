@@ -20,3 +20,9 @@ Other system install instructions at: https://docs.aws.amazon.com/cfn-guard/late
 ```sh
 cfn-guard validate --data ./pattern/**/files/*.yml --rules ./lint/guard
 ```
+
+#### Testing Guard Rules
+
+```sh
+cfn-guard test --rules-file awslogs-logging-driver.guard --test-data awslogs-non-blocking-tests.yaml
+```

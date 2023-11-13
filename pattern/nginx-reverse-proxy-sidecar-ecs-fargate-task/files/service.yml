@@ -68,6 +68,8 @@ Resources:
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:
+              mode: non-blocking
+              max-buffer-size: 25m
               awslogs-group: !Ref NginxLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Sub "${ServiceName}/nginx"
@@ -77,6 +79,8 @@ Resources:
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:
+              mode: non-blocking
+              max-buffer-size: 25m
               awslogs-group: !Ref AppLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Sub "${ServiceName}/app"

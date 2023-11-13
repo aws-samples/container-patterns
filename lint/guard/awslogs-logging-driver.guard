@@ -1,0 +1,28 @@
+#
+# The following rule ensures that when awslogs logging driver is being
+# configured, it is launched in nonblocking mode, with a buffer for storing
+# logs. This prevents cascading failures from a CloudWatch availability event
+# causing ECS tasks to freeze because logs are unable to be flushed. In most
+# cases it is better to stay online and available, with dropped logs, than
+# to completely freeze up applications, while they wait on a blocking stdout
+# See: https://aws.amazon.com/blogs/containers/preventing-log-loss-with-non-blocking-mode-in-the-awslogs-container-log-driver/
+#
+rule awslogs_nonblocking_condition {
+  let task_defs_with_awslogs = Resources.*[
+    Type == 'AWS::ECS::TaskDefinition'
+    some Properties.ContainerDefinitions[*] {
+      LogConfiguration.LogDriver == 'awslogs'
+    }
+  ]
+
+  when %task_defs_with_awslogs !empty {
+    %task_defs_with_awslogs {
+      Properties.ContainerDefinitions[*].LogConfiguration {
+        when LogDriver == 'awslogs' {
+          Options.mode == 'non-blocking'
+          Options['max-buffer-size'] == '25m'
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,156 @@
+---
+- name: awslogs logging driver config that is nonblocking should pass
+  expectations:
+    rules:
+      awslogs_nonblocking_condition: PASS
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  mode: non-blocking
+                  max-buffer-size: 25m
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+- name: awslogs logging driver config that is default should fail
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: FAIL
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+- name: awslogs logging driver config that is blocking should fail
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: FAIL
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  mode: 'blocking'
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+
+- name: with two containers that block, it should fail
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: FAIL
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+- name: with two containers, one blocking and one non-blocking, it should fail
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: FAIL
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  mode: non-blocking
+                  max-buffer-size: 25m
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+- name: should ignore logging drivers that aren't awslogs
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: SKIP
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'firelens'
+
+- name: should fail when there is a blocking awslogs, even if there is another logging driver
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: FAIL
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'firelens'
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName
+
+- name: should pass nonblocking awslogs, even if there is another logging driver
+  expectations:
+     rules:
+       awslogs_nonblocking_condition: PASS
+  input:
+    Resources:
+      TaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+          ContainerDefinitions:
+            - LogConfiguration:
+                LogDriver: 'firelens'
+            - LogConfiguration:
+                LogDriver: 'awslogs'
+                Options:
+                  mode: non-blocking
+                  max-buffer-size: 25m
+                  awslogs-group: !Ref LogGroup
+                  awslogs-region: !Ref AWS::Region
+                  awslogs-stream-prefix: !Ref ServiceName

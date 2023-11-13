@@ -137,3 +137,8 @@
   label: Workshop
   color: "#547a82"
   checked: false
+- key: type
+  value: policy-as-code
+  label: Policy as Code
+  color: "#547a82"
+  checked: false

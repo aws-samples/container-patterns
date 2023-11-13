@@ -149,6 +149,8 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
+              mode: non-blocking
+              max-buffer-size: 25m
               awslogs-group: !Ref EfsTaskLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: efs-task

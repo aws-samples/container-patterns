@@ -29,6 +29,11 @@
   label: AWS CLI
   color: "#42653d"
   checked: false
+- key: tool
+  value: samcli
+  label: AWS SAM CLI
+  color: "#42653d"
+  checked: false
 
 # Capacity types
 - key: capacity

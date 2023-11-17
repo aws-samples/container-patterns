@@ -5,6 +5,10 @@ description: >-
 filterDimensions:
   - key: tool
     value: cloudformation
+  - key: tool
+    value: aws-sam-cli
+  - key: capacity
+    value: fargate
   - key: app
     value: website
   - key: type

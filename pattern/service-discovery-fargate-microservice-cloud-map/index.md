@@ -5,6 +5,8 @@ description: >-
 filterDimensions:
   - key: tool
     value: cloudformation
+  - key: tool
+    value: aws-sam-cli
   - key: feature
     value: cloudmap
   - key: type

@@ -5,6 +5,8 @@ description: >-
 filterDimensions:
   - key: type
     value: pattern
+  - key: tool
+    value: aws-sam-cli
 authors:
   - mike-fiedler
 date: Nov 1, 2023

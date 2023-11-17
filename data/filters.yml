@@ -30,7 +30,7 @@
   color: "#42653d"
   checked: false
 - key: tool
-  value: samcli
+  value: aws-sam-cli
   label: AWS SAM CLI
   color: "#42653d"
   checked: false

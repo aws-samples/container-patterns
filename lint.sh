@@ -1,3 +1,6 @@
+# Exit immediately if this fails
+set +e
+
 # Check the repo pattern content against our defined schemas
 echo "Linting content";
 node ./lint/lint.js

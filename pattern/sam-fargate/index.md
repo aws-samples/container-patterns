@@ -18,12 +18,12 @@ date: Nov 15 2023
 
 #### Dependencies
 
-This pattern uses AWS SAM CLI for deploying CloudFormation stacks on your AWS account.
+This pattern uses the AWS SAM CLI for deploying CloudFormation stacks on your AWS account.
 You should follow the appropriate [steps for installing SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 
 #### About
 
-You can use the AWS SAM CLI to deploy your containerized applications, as well as the required infrastructure resources, in a streamlined and efficient way. AWS SAM (Serverless Application Model) CLI extends AWS CloudFormation to simplify the deployment and management of your serverless applications. SAM CLI enables you to define your infrastructure as code, making it easy to version control and reproduce. It simplifies the process of packaging and deploying your application code, dependencies, and configurations.
+AWS SAM CLI streamlines the deployment of your containerized applications and necessary infrastructure resources efficiently. An extension of AWS CloudFormation, SAM CLI simplifies serverless application deployment and management by allowing you to define infrastructure as code. This facilitates version control and reproducibility, simplifying the packaging and deployment of your application code, dependencies, and configurations.
 
 This pattern will show how to deploy a simple nodeJS application to AWS Fargate using AWS SAM CLI. The following resources will be created as part of the provided templates:
 
@@ -43,15 +43,20 @@ The following diagram shows the architecture that will be deployed:
 
 !!! @/pattern/sam-fargate/diagram.svg
 
-#### Define your Amazon ECS Cluster, ECR Repo, Log Group, and all IAM related roles/policies
+#### Define your Infrastructure
 
-The following AWS SAM CLI template.yaml creates a simple Amazon ECS cluster using AWS Fargate. 
+The following AWS SAM CLI template.yaml creates a simple Amazon ECS cluster using AWS Fargate.
 
-In addition to the template.yaml, you will also need a vpc.yaml, where the necessary network resources are defined.
+As part of the `template.yaml`, the following resources will be created:
+
+- Amazon ECS Cluster 
+- ECR Repo
+- Log Group
+- All IAM related roles/policies
+
+In addition to the template.yaml, you will also need a `vpc.yaml`, where the necessary network resources are defined.
 
 Finally, AWS SAM CLI will also look for a samconfig file, which contains default parameters for your Infrastructure as Code.
-
-You will also need an application you can deploy to your infrastructure. For the purpose of this demo, a simple Hello World nodeJS application is provided for you.
 
 <tabs>
 
@@ -72,6 +77,12 @@ You will also need an application you can deploy to your infrastructure. For the
 <<< @/pattern/sam-fargate/files/samconfig.toml
 
 </tab>
+
+</tabs>
+
+You will also need an application you can deploy to your infrastructure. For the purpose of this demo, a simple Hello World nodeJS application is provided for you.
+
+<tabs>
 
 <tab label='index.js'>
 
@@ -109,6 +120,13 @@ RepositoryUrl=$(aws cloudformation --region us-east-1 describe-stacks --stack-na
 FQDN=$(aws cloudformation --region us-east-1 describe-stacks --stack-name nodejs-sam --query "Stacks[0].Outputs[?OutputKey=='FQDN'].OutputValue" --output text) && echo $FQDN
 ```
 
-**Note:** You will want to build and push your container prior to deploying this application to Fargate. 
+::: warning
+**Note:** You will want to build and push your container image prior to deploying this application to Fargate. 
 
-The default template will look for the image in your provisioned Amazon Elastic Container Registry with the tag "latest". Once the image exists, you will be able to test your application using the output retrieved from the FQDN command.
+The default template will look for the image in your provisioned Amazon Elastic Container Registry with the tag "latest". Once the image exists, you will be able to test your application using the output retrieved from the FQDN command. 
+:::
+
+:::tip
+In Production, it's not best practice to use the `latest` tag for your containerized application images. Instead, you'll want to [tag your images per release](release-container-to-production-task-definition) as part of your CI/CD workflow or pipeline. 
+:::
+

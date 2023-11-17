@@ -4,7 +4,7 @@ description: >-
   How to deploy a simple public facing application on AWS Fargate using AWS SAM CLI
 filterDimensions:
   - key: tool
-    value: samcli
+    value: aws-sam-cli
   - key: tool
     value: cloudformation
   - key: type
@@ -45,30 +45,30 @@ The following diagram shows the architecture that will be deployed:
 
 #### Define your Infrastructure
 
-The following AWS SAM CLI template.yaml creates a simple Amazon ECS cluster using AWS Fargate.
+The following AWS SAM CLI template.yml creates a simple Amazon ECS cluster using AWS Fargate.
 
-As part of the `template.yaml`, the following resources will be created:
+As part of the `template.yml`, the following resources will be created:
 
 - Amazon ECS Cluster 
 - ECR Repo
 - Log Group
 - All IAM related roles/policies
 
-In addition to the template.yaml, you will also need a `vpc.yaml`, where the necessary network resources are defined.
+In addition to the `template.yml`, you will also need a `vpc.yml`, where the necessary network resources are defined.
 
 Finally, AWS SAM CLI will also look for a samconfig file, which contains default parameters for your Infrastructure as Code.
 
 <tabs>
 
-<tab label='template.yaml'>
+<tab label='template.yml'>
 
-<<< @/pattern/sam-fargate/files/template.yaml
+<<< @/pattern/sam-fargate/files/template.yml
 
 </tab>
 
-<tab label='vpc.yaml'>
+<tab label='vpc.yml'>
 
-<<< @/pattern/sam-fargate/files/vpc.yaml
+<<< @/pattern/sam-fargate/files/vpc.yml
 
 </tab>
 

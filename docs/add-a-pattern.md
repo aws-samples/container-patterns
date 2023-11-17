@@ -117,6 +117,9 @@ Scary red danger message here
 ::: warning
 Orange warning here
 :::
+::: tip
+Tip message here
+:::
 ```
 
 For more info and examples see: https://vitepress.dev/guide/markdown#custom-containers

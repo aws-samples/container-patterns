@@ -1,0 +1,13 @@
+
+let task_defs = Resources.*[Type == 'AWS::ECS::TaskDefinition']
+
+#
+# Verify that ECS tasks are not being given privileged mode
+#
+rule tasks_denied_privileged_condition {
+  when %task_defs !empty {
+    %task_defs.Properties.ContainerDefinitions[*] {
+      Privileged !exists or Privileged != true
+    }
+  }
+}

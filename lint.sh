@@ -1,5 +1,5 @@
-# Exit immediately if this fails
-set +e
+# Exit immediately if linter fails
+# set +e
 
 # Check the repo pattern content against our defined schemas
 echo "Linting content";

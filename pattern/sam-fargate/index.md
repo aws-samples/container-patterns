@@ -4,7 +4,7 @@ description: >-
   How to deploy a simple public facing application on AWS Fargate using AWS SAM CLI
 filterDimensions:
   - key: tool
-    value: aws-sam-cli
+    value: aws-sam-cli1
   - key: tool
     value: cloudformation
   - key: type

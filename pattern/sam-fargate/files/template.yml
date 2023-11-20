@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: AWS Fargate with VPC, ALB, and ECR
 
 Parameters:
-  Tag:
+  ImageTag:
     Description: tag name for image
     Type: String
     Default: latest
@@ -17,7 +17,7 @@ Resources:
   VPC:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./vpc.yaml
+      Location: ./vpc.yml
 
   ECRRepo:
     Type: AWS::ECR::Repository
@@ -62,7 +62,7 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       TaskRoleArn: !Ref ECSTaskRole
       RuntimePlatform:
         CpuArchitecture: X86_64
@@ -71,7 +71,7 @@ Resources:
           Cpu: 1024
           Memory: 8192
           Image: !Sub
-            - ${RepoUrl}:latest
+            - ${RepoUrl}:${ImageTag}
             - RepoUrl: !GetAtt ECRRepo.RepositoryUri
           PortMappings:
             - ContainerPort: 3000

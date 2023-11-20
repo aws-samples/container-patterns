@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition which has privileged mode
+
+Resources:
+  PrivilegedTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          Privileged: true

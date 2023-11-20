@@ -116,3 +116,7 @@ CloudFormation Guard will return a non zero exit code to indicate a failure. Whe
 
 - [Choosing container logging options to avoid backpressure](https://aws.amazon.com/blogs/containers/choosing-container-logging-options-to-avoid-backpressure/)
 - [Preventing log loss with non-blocking mode in the AWSLogs container log driver](https://aws.amazon.com/blogs/containers/preventing-log-loss-with-non-blocking-mode-in-the-awslogs-container-log-driver/)
+
+More policy as code patterns:
+
+- [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)

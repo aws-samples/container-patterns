@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template sets up infrastructure for a private, signed image
+
+Resources:
+
+  SigningProfile:
+    Type: AWS::Signer::SigningProfile
+    Properties:
+      PlatformId: Notation-OCI-SHA384-ECDSA
+      SignatureValidityPeriod:
+        Type: YEARS
+        Value: 3
+
+  PrivateContainerRegistry:
+    Type: AWS::ECR::Repository
+    Properties:
+      EmptyOnDelete: True
+
+Outputs:
+  RepositoryUri:
+    Description: The URI to use for pushing container images to the private registry
+    Value: !GetAtt PrivateContainerRegistry.RepositoryUri
+  SigningProfileArn:
+    Description: An ARN referencing the signing profile
+    Value: !GetAtt SigningProfile.Arn

@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: This template sets up the verifier function
+
+Parameters:
+  SigningProfileArn:
+    Type: String
+
+Resources:
+
+  VerifySignature:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 1024
+      Environment:
+        Variables:
+          SIGNING_PROFILE_ARN: !Ref SigningProfileArn
+          XDG_CONFIG_HOME: /tmp/notation
+      Policies:
+        # Give the function access to what it needs
+        - Statement:
+          - Sid: AllowEcrFetch
+            Effect: Allow
+            Action:
+              - ecr:DescribeRepositories
+              - ecr:DescribeImages
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Resource: !Sub 'arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/*'
+          - Sid: AllowEcrAuth
+            Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+            Resource: '*'
+      Events:
+        ECSTaskCreateEvent:
+          Type: EventBridgeRule # More info about CloudWatchEvent Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#cloudwatchevent
+          Properties:
+            Pattern:
+              source:
+              - aws.ecs
+              detail-type:
+              - ECS Task State Change
+              detail:
+                desiredStatus:
+                - RUNNING
+                lastStatus:
+                - PROVISIONING
+    Metadata:
+      DockerContext: ./sigverify
+      Dockerfile: Dockerfile

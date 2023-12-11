@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys a serverless AWS Fargate web service.
+             Containers for the application will be verified after launch using AWS Signer
+
+Resources:
+
+  # The registry and AWS Signer setup
+  RegistryStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: registry.yml
+
+  # The verification function
+  VerificationFunction:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: sigverify.yml
+      Parameters:
+        SigningProfileArn: !GetAtt RegistryStack.Outputs.SigningProfileArn
+
+Outputs:
+  RepositoryUri:
+    Description: The URI to use for pushing container images to the private registry
+    Value: !GetAtt RegistryStack.Outputs.RepositoryUri
+  SigningProfileArn:
+    Description: An ARN referencing the signing profile
+    Value: !GetAtt RegistryStack.Outputs.SigningProfileArn

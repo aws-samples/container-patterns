@@ -18,7 +18,7 @@ Resources:
           SIGNING_PROFILE_ARN: !Ref SigningProfileArn
           XDG_CONFIG_HOME: /tmp/notation
       Policies:
-        # Give the function access to what it needs
+        # Give the function access to Elastic Container Registry
         - Statement:
           - Sid: AllowEcrFetch
             Effect: Allow
@@ -34,8 +34,9 @@ Resources:
               - ecr:GetAuthorizationToken
             Resource: '*'
       Events:
+        # Run on ECS task launch events
         ECSTaskCreateEvent:
-          Type: EventBridgeRule # More info about CloudWatchEvent Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#cloudwatchevent
+          Type: EventBridgeRule
           Properties:
             Pattern:
               source:

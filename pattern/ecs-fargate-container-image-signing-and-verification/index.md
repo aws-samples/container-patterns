@@ -224,3 +224,31 @@ sam deploy \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
 ```
+
+#### Deploy sample ECS tasks
+
+It is time to deploy a sample workload and check to make sure the Lambda function is working.
+
+First we can define two tasks, one to be signed, and one to be unsigned:
+
+<<< files/sample-tasks.yml
+
+And add the sample task stack to the application definition:
+
+<<< files/parent-step-03.yml
+
+Now you can deploy the application stack with the following command:
+
+```sh
+sam build --template parent-step-03.yml
+
+sam deploy \
+  --template-file .aws-sam/build/template.yaml \
+  --stack-name aws-signer-image-verification \
+  --resolve-image-repos \
+  --resolve-s3 \
+  --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+  --parameter-overrides SignedImageUri=$IMAGE_SHA
+```
+
+In order to launch the sample tasks, let's just use the Amazon ECS console for simplicity.

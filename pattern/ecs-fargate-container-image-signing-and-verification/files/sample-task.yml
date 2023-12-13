@@ -39,19 +39,3 @@ Resources:
       ContainerDefinitions:
         - Name: sample-signed
           Image: !Ref SignedImageUri
-
-  # This task definition is unsigned
-  UnsignedTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: signed-task-def
-      RequiresCompatibilities:
-        - EC2
-        - FARGATE
-      ExecutionRoleArn: !Ref TaskExecutionRole
-      NetworkMode: awsvpc
-      Cpu: 256
-      Memory: 512
-      ContainerDefinitions:
-        - Name: sample-signed
-          Image: public.ecr.aws/ecs-sample-image/amazon-ecs-sample

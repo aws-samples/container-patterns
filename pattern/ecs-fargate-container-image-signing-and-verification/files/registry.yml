@@ -11,15 +11,23 @@ Resources:
         Type: YEARS
         Value: 3
 
-  PrivateContainerRegistry:
+  SignedContainerRegistry:
+    Type: AWS::ECR::Repository
+    Properties:
+      EmptyOnDelete: True
+
+  LambdaFunctionRegistory:
     Type: AWS::ECR::Repository
     Properties:
       EmptyOnDelete: True
 
 Outputs:
-  RepositoryUri:
-    Description: The URI to use for pushing container images to the private registry
-    Value: !GetAtt PrivateContainerRegistry.RepositoryUri
+  SignedRepositoryUri:
+    Description: The URI to use for pushing signed container images
+    Value: !GetAtt SignedContainerRegistry.RepositoryUri
+  LambdaRepositoryUri:
+    Description: The URI to use for pushing container images for lambda
+    Value: !GetAtt LambdaFunctionRegistory.RepositoryUri
   SigningProfileArn:
     Description: An ARN referencing the signing profile
     Value: !GetAtt SigningProfile.Arn

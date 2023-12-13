@@ -3,7 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: This template sets up the verifier function
 
 Parameters:
-  SigningProfileArn:
+  LambdaImageUri:
+    Description: The URI of the built container image (built outside of SAM because of buildkit)
     Type: String
 
 Resources:
@@ -12,11 +13,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
+      ImageUri: !Ref LambdaImageUri
       MemorySize: 1024
       Environment:
         Variables:
-          SIGNING_PROFILE_ARN: !Ref SigningProfileArn
-          XDG_CONFIG_HOME: /tmp/notation
+          XDG_CONFIG_HOME: /var/task
       Policies:
         # Give the function access to Elastic Container Registry
         - Statement:
@@ -33,6 +34,11 @@ Resources:
             Action:
               - ecr:GetAuthorizationToken
             Resource: '*'
+          - Sid: AllowSigner
+            Effect: Allow
+            Action:
+              - signer:GetRevocationStatus
+            Resource: '*'
       Events:
         # Run on ECS task launch events
         ECSTaskCreateEvent:
@@ -48,6 +54,3 @@ Resources:
                 - RUNNING
                 lastStatus:
                 - PROVISIONING
-    Metadata:
-      DockerContext: ./sigverify
-      Dockerfile: Dockerfile

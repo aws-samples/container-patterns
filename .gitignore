@@ -3,6 +3,9 @@ node_modules
 # Exclude Cloud Development Kit generated content
 cdk.out
 
+# Exclude AWS SAM generated content
+.aws-sam
+
 # Exclude Terraform generated content
 *.tfstate
 *.tfstate.backup

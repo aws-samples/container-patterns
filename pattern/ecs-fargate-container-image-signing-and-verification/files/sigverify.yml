@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: This template sets up the verifier function
+
+Parameters:
+  LambdaImageUri:
+    Description: The URI of the built container image (built outside of SAM because of buildkit)
+    Type: String
+
+Resources:
+
+  VerifySignature:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: !Ref LambdaImageUri
+      MemorySize: 1024
+      Environment:
+        Variables:
+          XDG_CONFIG_HOME: /var/task
+      Policies:
+        # Give the function access to Elastic Container Registry
+        - Statement:
+          - Sid: AllowEcrFetch
+            Effect: Allow
+            Action:
+              - ecr:DescribeRepositories
+              - ecr:DescribeImages
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Resource: !Sub 'arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/*'
+          - Sid: AllowEcrAuth
+            Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+            Resource: '*'
+          - Sid: AllowSigner
+            Effect: Allow
+            Action:
+              - signer:GetRevocationStatus
+            Resource: '*'
+      Events:
+        # Run on ECS task launch events
+        ECSTaskCreateEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+              - aws.ecs
+              detail-type:
+              - ECS Task State Change
+              detail:
+                desiredStatus:
+                - RUNNING
+                lastStatus:
+                - PROVISIONING

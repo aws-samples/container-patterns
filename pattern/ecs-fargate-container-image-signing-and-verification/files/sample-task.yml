@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template defines some sample workloads, signed and unsigned
+Parameters:
+  SignedImageUri:
+    Type: String
+
+Resources:
+  # This role is used to setup the execution environment for the task,
+  # including ability to download the image
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  # This task definition is signed
+  SignedTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: signed-task-def
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      ContainerDefinitions:
+        - Name: sample-signed
+          Image: !Ref SignedImageUri

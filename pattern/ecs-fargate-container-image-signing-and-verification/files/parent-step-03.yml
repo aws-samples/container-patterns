@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys a sample workflow for signing and verifying
+             the signatures on container images at runtime.
+Parameters:
+  LambdaImageUri:
+    Type: String
+  SignedImageUri:
+    Type: String
+
+Resources:
+
+  # The registry and AWS Signer setup
+  RegistryStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: registry.yml
+
+  # The verification function
+  VerificationFunction:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: sigverify.yml
+      Parameters:
+        LambdaImageUri: !Ref LambdaImageUri
+
+  # Sample task
+  SampleTask:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: sample-task.yml
+      Parameters:
+        SignedImageUri: !Ref SignedImageUri
+
+Outputs:
+  SignedRepositoryUri:
+    Description: The URI to use for pushing container images to the private registry
+    Value: !GetAtt RegistryStack.Outputs.SignedRepositoryUri
+  LambdaRepositoryUri:
+    Description: The URI to use for pushing container images for lambda
+    Value: !GetAtt RegistryStack.Outputs.LambdaRepositoryUri
+  SigningProfileArn:
+    Description: An ARN referencing the signing profile
+    Value: !GetAtt RegistryStack.Outputs.SigningProfileArn

@@ -16,7 +16,7 @@ date: Dec 5, 2023
 
 [AWS Signer](https://docs.aws.amazon.com/signer/latest/developerguide/Welcome.html) is a fully managed code-signing service to ensure the trust and integrity of your code. It can be used to sign and verify container images.
 
-[Notary](https://notaryproject.dev/) is open source software that has become the standard for signing container images, and then verifying the signatures. AWS Signer provides a Notary plugin, which can be configured as part of the Notation CLI tool.
+[Notary Project](https://notaryproject.dev/)The Notary Project is a set of specifications and tools that provide a cross-industry standard for securing software supply chains by signing and verifying container images and other OCI artifacts.  AWS Signer provides a plugin for Notation, a new client from the Notary Project, that customers can use to simplify their signing and verification workflows.
 
 In this reference architecture you will sign a container image, then deploy an automated event hook for [Amazon Elastic Container Service](https://aws.amazon.com/ecs/). The hook will check if containers launched on [AWS Fargate](https://aws.amazon.com/fargate/) are actually signed and verified.
 

@@ -14,11 +14,15 @@ authors:
 date: Dec 5, 2023
 ---
 
+#### About
+
+[Amazon Elastic Container Service (ECS)](https://aws.amazon.com/ecs/) is a fully managed container orchestration service that helps you to more efficiently deploy, manage, and scale containerized applications. Elastic Container Service works best with [AWS Fargate](https://aws.amazon.com/fargate/), a serverless, pay-as-you-go compute engine that lets you focus on building applications without managing servers.
+
 [AWS Signer](https://docs.aws.amazon.com/signer/latest/developerguide/Welcome.html) is a fully managed code-signing service to ensure the trust and integrity of your code. It can be used to sign and verify container images.
 
-[Notary Project](https://notaryproject.dev/)The Notary Project is a set of specifications and tools that provide a cross-industry standard for securing software supply chains by signing and verifying container images and other OCI artifacts.  AWS Signer provides a plugin for Notation, a new client from the Notary Project, that customers can use to simplify their signing and verification workflows.
+[The Notary Project](https://notaryproject.dev/) is a set of specifications and tools that provide a cross-industry standard for securing software supply chains by signing and verifying container images and other OCI artifacts.  AWS Signer provides a plugin for Notation, a new client from the Notary Project, that customers can use to simplify their signing and verification workflows.
 
-In this reference architecture you will sign a container image, then deploy an automated event hook for [Amazon Elastic Container Service](https://aws.amazon.com/ecs/). The hook will check if containers launched on [AWS Fargate](https://aws.amazon.com/fargate/) are actually signed and verified.
+In this reference architecture you will sign a container image, then deploy an automated event hook for [Amazon Elastic Container Service](https://aws.amazon.com/ecs/). The hook will use Notation to check if containers launched on [AWS Fargate](https://aws.amazon.com/fargate/) are actually signed and verified. This architecture will also work for Amazon ECS on EC2.
 
 #### Architecture
 

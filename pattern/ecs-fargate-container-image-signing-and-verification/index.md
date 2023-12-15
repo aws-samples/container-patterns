@@ -124,7 +124,7 @@ notation sign $APP_IMAGE_SHA  \
 --id $SIGNING_PROFILE_ARN
 ```
 
-Now you can now inspect the image to see the trust chain:
+Now you can inspect the image to see the trust chain:
 
 ```sh
 notation inspect $APP_IMAGE_SHA

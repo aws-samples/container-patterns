@@ -33,8 +33,8 @@ The following diagram shows the architecture you will deploy:
 ::: warning
 This EventBridge powered hook is read-only, and asynchronous from the ECS task launch workflow.
 Therefore this hook based architecture is only intended for auditing and notifying of unsigned or unapproved images
-being launched. The hook can only observe task launches and verify container images that are already
-in the process of being started up. It can not actually block Elastic Container Service
+being launched, such as for an auditing use case. The hook can only observe task launches and verify container images
+that are already in the process of being started up. It can not actually block Elastic Container Service
 from launching an unsigned or unapproved image.
 :::
 
@@ -357,7 +357,24 @@ For comparison, here is the output for another unsigned image that has no signat
 1702484161674,"209640446841.dkr.ecr.us-east-2.amazonaws.com/bun-hitcounter@sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d failed signature verification.
 1702484161676,"END RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2
 1702484161676,"REPORT RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2	Duration: 385.34 ms	Billed Duration: 386 ms	Memory Size: 1024 MB	Max Memory Used: 89 MB
-"
+```
+
+And here is the output when a signature fails verification:
+
+```txt
+2023-12-15T15:19:08.623-05:00	START RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce Version: $LATEST
+2023-12-15T15:19:08.656-05:00	level=info msg="Using the referrers tag schema"
+2023-12-15T15:19:08.751-05:00	level=info msg="Reference sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 resolved to manifest descriptor: {MediaType:application/vnd.docker.distribution.manifest.v2+json Digest:sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 Size:1778 URLs:[] Annotations:map[] Data:[] Platform:<nil> ArtifactType:}"
+2023-12-15T15:19:08.751-05:00	level=info msg="Checking whether signature verification should be skipped or not"
+2023-12-15T15:19:08.751-05:00	level=info msg="Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"
+2023-12-15T15:19:08.751-05:00	level=info msg="Check over. Trust policy is not configured to skip signature verification"
+2023-12-15T15:19:08.894-05:00	level=info msg="Processing signature with manifest mediaType: application/vnd.oci.image.manifest.v1+json and digest: sha256:fc4ee5d8335a385ba0a5a6dabc58ca1e55275182328b3ce3eab17fbce86529ab"
+2023-12-15T15:19:09.069-05:00	level=info msg="Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"
+2023-12-15T15:19:09.243-05:00	level=warning msg="Signature sha256:fc4ee5d8335a385ba0a5a6dabc58ca1e55275182328b3ce3eab17fbce86529ab failed verification with error: trusted identify verification by plugin \"com.amazonaws.signer.notation.plugin\" failed with reason \"signature publisher doesn't match any trusted identities\""
+2023-12-15T15:19:09.243-05:00	Error: signature verification failed for all the signatures associated with 209640446841.dkr.ecr.us-east-2.amazonaws.com/aws-signer-image-verification-registrystack-15g6wn192kvr1-signedcontainerregistry-ryrpet5bhnbg@sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40
+2023-12-15T15:19:09.244-05:00	209640446841.dkr.ecr.us-east-2.amazonaws.com/aws-signer-image-verification-registrystack-15g6wn192kvr1-signedcontainerregistry-ryrpet5bhnbg@sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 failed signature verification.
+2023-12-15T15:19:09.246-05:00	END RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce
+2023-12-15T15:19:09.246-05:00	REPORT RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce Duration: 622.28 ms Billed Duration: 623 ms Memory Size: 1024 MB Max Memory Used: 101 MB
 ```
 
 #### Tear it down
@@ -367,3 +384,8 @@ When you are done experimenting with this setup you can run the following comman
 ```sh
 sam delete --stack-name aws-signer-image-verification
 ```
+
+::: warning
+The `AWS::Signer::SigningProfile` will be cancelled as part of the CloudFormation stack teardown, but not revoked. You
+may also wish to revoke this signing profile to ensure that it can not be used in the future.
+:::

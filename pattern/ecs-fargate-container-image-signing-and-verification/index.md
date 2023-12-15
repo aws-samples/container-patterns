@@ -327,39 +327,50 @@ In order to launch the sample task, let's just use the Amazon ECS console for si
 6. Click "Create" and observe a new task launching in the cluster
 
 Now you can visit the Lambda function logs to see whether these tasks passed or failed verification.
+You will see log output similar to one of the following examples:
 
-For example here is the Lambda function output for the signed task definition:
+<tabs>
+<tab label="Trusted Signature">
 
-```txt
-1702417815650,"START RequestId: 25643a4a-147d-406d-bc0a-b2b5c5bae498 Version: $LATEST"
-1702417815843,"level=info msg=""Using the referrers tag schema"""
-1702417816002,"level=info msg=""Reference sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 resolved to manifest descriptor: {MediaType:application/vnd.docker.distribution.manifest.v2+json Digest:sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 Size:1778 URLs:[] Annotations:map[] Data:[] Platform:<nil> ArtifactType:}"""
-1702417816002,"level=info msg=""Checking whether signature verification should be skipped or not"""
-1702417816002,"level=info msg=""Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"""
-1702417816002,"level=info msg=""Check over. Trust policy is not configured to skip signature verification"""
-1702417816160,"level=info msg=""Processing signature with manifest mediaType: application/vnd.oci.image.manifest.v1+json and digest: sha256:6228069a242657828cd524c21a554bb7e1f877fad63ff9c9848f3822a470a028"""
-1702417816317,"level=info msg=""Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"""
-1702417816557,"Successfully verified signature for 209640446841.dkr.ecr.us-east-2.amazonaws.com/aws-signer-image-verification-registrystack-15g6wn192kvr1-signedcontainerregistry-ryrpet5bhnbg@sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40"
-1702417816561,"END RequestId: 25643a4a-147d-406d-bc0a-b2b5c5bae498"
-1702417816561,"REPORT RequestId: 25643a4a-147d-406d-bc0a-b2b5c5bae498	Duration: 910.85 ms	Billed Duration: 1308 ms	Memory Size: 1024 MB	Max Memory Used: 100 MB	Init Duration: 396.69 ms"
-```
-
-For comparison, here is the output for another unsigned image that has no signature:
+This is the output when the function successfully verifies an image's signature:
 
 ```txt
-1702484161290,"START RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2 Version: $LATEST
-1702484161319,"level=info msg=""Using the referrers tag schema""
-1702484161495,"level=info msg=""Reference sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d resolved to manifest descriptor: {MediaType:application/vnd.docker.distribution.manifest.v2+json Digest:sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d Size:2406 URLs:[] Annotations:map[] Data:[] Platform:<nil> ArtifactType:}""
-1702484161495,"level=info msg=""Checking whether signature verification should be skipped or not""
-1702484161495,"level=info msg=""Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}""
-1702484161495,"level=info msg=""Check over. Trust policy is not configured to skip signature verification""
-1702484161673,"Error: signature verification failed: no signature is associated with ""209640446841.dkr.ecr.us-east-2.amazonaws.com/bun-hitcounter@sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d"", make sure the artifact was signed successfully
-1702484161674,"209640446841.dkr.ecr.us-east-2.amazonaws.com/bun-hitcounter@sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d failed signature verification.
-1702484161676,"END RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2
-1702484161676,"REPORT RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2	Duration: 385.34 ms	Billed Duration: 386 ms	Memory Size: 1024 MB	Max Memory Used: 89 MB
+2023-12-15T15:15:53.093-05:00	START RequestId: 184e6833-99ae-46b3-95ac-84df625fc1e6 Version: $LATEST
+2023-12-15T15:15:53.285-05:00	level=info msg="Using the referrers tag schema"
+2023-12-15T15:15:53.394-05:00	level=info msg="Reference sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 resolved to manifest descriptor: {MediaType:application/vnd.docker.distribution.manifest.v2+json Digest:sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40 Size:1778 URLs:[] Annotations:map[] Data:[] Platform:<nil> ArtifactType:}"
+2023-12-15T15:15:53.394-05:00	level=info msg="Checking whether signature verification should be skipped or not"
+2023-12-15T15:15:53.394-05:00	level=info msg="Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"
+2023-12-15T15:15:53.394-05:00	level=info msg="Check over. Trust policy is not configured to skip signature verification"
+2023-12-15T15:15:53.540-05:00	level=info msg="Processing signature with manifest mediaType: application/vnd.oci.image.manifest.v1+json and digest: sha256:6228069a242657828cd524c21a554bb7e1f877fad63ff9c9848f3822a470a028"
+2023-12-15T15:15:53.701-05:00	level=info msg="Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"
+2023-12-15T15:15:53.873-05:00	Successfully verified signature for 209640446841.dkr.ecr.us-east-2.amazonaws.com/aws-signer-image-verification-registrystack-15g6wn192kvr1-signedcontainerregistry-ryrpet5bhnbg@sha256:7ebff78b7d7bd0cb13d462ecf4d9aaa6ea7571bd5548008163d0499eae2fbf40
+2023-12-15T15:15:53.877-05:00	END RequestId: 184e6833-99ae-46b3-95ac-84df625fc1e6
+2023-12-15T15:15:53.877-05:00	REPORT RequestId: 184e6833-99ae-46b3-95ac-84df625fc1e6 Duration: 783.63 ms Billed Duration: 1186 ms Memory Size: 1024 MB Max Memory Used: 100 MB Init Duration: 401.84 ms
 ```
 
-And here is the output when a signature fails verification:
+</tab>
+<tab label="No Signature">
+
+This is the output for an unsigned image, when the trust policy expects images to be signed:
+
+```txt
+2023-12-13T11:16:01.290-05:00	START RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2 Version: $LATEST
+2023-12-13T11:16:01.319-05:00	level=info msg="Using the referrers tag schema"
+2023-12-13T11:16:01.495-05:00	level=info msg="Reference sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d resolved to manifest descriptor: {MediaType:application/vnd.docker.distribution.manifest.v2+json Digest:sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d Size:2406 URLs:[] Annotations:map[] Data:[] Platform:<nil> ArtifactType:}"
+2023-12-13T11:16:01.495-05:00	level=info msg="Checking whether signature verification should be skipped or not"
+2023-12-13T11:16:01.495-05:00	level=info msg="Trust policy configuration: &{Name:aws-signer-tp RegistryScopes:[*] SignatureVerification:{VerificationLevel:strict Override:map[]} TrustStores:[signingAuthority:aws-signer-ts] TrustedIdentities:[arn:aws:signer:us-east-2:209640446841:/signing-profiles/SigningProfile_0y9b0jhBJAoh]}"
+2023-12-13T11:16:01.495-05:00	level=info msg="Check over. Trust policy is not configured to skip signature verification"
+2023-12-13T11:16:01.673-05:00	Error: signature verification failed: no signature is associated with "209640446841.dkr.ecr.us-east-2.amazonaws.com/bun-hitcounter@sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d", make sure the artifact was signed successfully
+2023-12-13T11:16:01.674-05:00	209640446841.dkr.ecr.us-east-2.amazonaws.com/bun-hitcounter@sha256:22f34fb040d17d2cca44ba5903c6af24b3cf6ed97bc1aeb257c510b1b829701d failed signature verification.
+2023-12-13T11:16:01.676-05:00	END RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2
+2023-12-13T11:16:01.676-05:00	REPORT RequestId: 1883a890-84f1-4ac9-8b4c-ca63c395e0e2 Duration: 385.34 ms Billed Duration: 386 ms Memory Size: 1024 MB Max Memory Used: 89 MB
+```
+
+
+</tab>
+<tab label="Untrusted Signature">
+
+This is the output when the image has a signature, but it is not a trusted signature according to the trust policy:
 
 ```txt
 2023-12-15T15:19:08.623-05:00	START RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce Version: $LATEST
@@ -376,6 +387,10 @@ And here is the output when a signature fails verification:
 2023-12-15T15:19:09.246-05:00	END RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce
 2023-12-15T15:19:09.246-05:00	REPORT RequestId: 9974d1b8-b59e-4793-9eea-eceabd288cce Duration: 622.28 ms Billed Duration: 623 ms Memory Size: 1024 MB Max Memory Used: 101 MB
 ```
+
+</tab>
+</tabs>
+
 
 #### Tear it down
 

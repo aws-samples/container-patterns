@@ -28,7 +28,7 @@ The following diagram shows the architecture you will deploy:
 
 ::: warning
 This EventBridge powered hook is read-only, and asynchronous from the ECS task launch workflow.
-Therefore this hook based architecture is only intended for auditing and notifying of unsigned images
+Therefore this hook based architecture is only intended for auditing and notifying of unsigned or unapproved images
 being launched. The hook can only observe task launches and verify container images that are already
 in the process of being started up. It can not actually block Elastic Container Service
 from launching an unsigned image.

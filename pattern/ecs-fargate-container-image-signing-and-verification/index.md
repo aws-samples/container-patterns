@@ -36,7 +36,7 @@ from launching an unsigned image.
 
 1. A task launch is initiated (either by the ECS `RunTask` API call, or the ECS `CreateService` API call)
 2. The task launch generates a task state change event that is picked up by Amazon EventBridge
-3. If the task state change is a task launch then EventBridge invokes a verifier Lambda function
+3. If the task state change is a task launch then EventBridge invokes a Lambda function to verify image signatures
 4. The Lambda function downloads the container image manifest and verifies the signature, using AWS Signer to
    verify that the signature has not been revoked.
 5. You can plug your own logic into the Lambda for handling unsigned images: log and ignore, stop the task, send a Slack message or Pagerduty alert, etc.

@@ -83,12 +83,19 @@ This parent stack requires the following parameters:
 Use SAM CLI to deploy the stacks with a command like this:
 
 ```sh
+# Get the VPC ID of the default VPC on the AWS account
+DEFAULT_VPC_ID=$(aws ec2 describe-vpcs --filters Name=is-default,Values=true --query 'Vpcs[0].VpcId' --output text)
+
+# Grab the list of subnet ID's from the default VPC, and glue it together into a comma separated list
+DEFAULT_VPC_SUBNET_IDS=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=$DEFAULT_VPC --query "Subnets[*].[SubnetId]" --output text | paste -sd, -)
+
+# Now deploy the ECS cluster to the default VPC and it's subnets
 sam deploy \
   --template-file parent.yml \
   --stack-name capacity-provider-environment \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides VpcId=vpc-79508710 SubnetIds=subnet-b4676dfe,subnet-c71ebfae
+  --parameter-overrides VpcId=$DEFAULT_VPC_ID SubnetIds=$DEFAULT_VPC_SUBNET_IDS
 ```
 
 ::: warning
@@ -112,6 +119,14 @@ Use the Amazon ECS web console to update the service and set the desired count t
 #### Test out scaling down
 
 Last but not least update the service in the ECS console to adjust its desired count back down to zero. Once all instances are empty you will see ECS begin to shutdown EC2 instances until the cluster has been scaled back down to zero.
+
+#### Tear it Down
+
+You can use the following command to tear down this test stack:
+
+```sh
+sam delete --stack-name capacity-provider-environment --no-prompts
+```
 
 #### See Also
 

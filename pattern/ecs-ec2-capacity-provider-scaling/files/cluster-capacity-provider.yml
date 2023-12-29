@@ -116,7 +116,8 @@ Resources:
 
   CustomAsgDestroyer:
     Type: Custom::AsgDestroyer
-    DependsOn: ECSAutoScalingGroup
+    DependsOn:
+      - CapacityProviderAssociation
     Properties:
       ServiceToken: !GetAtt CustomAsgDestroyerFunction.Arn
       Region: !Ref "AWS::Region"
@@ -178,7 +179,6 @@ Resources:
   # so that it autoscales as we launch more containers
   CapacityProvider:
     Type: AWS::ECS::CapacityProvider
-    DependsOn: ECSAutoScalingGroup
     Properties:
       AutoScalingGroupProvider:
         AutoScalingGroupArn: !Ref ECSAutoScalingGroup

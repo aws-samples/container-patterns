@@ -187,7 +187,7 @@ Resources:
           Status: ENABLED
           # Percentage of cluster reservation to try to maintain
           TargetCapacity: 100
-        ManagedTerminationProtection: DISABLED
+        ManagedTerminationProtection: ENABLED
 
   # Create a cluster capacity provider assocation so that the cluster
   # will use the capacity provider

@@ -96,6 +96,83 @@ Resources:
       Roles:
         - !Ref EC2Role
 
+  # Custom resource that force destroys the ASG. This cleans up EC2 instances that had
+  # managed termination protection enabled, but which are not yet released.
+  # This is necessary because ECS does not immediately release an EC2 instance from termination
+  # protection as soon as the instance is no longer running tasks. There is a cooldown delay.
+  # In the case of tearing down the CloudFormation stack, CloudFormation will delete the
+  # AWS::ECS::Service and immediately move on to tearing down the AWS::ECS::Cluster, disconnecting
+  # the AWS::AutoScaling::AutoScalingGroup from ECS management too fast, before ECS has a chance
+  # to asynchronously turn off managed instance protection on the EC2 instances.
+  # This will leave some EC2 instances stranded in a state where they are protected from scale-in forever.
+  # This then blocks the AWS::AutoScaling::AutoScalingGroup from cleaning itself up.
+  # The custom resource function force destroys the autoscaling group when tearing down the stack,
+  # avoiding the issue of protected EC2 instances that can never be cleaned up.
+  CustomAsgDestroyerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: !Sub |
+          const { AutoScalingClient, DeleteAutoScalingGroupCommand } = require("@aws-sdk/client-auto-scaling");
+          const autoscaling = new AutoScalingClient({ region: '${AWS::Region}' });
+          const response = require('cfn-response');
+
+          exports.handler = async function(event, context) {
+            console.log(event);
+
+            if (event.RequestType !== "Delete") {
+              await response.send(event, context, response.SUCCESS);
+              return;
+            }
+
+            const input = {
+              AutoScalingGroupName: '${ECSAutoScalingGroup}',
+              ForceDelete: true
+            };
+            const command = new DeleteAutoScalingGroupCommand(input);
+            const deleteResponse = await autoscaling.send(command);
+            console.log(deleteResponse);
+
+            await response.send(event, context, response.SUCCESS);
+          };
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      Role: !GetAtt CustomAsgDestroyerRole.Arn
+
+  # The role used by the ASG destroyer
+  CustomAsgDestroyerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        # https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: allow-to-delete-autoscaling-group
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: autoscaling:DeleteAutoScalingGroup
+                Resource: !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${ECSAutoScalingGroup}
+
+  CustomAsgDestroyer:
+    Type: Custom::AsgDestroyer
+    DependsOn:
+      - CapacityProviderAssociation
+    Properties:
+      ServiceToken: !GetAtt CustomAsgDestroyerFunction.Arn
+      Region: !Ref "AWS::Region"
+
   # Create an ECS capacity provider to attach the ASG to the ECS cluster
   # so that it autoscales as we launch more containers
   CapacityProvider:
@@ -110,7 +187,7 @@ Resources:
           Status: ENABLED
           # Percentage of cluster reservation to try to maintain
           TargetCapacity: 100
-        ManagedTerminationProtection: ENABLED
+        ManagedTerminationProtection: DISABLED
 
   # Create a cluster capacity provider assocation so that the cluster
   # will use the capacity provider

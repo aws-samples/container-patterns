@@ -55,7 +55,7 @@ Resources:
   # to asynchronously turn off managed instance protection on the EC2 instances.
   # This will leave some EC2 instances stranded in a state where they are protected from scale-in forever.
   # This then blocks the AWS::AutoScaling::AutoScalingGroup from cleaning itself up.
-  # The custom resource function force destroys these autoscaling group when tearing down the stack,
+  # The custom resource function force destroys the autoscaling group when tearing down the stack,
   # avoiding the issue of protected EC2 instances that can never be cleaned up.
   CustomAsgDestroyerFunction:
     Type: AWS::Lambda::Function

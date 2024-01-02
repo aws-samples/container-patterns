@@ -54,12 +54,15 @@ Resources:
             echo "ECS_CLUSTER=${ECSCluster}" >> /etc/ecs/ecs.config
             echo "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true" >> /etc/ecs/ecs.config
             echo "ECS_CONTAINER_STOP_TIMEOUT=90s" >> /etc/ecs/ecs.config
-
         BlockDeviceMappings:
           - DeviceName: "/dev/xvda"
             Ebs:
               VolumeSize: 50
               VolumeType: gp3
+        # Disable IMDSv1, and require IMDSv2
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpTokens: required
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

@@ -86,6 +86,10 @@ Resources:
           Fn::Base64: !Sub |
             [settings.ecs]
             cluster = "${ECSCluster}"
+        # Disable IMDSv1, and require IMDSv2
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpTokens: required
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

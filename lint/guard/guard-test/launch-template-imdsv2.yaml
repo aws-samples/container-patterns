@@ -1,0 +1,100 @@
+---
+- name: Launch template without IMDSv2 enabled should fail
+  input:
+    Resources:
+      ContainerInstances:
+        Type: AWS::EC2::LaunchTemplate
+        Properties:
+          LaunchTemplateData:
+            ImageId: !Ref ECSAMI
+            InstanceType: !Ref InstanceType
+            IamInstanceProfile:
+              Name: !Ref EC2InstanceProfile
+            SecurityGroupIds:
+              - !Ref ContainerHostSecurityGroup
+            UserData:
+              # This injected configuration file is how the EC2 instance
+              # knows which ECS cluster on your AWS account it should be joining
+              Fn::Base64: !Sub |
+                [settings.ecs]
+                cluster = "${ECSCluster}"
+      EC2InstanceProfile:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+          Path: /
+          Roles:
+            - !Ref EC2Role
+
+  expectations:
+    rules:
+      launch_template_imdsv2_condition: FAIL
+
+- name: Launch template with IMDSv2 enabled should pass
+  input:
+    Resources:
+      ContainerInstances:
+        Type: AWS::EC2::LaunchTemplate
+        Properties:
+          LaunchTemplateData:
+            ImageId: !Ref ECSAMI
+            InstanceType: !Ref InstanceType
+            IamInstanceProfile:
+              Name: !Ref EC2InstanceProfile
+            SecurityGroupIds:
+              - !Ref ContainerHostSecurityGroup
+            UserData:
+              # This injected configuration file is how the EC2 instance
+              # knows which ECS cluster on your AWS account it should be joining
+              Fn::Base64: !Sub |
+                [settings.ecs]
+                cluster = "${ECSCluster}"
+            # Disable IMDSv1, and require IMDSv2
+            MetadataOptions:
+              HttpEndpoint: enabled
+              HttpTokens: required
+      EC2InstanceProfile:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+          Path: /
+          Roles:
+            - !Ref EC2Role
+
+  expectations:
+     rules:
+       launch_template_imdsv2_condition: PASS
+
+- name: Launch template with IMDSv2 enabled and extra options should pass
+  input:
+    Resources:
+      ContainerInstances:
+        Type: AWS::EC2::LaunchTemplate
+        Properties:
+          LaunchTemplateData:
+            ImageId: !Ref ECSAMI
+            InstanceType: !Ref InstanceType
+            IamInstanceProfile:
+              Name: !Ref EC2InstanceProfile
+            SecurityGroupIds:
+              - !Ref ContainerHostSecurityGroup
+            UserData:
+              # This injected configuration file is how the EC2 instance
+              # knows which ECS cluster on your AWS account it should be joining
+              Fn::Base64: !Sub |
+                [settings.ecs]
+                cluster = "${ECSCluster}"
+            # Disable IMDSv1, and require IMDSv2
+            MetadataOptions:
+              HttpEndpoint: enabled
+              HttpTokens: required
+              HttpPutResponseHopLimit: 1
+
+      EC2InstanceProfile:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+          Path: /
+          Roles:
+            - !Ref EC2Role
+
+  expectations:
+     rules:
+       launch_template_imdsv2_condition: PASS

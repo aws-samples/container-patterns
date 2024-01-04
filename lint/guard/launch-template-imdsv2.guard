@@ -1,0 +1,13 @@
+#
+# The following rule ensures that launch templates enforce the
+# AWS Instance Metadata Service V2:
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata-transition-to-version-2.html
+#
+rule launch_template_imdsv2_condition {
+  Resources.*[
+    Type == 'AWS::EC2::LaunchTemplate'
+  ].Properties.LaunchTemplateData.MetadataOptions {
+    HttpEndpoint == "enabled"
+    HttpTokens == "required"
+  }
+}

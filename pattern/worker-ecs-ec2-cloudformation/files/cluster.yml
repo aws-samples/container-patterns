@@ -89,6 +89,10 @@ Resources:
             Ebs:
               VolumeSize: 50
               VolumeType: gp3
+        # Disable IMDSv1, and require IMDSv2
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpTokens: required
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

@@ -212,3 +212,4 @@ If you are interested in service level events, or container instance level event
 #### See Also
 
 - [Create a custom CloudWatch dashboard for your ECS service](/ecs-service-dashboard-cloudformation)
+- [Effective use: Amazon ECS lifecycle events with Amazon CloudWatch logs insights](https://aws.amazon.com/blogs/containers/effective-use-amazon-ecs-lifecycle-events-with-amazon-cloudwatch-logs-insights/) - More sample queries for CloudWatch Log Insights

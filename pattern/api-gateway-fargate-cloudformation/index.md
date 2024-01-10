@@ -12,6 +12,8 @@ filterDimensions:
     value: pattern
   - key: capacity
     value: fargate
+  - key: app
+    value: api
 authors:
   - peckn
 date: Oct 23, 2023

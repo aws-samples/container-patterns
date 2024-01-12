@@ -1,0 +1,10 @@
+#
+# The following rule ensures that ECS task definitions have readonly root filesystem
+#
+rule readonly_root_filesystem_condition {
+  Resources.*[
+    Type == 'AWS::ECS::TaskDefinition'
+  ].Properties.ContainerDefinitions[*] {
+    ReadonlyRootFilesystem == true
+  }
+}

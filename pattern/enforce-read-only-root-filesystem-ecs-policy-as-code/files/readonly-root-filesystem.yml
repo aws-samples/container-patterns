@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition with a readonly root filesystem
+Resources:
+  ReadonlyRootTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          ReadonlyRootFilesystem: true

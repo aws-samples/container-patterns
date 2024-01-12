@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An example task definition with a writable root filesystem
+Resources:
+  DefaultTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+
+  WritableRootTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          ReadonlyRootFilesystem: false

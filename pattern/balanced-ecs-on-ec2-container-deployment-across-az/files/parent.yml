@@ -31,7 +31,7 @@ Resources:
       Parameters:
         VpcId: !Ref VpcId
         SubnetId: !Select [0, !Ref SubnetIds]
-        ECSCluster: !GetAtt ClusterStack.Outputs.ClusterName
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
 
@@ -43,7 +43,7 @@ Resources:
       Parameters:
         VpcId: !Ref VpcId
         SubnetId: !Select [1, !Ref SubnetIds]
-        ECSCluster: !GetAtt ClusterStack.Outputs.ClusterName
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
 
@@ -55,7 +55,7 @@ Resources:
       Parameters:
         VpcId: !Ref VpcId
         SubnetId: !Select [2, !Ref SubnetIds]
-        ECSCluster: !GetAtt ClusterStack.Outputs.ClusterName
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
 
@@ -65,7 +65,7 @@ Resources:
     Properties:
       Location: capacity-provider-associations.yml
       Parameters:
-        ECSCluster: !GetAtt ClusterStack.Outputs.ClusterName
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         CapacityProvider00: !GetAtt AzCapacityProviderStack00.Outputs.CapacityProvider
         CapacityProvider01: !GetAtt AzCapacityProviderStack01.Outputs.CapacityProvider
         CapacityProvider02: !GetAtt AzCapacityProviderStack02.Outputs.CapacityProvider
@@ -79,9 +79,8 @@ Resources:
       Parameters:
         VpcId: !Ref VpcId
         SubnetIds: !Join [',', !Ref SubnetIds]
-        ClusterName: !GetAtt BaseStack.Outputs.ClusterName
-        ECSTaskExecutionRole: !GetAtt BaseStack.Outputs.ECSTaskExecutionRole
-        CapacityProvider: !GetAtt BaseStack.Outputs.CapacityProvider
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
         CapacityProvider00: !GetAtt AzCapacityProviderStack00.Outputs.CapacityProvider
         CapacityProvider01: !GetAtt AzCapacityProviderStack01.Outputs.CapacityProvider
         CapacityProvider02: !GetAtt AzCapacityProviderStack02.Outputs.CapacityProvider

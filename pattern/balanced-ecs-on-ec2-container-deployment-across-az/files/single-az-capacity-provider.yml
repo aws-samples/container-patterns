@@ -28,7 +28,7 @@ Parameters:
   SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: A single subnet ID to launch the ECS nodes in
-  ECSCluster:
+  ClusterName:
     Type: String
     Description: The ECS cluster that this capacity provider will be associated with
   EC2Role:
@@ -148,7 +148,7 @@ Resources:
           # knows which ECS cluster on your AWS account it should be joining
           Fn::Base64: !Sub |
             #!/bin/bash
-            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+            echo ECS_CLUSTER=${ClusterName} >> /etc/ecs/ecs.config
         BlockDeviceMappings:
           - DeviceName: "/dev/xvda"
             Ebs:
@@ -180,6 +180,7 @@ Resources:
           # Percentage of cluster reservation to try to maintain
           TargetCapacity: 100
         ManagedTerminationProtection: ENABLED
+        ManagedDraining: ENABLED
 
 Outputs:
   CapacityProvider:

@@ -45,61 +45,6 @@ Resources:
         - Name: containerInsights
           Value: enabled
 
-  # Autoscaling group. This launches the actual EC2 instances that will register
-  # themselves as members of the cluster, and run the docker containers.
-  ECSAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    DependsOn:
-      # This is to ensure that the ASG gets deleted first before these
-      # resources, when it comes to stack teardown.
-      - ECSCluster
-      - EC2Role
-    Properties:
-      VPCZoneIdentifier: !Ref SubnetIds
-      LaunchTemplate:
-        LaunchTemplateId: !Ref ContainerInstances
-        Version: !GetAtt ContainerInstances.LatestVersionNumber
-      MinSize: 0
-      MaxSize: !Ref MaxSize
-      DesiredCapacity: !Ref DesiredCapacity
-      NewInstancesProtectedFromScaleIn: true
-    UpdatePolicy:
-      AutoScalingReplacingUpdate:
-        WillReplace: 'true'
-
-  # The config for each instance that is added to the cluster
-  ContainerInstances:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateData:
-        ImageId: !Ref ECSAMI
-        InstanceType: !Ref InstanceType
-        IamInstanceProfile:
-          Name: !Ref EC2InstanceProfile
-        SecurityGroupIds:
-          - !Ref ContainerHostSecurityGroup
-        UserData:
-          # This injected configuration file is how the EC2 instance
-          # knows which ECS cluster on your AWS account it should be joining
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-        BlockDeviceMappings:
-          - DeviceName: "/dev/xvda"
-            Ebs:
-              VolumeSize: 50
-              VolumeType: gp3
-        # Disable IMDSv1, and require IMDSv2
-        MetadataOptions:
-          HttpEndpoint: enabled
-          HttpTokens: required
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: /
-      Roles:
-        - !Ref EC2Role
-
   # Custom resource that force destroys the ASG. This cleans up EC2 instances that had
   # managed termination protection enabled, but which are not yet released.
   # This is necessary because ECS does not immediately release an EC2 instance from termination
@@ -177,6 +122,63 @@ Resources:
       ServiceToken: !GetAtt CustomAsgDestroyerFunction.Arn
       Region: !Ref "AWS::Region"
 
+  # Autoscaling group. This launches the actual EC2 instances that will register
+  # themselves as members of the cluster, and run the docker containers.
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      # This is to ensure that the ASG gets deleted first before these
+      # resources, when it comes to stack teardown.
+      - ECSCluster
+      - EC2Role
+    Properties:
+      VPCZoneIdentifier:
+        - !Select [ 0, !Ref SubnetIds ]
+        - !Select [ 1, !Ref SubnetIds ]
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ContainerInstances
+        Version: !GetAtt ContainerInstances.LatestVersionNumber
+      MinSize: 0
+      MaxSize: !Ref MaxSize
+      DesiredCapacity: !Ref DesiredCapacity
+      NewInstancesProtectedFromScaleIn: true
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: 'true'
+
+  # The config for each instance that is added to the cluster
+  ContainerInstances:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: !Ref ECSAMI
+        InstanceType: !Ref InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref ContainerHostSecurityGroup
+        UserData:
+          # This injected configuration file is how the EC2 instance
+          # knows which ECS cluster on your AWS account it should be joining
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+        BlockDeviceMappings:
+          - DeviceName: "/dev/xvda"
+            Ebs:
+              VolumeSize: 50
+              VolumeType: gp3
+        # Disable IMDSv1, and require IMDSv2
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpTokens: required
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2Role
+
   # Create an ECS capacity provider to attach the ASG to the ECS cluster
   # so that it autoscales as we launch more containers
   CapacityProvider:
@@ -191,7 +193,7 @@ Resources:
           Status: ENABLED
           # Percentage of cluster reservation to try to maintain
           TargetCapacity: 100
-        ManagedTerminationProtection: ENABLED
+        ../srcion: ENABLED
         ManagedDraining: ENABLED
 
   # Create a cluster capacity provider assocation so that the cluster
@@ -268,6 +270,3 @@ Outputs:
     Description: The cluster capacity provider that the service should use
                  to request capacity when it wants to start up a task
     Value: !Ref CapacityProvider
-  ContainerHostSecurityGroup:
-    Description: The security group of the host EC2 instances
-    Value: !Ref ContainerHostSecurityGroup

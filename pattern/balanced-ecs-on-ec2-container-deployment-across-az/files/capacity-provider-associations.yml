@@ -3,7 +3,7 @@ Description: This stack defines the capacity provider strategy that distributes
              tasks evenly across all zonal capacity providers for the cluster.
 
 Parameters:
-  ECSCluster:
+  ClusterName:
     Type: String
     Description: The cluster that uses the capacity providers
   CapacityProvider00:
@@ -27,7 +27,7 @@ Resources:
         - !Ref CapacityProvider00
         - !Ref CapacityProvider01
         - !Ref CapacityProvider02
-      Cluster: !Ref ECSCluster
+      Cluster: !Ref ClusterName
       DefaultCapacityProviderStrategy:
         - Base: 0
           CapacityProvider: !Ref CapacityProvider00

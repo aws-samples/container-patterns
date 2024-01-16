@@ -122,8 +122,7 @@ The `cfn-guard` process will also exit with a non-zero exit code. In a typical C
 
 #### See Also
 
-
-
 More policy as code patterns:
 
 - [Enforce non-blocking mode for awslogs logging driver, with CloudFormation Guard policy as code](nonblocking-awslogs-policy-as-code)
+- [Enforce readonly root filesystem for containers in ECS, with CloudFormation Guard policy as code](enforce-read-only-root-filesystem-ecs-policy-as-code)

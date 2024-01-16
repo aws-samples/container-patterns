@@ -120,3 +120,4 @@ CloudFormation Guard will return a non zero exit code to indicate a failure. Whe
 More policy as code patterns:
 
 - [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)
+- [Enforce readonly root filesystem for containers in ECS, with CloudFormation Guard policy as code](enforce-read-only-root-filesystem-ecs-policy-as-code)

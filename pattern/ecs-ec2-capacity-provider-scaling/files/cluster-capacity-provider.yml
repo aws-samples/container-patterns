@@ -30,12 +30,6 @@ Parameters:
     Description: List of subnet IDs where the EC2 instances will be launched
 
 Resources:
-  # This is authorizes ECS to manage resources on your
-  # account on your behalf. This role is likely already created on your account
-  # ECSRole:
-  #  Type: AWS::IAM::ServiceLinkedRole
-  #  Properties:
-  #    AWSServiceName: 'ecs.amazonaws.com'
 
   # ECS Resources
   ECSCluster:
@@ -61,9 +55,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        ZipFile: !Sub |
+        ZipFile: |
           const { AutoScalingClient, DeleteAutoScalingGroupCommand } = require("@aws-sdk/client-auto-scaling");
-          const autoscaling = new AutoScalingClient({ region: '${AWS::Region}' });
           const response = require('cfn-response');
 
           exports.handler = async function(event, context) {
@@ -74,8 +67,10 @@ Resources:
               return;
             }
 
+            const autoscaling = new AutoScalingClient({ region: event.ResourceProperties.Region });
+
             const input = {
-              AutoScalingGroupName: '${ECSAutoScalingGroup}',
+              AutoScalingGroupName: event.ResourceProperties.AutoScalingGroupName,
               ForceDelete: true
             };
             const command = new DeleteAutoScalingGroupCommand(input);
@@ -116,11 +111,10 @@ Resources:
 
   CustomAsgDestroyer:
     Type: Custom::AsgDestroyer
-    DependsOn:
-      - CapacityProviderAssociation
     Properties:
       ServiceToken: !GetAtt CustomAsgDestroyerFunction.Arn
       Region: !Ref "AWS::Region"
+      AutoScalingGroupName: !Ref ECSAutoScalingGroup
 
   # Turn on ENI trunking for the EC2 instances. This setting is not on by default,
   # but it is highly important for increasing the density of AWS VPC networking mode
@@ -137,7 +131,6 @@ Resources:
           const { ECSClient, PutAccountSettingCommand } = require("@aws-sdk/client-ecs");
           const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
 
-          const sts = new STSClient({ region: '${AWS::Region}' });
           const response = require('cfn-response');
 
           exports.handler = async function(event, context) {
@@ -148,6 +141,8 @@ Resources:
               return;
             }
 
+            const sts = new STSClient({ region: event.ResourceProperties.Region });
+
             const assumeRoleResponse = await sts.send(new AssumeRoleCommand({
               RoleArn: event.ResourceProperties.EC2Role,
               RoleSessionName: "eni-trunking-enable-session",
@@ -156,7 +151,7 @@ Resources:
 
             // Instantiate an ECS client using the credentials of the EC2 role
             const ecs = new ECSClient({
-              region: '${AWS::Region}',
+              region: event.ResourceProperties.Region,
               credentials: {
                 accessKeyId: assumeRoleResponse.Credentials.AccessKeyId,
                 secretAccessKey: assumeRoleResponse.Credentials.SecretAccessKey,
@@ -166,8 +161,7 @@ Resources:
 
             const putAccountResponse = await ecs.send(new PutAccountSettingCommand({
               name: 'awsvpcTrunking',
-              value: 'enabled',
-              principalArn: event.ResourceProperties.EC2Role
+              value: 'enabled'
             }));
             console.log(putAccountResponse);
 
@@ -220,7 +214,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt CustomEniTrunkingFunction.Arn
       Region: !Ref "AWS::Region"
-      EC2Role: !Ref EC2Role.Arn
+      EC2Role: !GetAtt EC2Role.Arn
 
   # Autoscaling group. This launches the actual EC2 instances that will register
   # themselves as members of the cluster, and run the docker containers.
@@ -232,9 +226,7 @@ Resources:
       - ECSCluster
       - EC2Role
     Properties:
-      VPCZoneIdentifier:
-        - !Select [ 0, !Ref SubnetIds ]
-        - !Select [ 1, !Ref SubnetIds ]
+      VPCZoneIdentifier: !Ref SubnetIds
       LaunchTemplate:
         LaunchTemplateId: !Ref ContainerInstances
         Version: !GetAtt ContainerInstances.LatestVersionNumber
@@ -300,6 +292,9 @@ Resources:
   # will use the capacity provider
   CapacityProviderAssociation:
     Type: AWS::ECS::ClusterCapacityProviderAssociations
+    DependsOn:
+      - CustomEniTrunking
+      - CustomAsgDestroyer
     Properties:
       CapacityProviders:
         - !Ref CapacityProvider

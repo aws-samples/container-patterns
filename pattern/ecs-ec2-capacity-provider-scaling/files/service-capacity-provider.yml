@@ -100,9 +100,7 @@ Resources:
         AwsvpcConfiguration:
           SecurityGroups:
             - !Ref ServiceSecurityGroup
-          Subnets:
-            - !Select [ 0, !Ref SubnetIds ]
-            - !Select [ 1, !Ref SubnetIds ]
+          Subnets: !Ref SubnetIds
       TaskDefinition: !Ref TaskDefinition
 
   # Because we are launching tasks in AWS VPC networking mode

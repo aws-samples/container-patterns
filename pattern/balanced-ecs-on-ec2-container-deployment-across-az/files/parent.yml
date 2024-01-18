@@ -34,6 +34,9 @@ Resources:
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
+        CustomAsgDestroyerFunctionArn: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionArn
+        CustomAsgDestroyerFunctionRole: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionRole
+
 
   # Capacity provider for the second availability zone
   AzCapacityProviderStack01:
@@ -46,6 +49,8 @@ Resources:
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
+        CustomAsgDestroyerFunctionArn: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionArn
+        CustomAsgDestroyerFunctionRole: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionRole
 
   # Capacity provider for the third availability zone
   AzCapacityProviderStack02:
@@ -58,6 +63,8 @@ Resources:
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
         ContainerHostSecurityGroup: !GetAtt ClusterStack.Outputs.ContainerHostSecurityGroup
+        CustomAsgDestroyerFunctionArn: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionArn
+        CustomAsgDestroyerFunctionRole: !GetAtt ClusterStack.Outputs.CustomAsgDestroyerFunctionRole
 
   # Define the strategy for distributing tasks across the capacity providers
   CapacityProviderStrategyStack:

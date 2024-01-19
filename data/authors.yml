@@ -70,3 +70,13 @@
       uri: https://mike.fiedler.me/
     - type: github
       uri: https://github.com/miketheman
+
+- id: AlexPinhel
+  name: Alexandre Pinhel
+  title: Senior Manager SA at AWS
+  image: /pattern/images/authors/alexpinhel.jpg
+  links:
+    - type: twitter
+      uri: https://twitter.com/AlexPinhel
+    - type: github
+      uri: https://github.com/AlexPinhel

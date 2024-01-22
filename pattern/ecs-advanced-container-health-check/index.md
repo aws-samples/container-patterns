@@ -19,7 +19,7 @@ authors:
 date: Jan 22, 2024
 ---
 
-### Introduction
+## Introduction
 
 Amazon Elastic Container Service (Amazon ECS) provides a container health check feature that allows you to define health checks for your containerized workloads. This health check runs locally on the container instance or Fargate hosting your ECS task. It checks whether your application running in the container is available and responding as expected.
 
@@ -33,7 +33,7 @@ In this pattern, we dive into best practices around leveraging ECS container hea
 
 The goal is to provide guidelines to help you effectively utilize ECS container health checks for monitoring workload availability.
 
-### Container Health Checks
+## Container Health Checks
 
 Amazon ECS supports defining container health checks in task definitions. Health checks are commands or scripts that run locally within a container to validate application health and availability.
 
@@ -58,17 +58,17 @@ While simple health checks can be useful, the example above has some drawbacks:
 - Health check output is not visible in ECS console or APIs, limiting observability.
 - Including additional binaries like `curl` in container images goes against security best practices of reducing the container attack surface area.
 
-### Optimizing the container health check
+## Optimizing the container health check
 
 This pattern will provide multiple examples on how container health checks can be optimized in Amazon ECS.
 
-#### Capturing the output of the health check process
+### Capturing the output of the health check process
 
-##### Overview
+#### Overview
 
 When defining a container in an Amazon ECS task definition, you can specify a logging driver such as Amazon CloudWatch Logs. This logging driver captures the stdout and stderr streams from the container and forwards them to a central logging service. However, Amazon ECS does not capture the output of the health check process by default. You can optimize your health checks by forwarding the health check output to the stdout/stderr streams of your application. This allows the logging driver to collect the health check output.
 
-##### Solution
+#### Solution
 
 The example below shows how to redirect the health check output so that it is forwarded to the central logging service. This builds on the first example task definition by routing the health check output to the first process in the container using `>> /proc/1/fd/1`. It also ensures both stdout and stderr are captured using `2>&1`.
 
@@ -84,13 +84,13 @@ The example below shows how to redirect the health check output so that it is fo
 
 By routing the health check output to the application stdout/stderr streams, the configured logging driver can pick up this output and forward it to the central logging server. This provides observability into the health checks results. 
 
-#### Capturing and annotating the output of the health check process
+### Capturing and annotating the output of the health check process
 
-##### Overview
+#### Overview
 
 Our health check process outputs debug information that gets logged, but this results in noisy and hard to parse logs. We want to transform the output to only include relevant data like status codes and timestamps.
 
-##### Solution
+#### Solution
 
 We can encapsulate the health check logic in a bash script called `healthcheck.sh`. This allows us to process the raw output and format it before logging. For example, the script can:
 
@@ -124,16 +124,16 @@ Now the script will handle executing the health check, and will send the output 
 Wrapping health checks in this bash script allows container logs to be more useful for diagnosing issues, by filtering noise and annotating the output. 
 
 
-#### Reducing the attack surface of a container image
+### Reducing the attack surface of a container image
 
-##### Overview
+#### Overview
 
 When securing a container image, it's best practice to reduce the attack surface by removing non-required components like binaries, libraries, and shells. These components could potentially be leveraged by an attacker to exploit the container. Some container security tools may flag the inclusion of bash and curl as risks. To remove these while still providing a health check, a container health check process can be implemented in a module or binary.
 
 
 To reduce the number of additional packages in the container image, build the health check using the same runtime environment as the application. For example, if the container runs a Python web application, implement the health check as a Python script that reuses the existing Python interpreter. The script can use Python's requests module to check the application's health, eliminating the need to include bash, curl, or other tools solely for the health check. This approach streamlines the container image by leveraging the application's existing dependencies.
 
-##### Solution
+#### Solution
 
 A healthcheck.py script can leverage the requests library to query the app similar to a curl bash script, but more secured:
 
@@ -145,6 +145,6 @@ A similar approach can be taken for other languages like Golang:
 
 <<< @/pattern/ecs-advanced-container-health-check/files/healthcheck.go
 
-### Conclusion
+## Conclusion
 
 In this post, we demonstrated the health check options that you can configure on Amazon ECS tasks. We discussed advanced scenarios where you can set up the container health check to send logs to CloudWatch Logs. This provides more detailed information about why Amazon ECS tasks become unhealthy. We also covered two approaches to implement custom health checks - using the container command or application code. These allow you to evaluate container health in an advanced way.

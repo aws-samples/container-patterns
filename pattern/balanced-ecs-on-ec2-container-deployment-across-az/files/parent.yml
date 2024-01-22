@@ -81,6 +81,9 @@ Resources:
   # details from the base stack into the service stack
   Service:
     Type: AWS::Serverless::Application
+    # Ensure that the service stack get's torn down before the capacity provider stack
+    DependsOn:
+      - CapacityProviderStrategyStack
     Properties:
       Location: service-capacity-provider.yml
       Parameters:

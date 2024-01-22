@@ -44,11 +44,11 @@ Parameters:
     Description: How much memory in megabytes to give the container
   Command:
     Type: String
-    Default: sleep 3600
+    Default: sleep 86400
     Description: The command to run inside of the container
   DesiredCount:
     Type: Number
-    Default: 0
+    Default: 35
     Description: How many copies of the service task to run
 
 Resources:
@@ -103,7 +103,7 @@ Resources:
           Weight: 1
       DeploymentConfiguration:
         MaximumPercent: 200
-        MinimumHealthyPercent: 75
+        MinimumHealthyPercent: 100
       DesiredCount: !Ref DesiredCount
       NetworkConfiguration:
         AwsvpcConfiguration:

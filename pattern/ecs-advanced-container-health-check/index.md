@@ -41,7 +41,7 @@ When a health check is defined in a task definition, ECS will execute the health
 
 Because health checks execute inside the container, any tools used such as `curl` must be included in the container image. The health check reaches the application via the container's loopback interface at `localhost` or `127.0.0.1`.
 
-!!! @/pattern/ecs-advanced-container-health-check/files/container_health_check.svg
+!!! @/pattern/ecs-advanced-container-health-check/files/ecscontainerhealthcheck.png
 
 The example below shows a task definition with a health check defined to run `curl` against the nginx web server running in the same container:
 

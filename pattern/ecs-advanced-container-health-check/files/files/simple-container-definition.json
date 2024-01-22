@@ -1,0 +1,19 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "containerone",
+            "image": "public.ecr.aws/docker/library/nginx:latest",
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost/ || exit 1"
+                ],
+                "interval": 10,
+                "retries": 3,
+                "startPeriod": 0,
+                "timeout": 5
+            },
+            …
+    }
+  ]
+}

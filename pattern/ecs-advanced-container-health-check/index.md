@@ -25,7 +25,7 @@ Amazon Elastic Container Service (Amazon ECS) provides a container health check 
 
 The container health check provides visibility into the availability of your application from the instance level. However, it does not monitor external network availability or other components of your architecture. As David Yanacek points out, [health checks can be implemented at multiple levels of your architecture](https://aws.amazon.com/builders-library/implementing-health-checks/).
 
-In this post, we dive into best practices around leveraging ECS container health checks:
+In this pattern, we dive into best practices around leveraging ECS container health checks:
 
 - Improving visibility into the health check process
 - Enhancing the security posture of your health checks
@@ -37,7 +37,7 @@ The goal is to provide guidelines to help you effectively utilize ECS container 
 
 Amazon ECS supports defining container health checks in task definitions. Health checks are commands or scripts that run locally within a container to validate application health and availability.
 
-When a health check is defined in a task definition, ECS will execute the health check process inside the container and evaluate the exit code to determine pass or fail. If the health check fails consistently, ECS will mark the container and task as unhealthy and take remediation actions if the task is part of a service.
+When a health check is defined in a task definition, the container runtime will execute the health check process inside the container and evaluate the exit code to determine the application health. If the health check fails consistently, ECS will mark the container and task as unhealthy and take remediation actions if the task is part of a service.
 
 Because health checks execute inside the container, any tools used such as `curl` must be included in the container image. The health check reaches the application via the container's loopback interface at `localhost` or `127.0.0.1`.
 
@@ -60,7 +60,7 @@ While simple health checks can be useful, the example above has some drawbacks:
 
 #### Optimizing the container health check
 
-This walkthrough will provide multiple examples on how container health checks can be optimized in Amazon ECS.
+This pattern will provide multiple examples on how container health checks can be optimized in Amazon ECS.
 
 ##### Capturing the output of the health check process
 
@@ -88,7 +88,7 @@ By routing the health check output to the application stdout/stderr streams, the
 
 ###### Overview
 
-The health check process outputs debug information that gets logged, but this results in noisy and hard to parse logs. We want to transform the output to only include relevant data like status codes and timestamps.
+Our health check process outputs debug information that gets logged, but this results in noisy and hard to parse logs. We want to transform the output to only include relevant data like status codes and timestamps.
 
 ###### Solution
 
@@ -97,22 +97,11 @@ We can encapsulate the health check logic in a bash script called `healthcheck.s
 - Execute the health check curl command
 - Extract and set key variables like HTTP status codes
 - Construct log messages including relevant metadata  
-- Print the log output to stdout for the ECS logging driver
+- Print the log output to stdout for the logging driver
 
 Here is an example `healthcheck.sh` script that implements this:
 
-```bash
-# Perform health check and redirect output to stdout
-output=$(curl --max-time 5 -s -o /dev/null -w "%{http_code}" $endpoint 2>&1)
-http_code=$(echo "$output" | tail -n1)
-if [[ $http_code == "000" ]]; then
-    echo "$timestamp - Error: Connection timed out while trying to reach $endpoint"
-    exit 1
-fi
-
-# Log output to stdout
-echo "$timestamp - Health check $endpoint: HTTP status code $http_code" >&1
-```
+<<< @/pattern/ecs-advanced-container-health-check/files/healthcheck.sh
 
 To implement this, the `curl` command in the health check definition needs to be replaced with a call to the bash script. 
 
@@ -126,7 +115,12 @@ To implement this, the `curl` command in the health check definition needs to be
 }
 ```
 
+::: warning
+The healthscript.sh file must be copied to the container image.
+:::
+
 Now the script will handle executing the health check, and will send the output to the stdout/stderr streams which get captured in the log stream. The resulting logs will only contain relevant information and metadata, easy to parse and troubleshoot.
+
 Wrapping health checks in this bash script allows container logs to be more useful for diagnosing issues, by filtering noise and annotating the output. 
 
 
@@ -136,7 +130,8 @@ Wrapping health checks in this bash script allows container logs to be more usef
 
 When securing a container image, it's best practice to reduce the attack surface by removing non-required components like binaries, libraries, and shells. These components could potentially be leveraged by an attacker to exploit the container. Some container security tools may flag the inclusion of bash and curl as risks. To remove these while still providing a health check, a container health check process can be implemented in a module or binary.
 
-For a python web application, the python interpreter is already included so the requests package can be used to check availability without adding shells or binaries.
+
+To reduce the number of additional packages in the container image, build the health check using the same runtime environment as the application. For example, if the container runs a Python web application, implement the health check as a Python script that reuses the existing Python interpreter. The script can use Python's requests module to check the application's health, eliminating the need to include bash, curl, or other tools solely for the health check. This approach streamlines the container image by leveraging the application's existing dependencies.
 
 ###### Solution
 
@@ -148,12 +143,7 @@ This removes non-required attack surfaces while still providing a health check.
 
 A similar approach can be taken for other languages like Golang:
 
-```json
-"command": [
-    "CMD",
-    "healthcheck"
-]
-```
+<<< @/pattern/ecs-advanced-container-health-check/files/healthcheck.go
 
 #### Conclusion
 

@@ -1,7 +1,7 @@
 ---
 title: Advanced Techniques for Amazon ECS Container Health Checks
 description: >-
-  Learn Learn ECS health check best practices - improve observability, security & customization. Tips: capture logs in CloudWatch, reduce image attack surface, build custom utilities. Understand how container health can better monitor workload availability.
+  Improve ECS container health checks. Best practices for logs, security, customization. Enhance workload availability monitoring.
 filterDimensions:
   - key: type
     value: pattern

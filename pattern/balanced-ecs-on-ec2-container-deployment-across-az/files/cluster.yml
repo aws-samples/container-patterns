@@ -93,7 +93,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        ZipFile: !Sub |
+        ZipFile: |
           const { ECSClient, PutAccountSettingCommand } = require("@aws-sdk/client-ecs");
           const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
 

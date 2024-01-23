@@ -22,9 +22,6 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
     Description: The Amazon Machine Image ID used for the cluster, leave it as the default value to get the latest AMI
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-    Description: VPC ID where the ECS cluster is launched
   SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: A single subnet ID to launch the ECS nodes in

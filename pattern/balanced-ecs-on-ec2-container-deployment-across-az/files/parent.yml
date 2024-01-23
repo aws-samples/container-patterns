@@ -29,7 +29,6 @@ Resources:
     Properties:
       Location: single-az-capacity-provider.yml
       Parameters:
-        VpcId: !Ref VpcId
         SubnetId: !Select [0, !Ref SubnetIds]
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
@@ -44,7 +43,6 @@ Resources:
     Properties:
       Location: single-az-capacity-provider.yml
       Parameters:
-        VpcId: !Ref VpcId
         SubnetId: !Select [1, !Ref SubnetIds]
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role
@@ -58,7 +56,6 @@ Resources:
     Properties:
       Location: single-az-capacity-provider.yml
       Parameters:
-        VpcId: !Ref VpcId
         SubnetId: !Select [2, !Ref SubnetIds]
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         EC2Role: !GetAtt ClusterStack.Outputs.EC2Role

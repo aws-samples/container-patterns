@@ -78,3 +78,13 @@
   links:
     - type: github
       uri: https://github.com/ollypom
+
+- id: cssntan
+  name: Henrique Santana
+  title: Senior Cloud Support Engineer at AWS
+  image: /pattern/images/authors/cssntan.jpg
+  links:
+    - type: github
+      uri: https://github.com/henriquesantanati
+    - type: linkedin
+      uri: https://www.linkedin.com/in/henriquessantana/

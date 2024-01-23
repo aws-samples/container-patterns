@@ -1,4 +1,0 @@
----
-type: author
-authorId: opomer
----

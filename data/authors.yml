@@ -70,3 +70,11 @@
       uri: https://mike.fiedler.me/
     - type: github
       uri: https://github.com/miketheman
+
+- id: opomer
+  name: Olly Pomeroy
+  title: Senior Developer Advocate at AWS
+  image: /pattern/images/authors/opomer.jpg
+  links:
+    - type: github
+      uri: https://github.com/ollypom

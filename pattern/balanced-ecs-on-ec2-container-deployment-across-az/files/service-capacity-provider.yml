@@ -16,10 +16,15 @@ Parameters:
   ECSTaskExecutionRole:
     Type: String
     Description: The role used to start up an ECS task
-  CapacityProvider:
+  CapacityProvider00:
     Type: String
-    Description: The cluster capacity provider that the service should use
-                 to request capacity when it wants to start up a task
+    Description: First AZ capacity provider
+  CapacityProvider01:
+    Type: String
+    Description: Second AZ capacity provider
+  CapacityProvider02:
+    Type: String
+    Description: Third AZ capacity provider
   ServiceName:
     Type: String
     Default: example-service
@@ -39,11 +44,11 @@ Parameters:
     Description: How much memory in megabytes to give the container
   Command:
     Type: String
-    Default: sleep 3600
+    Default: sleep 86400
     Description: The command to run inside of the container
   DesiredCount:
     Type: Number
-    Default: 0
+    Default: 35
     Description: How many copies of the service task to run
 
 Resources:
@@ -84,23 +89,30 @@ Resources:
       ServiceName: !Ref ServiceName
       Cluster: !Ref ClusterName
       PlacementStrategies:
-        - Field: attribute:ecs.availability-zone
-          Type: spread
         - Field: cpu
           Type: binpack
       CapacityProviderStrategy:
         - Base: 0
-          CapacityProvider: !Ref CapacityProvider
+          CapacityProvider: !Ref CapacityProvider00
+          Weight: 1
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider01
+          Weight: 1
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider02
           Weight: 1
       DeploymentConfiguration:
         MaximumPercent: 200
-        MinimumHealthyPercent: 75
+        MinimumHealthyPercent: 100
       DesiredCount: !Ref DesiredCount
       NetworkConfiguration:
         AwsvpcConfiguration:
           SecurityGroups:
             - !Ref ServiceSecurityGroup
-          Subnets: !Ref SubnetIds
+          Subnets:
+            - !Select [ 0, !Ref SubnetIds ]
+            - !Select [ 1, !Ref SubnetIds ]
+            - !Select [ 2, !Ref SubnetIds ]
       TaskDefinition: !Ref TaskDefinition
 
   # Because we are launching tasks in AWS VPC networking mode

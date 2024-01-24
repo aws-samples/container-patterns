@@ -19,45 +19,62 @@ Parameters:
     Default: '100'
     Description: Maximum number of EC2 instances that can be launched in your ECS cluster.
   ECSAMI:
-    Description: The Bottlerocket Amazon Machine Image ID used for the cluster
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/bottlerocket/aws-ecs-1/x86_64/latest/image_id
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-    Description: VPC ID where the ECS cluster is launched
-  SubnetIds:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: List of subnet IDs where the EC2 instances will be launched
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
+    Description: The Amazon Machine Image ID used for the cluster, leave it as the default value to get the latest AMI
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: A single subnet ID to launch the ECS nodes in
+  ClusterName:
+    Type: String
+    Description: The ECS cluster that this capacity provider will be associated with
+  EC2Role:
+    Type: String
+    Description: The role that the EC2 instances will use
+  ContainerHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: The security group used by the EC2 instances
+  CustomAsgDestroyerFunctionArn:
+    Type: String
+    Description: ARN of a shared Lambda function that provides the logic for a custom CloudFormation
+                 resource that helps cleanup ASG's associated with an ECS capacity provider.
+  CustomAsgDestroyerFunctionRole:
+    Type: String
+    Description: The role used by the ASG destroyer function
 
 Resources:
-  # This is authorizes ECS to manage resources on your
-  # account on your behalf. This role is likely already created on your account
-  # ECSRole:
-  #  Type: AWS::IAM::ServiceLinkedRole
-  #  Properties:
-  #    AWSServiceName: 'ecs.amazonaws.com'
-
-  # ECS Resources
-  ECSCluster:
-    Type: AWS::ECS::Cluster
+  # This allows the ASG destroyer to destroy the capacity provider ASG from this stack.
+  AllowAsgDestroyerToDestroyThisAsg:
+    Type: AWS::IAM::Policy
     Properties:
-      ClusterSettings:
-        - Name: containerInsights
-          Value: enabled
+      Roles:
+        - !Ref CustomAsgDestroyerFunctionRole
+      PolicyName: !Sub allow-to-destroy-asg-${ECSAutoScalingGroup}
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: autoscaling:DeleteAutoScalingGroup
+            Resource: !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${ECSAutoScalingGroup}
+
+  # This configures a custom hook that helps destroy the ASG cleanly when
+  # tearing down the CloudFormation stack.
+  CustomAsgDestroyer:
+    Type: Custom::AsgDestroyer
+    DependsOn:
+      - AllowAsgDestroyerToDestroyThisAsg
+    Properties:
+      ServiceToken: !Ref CustomAsgDestroyerFunctionArn
+      Region: !Ref "AWS::Region"
+      AutoScalingGroupName: !Ref ECSAutoScalingGroup
 
   # Autoscaling group. This launches the actual EC2 instances that will register
   # themselves as members of the cluster, and run the docker containers.
   ECSAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
-    DependsOn:
-      # This is to ensure that the ASG gets deleted first before these
-      # resources, when it comes to stack teardown.
-      - ECSCluster
-      - EC2Role
     Properties:
       VPCZoneIdentifier:
-        - !Select [ 0, !Ref SubnetIds ]
-        - !Select [ 1, !Ref SubnetIds ]
+        - !Ref SubnetId
       LaunchTemplate:
         LaunchTemplateId: !Ref ContainerInstances
         Version: !GetAtt ContainerInstances.LatestVersionNumber
@@ -84,8 +101,13 @@ Resources:
           # This injected configuration file is how the EC2 instance
           # knows which ECS cluster on your AWS account it should be joining
           Fn::Base64: !Sub |
-            [settings.ecs]
-            cluster = "${ECSCluster}"
+            #!/bin/bash
+            echo ECS_CLUSTER=${ClusterName} >> /etc/ecs/ecs.config
+        BlockDeviceMappings:
+          - DeviceName: "/dev/xvda"
+            Ebs:
+              VolumeSize: 50
+              VolumeType: gp3
         # Disable IMDSv1, and require IMDSv2
         MetadataOptions:
           HttpEndpoint: enabled
@@ -114,77 +136,7 @@ Resources:
         ManagedTerminationProtection: ENABLED
         ManagedDraining: ENABLED
 
-  # Create a cluster capacity provider assocation so that the cluster
-  # will use the capacity provider
-  CapacityProviderAssociation:
-    Type: AWS::ECS::ClusterCapacityProviderAssociations
-    Properties:
-      CapacityProviders:
-        - !Ref CapacityProvider
-      Cluster: !Ref ECSCluster
-      DefaultCapacityProviderStrategy:
-        - Base: 0
-          CapacityProvider: !Ref CapacityProvider
-          Weight: 1
-
-  # A security group for the EC2 hosts that will run the containers.
-  # This can be used to limit incoming traffic to or outgoing traffic
-  # from the container's host EC2 instance.
-  ContainerHostSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Access to the EC2 hosts that run containers
-      VpcId: !Ref VpcId
-
-  # Role for the EC2 hosts. This allows the ECS agent on the EC2 hosts
-  # to communciate with the ECS control plane, as well as download the docker
-  # images from ECR to run on your host.
-  EC2Role:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: [ec2.amazonaws.com]
-            Action: ['sts:AssumeRole']
-      Path: /
-      ManagedPolicyArns:
-        # See reference: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonEC2ContainerServiceforEC2Role
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-        # This managed policy allows us to connect to the instance using SSM
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-
-  # This is a role which is used within Fargate to allow the Fargate agent
-  # to download images, and upload logs.
-  ECSTaskExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: [ecs-tasks.amazonaws.com]
-            Action: ['sts:AssumeRole']
-            Condition:
-              ArnLike:
-                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
-      Path: /
-
-      # This role enables all features of ECS. See reference:
-      # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonECSTaskExecutionRolePolicy
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-
 Outputs:
-  ClusterName:
-    Description: The ECS cluster into which to launch resources
-    Value: !Ref ECSCluster
-  ECSTaskExecutionRole:
-    Description: The role used to start up a task
-    Value: !Ref ECSTaskExecutionRole
   CapacityProvider:
     Description: The cluster capacity provider that the service should use
                  to request capacity when it wants to start up a task

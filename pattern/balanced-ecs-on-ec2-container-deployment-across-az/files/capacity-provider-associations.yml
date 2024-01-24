@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This stack defines the capacity provider strategy that distributes
+             tasks evenly across all zonal capacity providers for the cluster.
+
+Parameters:
+  ClusterName:
+    Type: String
+    Description: The cluster that uses the capacity providers
+  CapacityProvider00:
+    Type: String
+    Description: The first capacity provider
+  CapacityProvider01:
+    Type: String
+    Description: The second capacity provider
+  CapacityProvider02:
+    Type: String
+    Description: The third capacity provider
+
+Resources:
+
+  # Create a cluster capacity provider assocation list so that the cluster
+  # will use the capacity provider
+  CapacityProviderAssociation:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      CapacityProviders:
+        - !Ref CapacityProvider00
+        - !Ref CapacityProvider01
+        - !Ref CapacityProvider02
+      Cluster: !Ref ClusterName
+      DefaultCapacityProviderStrategy:
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider00
+          Weight: 1
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider01
+          Weight: 1
+        - Base: 0
+          CapacityProvider: !Ref CapacityProvider02
+          Weight: 1

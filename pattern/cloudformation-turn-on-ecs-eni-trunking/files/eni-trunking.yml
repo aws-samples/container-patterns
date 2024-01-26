@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation custom resource example, which turns on ENI trunking for the
+             EC2 Role that is used by EC2 instances that join the ECS cluster
+
+Resources:
+  # Turn on ENI trunking for the EC2 instances. This setting is not on by default,
+  # but it is highly important for increasing the density of AWS VPC networking mode
+  # tasks per instance. Additionally, it is not controllable by default in CloudFormation
+  # because it has some complexity of needing to be turned on by a bearer of the role
+  # of the EC2 instances themselves. With this custom function we can assume the EC2 role,
+  # then use that role to call the ecs:PutAccountSetting API in order to enable
+  # ENI trunking
+  CustomEniTrunkingFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          const { ECSClient, PutAccountSettingCommand } = require("@aws-sdk/client-ecs");
+          const { STSClient, AssumeRoleCommand } = require("@aws-sdk/client-sts");
+
+          const response = require('cfn-response');
+
+          exports.handler = async function(event, context) {
+            console.log(event);
+
+            if (event.RequestType == "Delete") {
+              await response.send(event, context, response.SUCCESS);
+              return;
+            }
+
+            const sts = new STSClient({ region: event.ResourceProperties.Region });
+
+            const assumeRoleResponse = await sts.send(new AssumeRoleCommand({
+              RoleArn: event.ResourceProperties.EC2Role,
+              RoleSessionName: "eni-trunking-enable-session",
+              DurationSeconds: 900
+            }));
+
+            // Instantiate an ECS client using the credentials of the EC2 role
+            const ecs = new ECSClient({
+              region: event.ResourceProperties.Region,
+              credentials: {
+                accessKeyId: assumeRoleResponse.Credentials.AccessKeyId,
+                secretAccessKey: assumeRoleResponse.Credentials.SecretAccessKey,
+                sessionToken: assumeRoleResponse.Credentials.SessionToken
+              }
+            });
+
+            const putAccountResponse = await ecs.send(new PutAccountSettingCommand({
+              name: 'awsvpcTrunking',
+              value: 'enabled'
+            }));
+            console.log(putAccountResponse);
+
+            await response.send(event, context, response.SUCCESS);
+          };
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      Role: !GetAtt CustomEniTrunkingRole.Arn
+
+  # The role used by the Lambda function that turns on ENI trunking
+  CustomEniTrunkingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        # https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # This allows the Lambda function that backs the CloudFormation custom resources
+  # to assume the role that is used by the EC2 instances. The Lambda function must
+  # assume this role because the ecs:PutAccountSetting must be called either
+  # by the role that the setting is for, or by the root account, and we aren't
+  # using the root account for CloudFormation.
+  AllowEniTrunkingRoleToAssumeEc2Role:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref CustomEniTrunkingRole
+      PolicyName: allow-to-assume-ec2-role
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Resource: !GetAtt EC2Role.Arn
+
+  # Role for the EC2 hosts. This is the role that allows the ECS agent on the
+  # EC2 hosts to communciate with the ECS control plane, as well as download the
+  # container images from ECR to run on your host.
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Statement:
+          # Allow the EC2 instances to assume this role
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+          # Allow the ENI trunking function to assume this role in order to enable
+          # ENI trunking while operating under the identity of this role
+          - Effect: Allow
+            Principal:
+              AWS: !GetAtt CustomEniTrunkingRole.Arn
+            Action: ['sts:AssumeRole']
+
+      # See reference: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonEC2ContainerServiceforEC2Role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+      # The ENI trunking function will assume this role and then use
+      # the ecs:PutAccountSetting to set ENI trunking on for this role
+      Policies:
+        - PolicyName: allow-to-modify-ecs-settings
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ecs:PutAccountSetting
+                Resource: '*'
+
+  # This is the actual custom resource, which triggers the invocation
+  # of the Lambda function that enables ENI trunking during the stack deploy
+  CustomEniTrunking:
+    Type: Custom::CustomEniTrunking
+    DependsOn:
+      - AllowEniTrunkingRoleToAssumeEc2Role
+    Properties:
+      ServiceToken: !GetAtt CustomEniTrunkingFunction.Arn
+      Region: !Ref "AWS::Region"
+      EC2Role: !GetAtt EC2Role.Arn
+
+Outputs:
+  EC2Role:
+    Description: The role used by EC2 instances in the cluster
+    Value: !Ref EC2Role

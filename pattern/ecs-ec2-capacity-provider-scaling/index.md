@@ -1,8 +1,8 @@
 ---
-title: Amazon ECS Capacity Providers for EC2 instances
+title: Amazon ECS Capacity Provider for EC2 instances
 description: >-
-  How to automatically scale the EC2 capacity for your ECS cluster
-  by using an ECS Capacity Provider
+  Production reach pattern for scaling EC2 capacity in an ECS cluster
+  using an ECS Capacity Provider
 filterDimensions:
   - key: tool
     value: cloudformation
@@ -19,13 +19,15 @@ authors:
 date: April 5 2023
 ---
 
-#### About
+#### About and Terminology
 
-This pattern shows how to setup an ECS cluster that automatically launches its
-own EC2 instances using an ECS Capacity Provider. This approach allows the ECS
-cluster to start out completely empty, add capacity as needed, and then "scale to zero" when you stop all tasks in the cluster.
+Amazon Elastic Container Service (ECS)](https://aws.amazon.com/ecs/) is container orchestrator that deploy containerized applications to both [Amazon EC2](https://aws.amazon.com/ec2/) capacity as well as serverless [AWS Fargate](https://aws.amazon.com/fargate/) capacity.
 
-#### Install SAM CLI
+[Amazon ECS capacity providers](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-capacity-providers.html) are a built-in feature that helps you launch EC2 capacity on fly. When application containers need to run, the capacity provider provisions as many EC2 hosts as necessary. When all containers are done running, the cluster can "scale to zero" by shutting down all EC2 hosts.
+
+This pattern shows a production ready ECS on EC2 capacity provider configuration. It comes with a variety of helpful, out of the box configurations and failsafes to keep your ECS on EC2 cluster resilient.
+
+#### Dependencies
 
 This pattern uses AWS SAM CLI for deploying CloudFormation stacks on your account.
 You should follow the appropriate [steps for installing SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).

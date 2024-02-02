@@ -301,7 +301,6 @@ Resources:
           # signal back to CloudFormation when it is ready and healthy in the ECS cluster
           Fn::Base64: !Sub |
             #!/bin/bash -xe
-            # test
             echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
             yum install -y aws-cfn-bootstrap
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource ContainerInstances --configsets full_install --region ${AWS::Region} &

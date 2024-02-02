@@ -43,7 +43,7 @@ Parameters:
     Description: The command to run inside of the container
   DesiredCount:
     Type: Number
-    Default: 1
+    Default: 0
     Description: How many copies of the service task to run
 
 Resources:

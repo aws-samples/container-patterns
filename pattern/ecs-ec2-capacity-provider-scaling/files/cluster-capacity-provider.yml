@@ -262,7 +262,7 @@ Resources:
         verify_instance_health:
           commands:
             ECSHealthCheck:
-              command: !Sub |
+              command: |
                 echo "Introspecting ECS agent status"
                 find_container_instance_arn() {
                   CONTAINER_INSTANCE_ARN=$(curl --connect-timeout 1 --max-time 1 -s http://localhost:51678/v1/metadata | jq -r '.ContainerInstanceArn')
@@ -432,7 +432,7 @@ Resources:
       Memory: 10
       RequiresCompatibilities:
         - EC2
-      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: 'healthcheck-pause'
           Image: public.ecr.aws/docker/library/busybox:latest

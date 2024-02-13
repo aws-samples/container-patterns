@@ -78,3 +78,7 @@ Use the following commands to interact with your CDK application:
 * The sample application is launching EC2 capacity of type `t2.micro`. You will probably want a bigger EC2 instance type
 * The sample application is deploying a sample app straight off of Docker Hub. Check out the CDK docs for [`ContainerImage.fromAsset()`](https://docs.aws.amazon.com/cdk/api/v1/docs/@aws-cdk_aws-ecs.ContainerImage.html#static-fromwbrassetdirectory-props) to see how to make CDK build your local application.
 * You may wish to add port 443 to the load balancer, and configure an SSL certificate for HTTPS traffic
+
+#### See Also
+
+* [Share an Application Load Balancer between multiple ECS services](cdk-shared-alb-for-amazon-ecs-fargate-service)

@@ -184,4 +184,5 @@ npx cdk destroy --all -f
 
 #### See Also
 
-- [Basic load balanced ECS service deployed on EC2 capacity](advanced-public-facing-service-cdk)
+- ["Basic load balanced ECS service deployed on EC2 capacity"](advanced-public-facing-service-cdk)
+- ["Network Load Balancer Ingress for Application Load Balancer fronted AWS Fargate service"](nlb-ingress-alb-load-balancer-fargate-service-cdk)

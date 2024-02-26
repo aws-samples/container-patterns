@@ -1,7 +1,7 @@
 {
-  "name": "fargate-shared-alb",
+  "name": "fargate-nlb-alb",
   "version": "1.0.0",
-  "description": "Two fargate services with a shared Application Load Balancer",
+  "description": "Fargate service with NLB ingress to an ALB",
   "private": true,
   "scripts": {
     "build": "tsc",

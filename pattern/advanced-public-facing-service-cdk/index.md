@@ -81,4 +81,5 @@ Use the following commands to interact with your CDK application:
 
 #### See Also
 
-* [Share an Application Load Balancer between multiple ECS services](cdk-shared-alb-for-amazon-ecs-fargate-service)
+- ["Share an Application Load Balancer between multiple ECS services"](cdk-shared-alb-for-amazon-ecs-fargate-service)
+- ["Network Load Balancer Ingress for Application Load Balancer fronted AWS Fargate service"](nlb-ingress-alb-load-balancer-fargate-service-cdk)

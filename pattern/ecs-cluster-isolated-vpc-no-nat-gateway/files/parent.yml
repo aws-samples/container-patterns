@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys an isolated VPC and a private
+             Amazon ECS service in that isolated VPC.
+Parameters:
+  ImageUri:
+    Type: String
+    Description: The URI of the private container image to deploy
+
+Resources:
+
+  # The networking configuration. This creates an isolated
+  # network specific to this particular environment
+  VpcStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: isolated-vpc.yml
+
+  # This stack defines the Amazon ECS cluster itself
+  ClusterStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: cluster.yml
+
+  # This stack defines the container deployment
+  ServiceStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: private-service.yml
+      Parameters:
+        ImageUri: !Ref ImageUri
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VpcStack.Outputs.PrivateSubnetIds
+        PrivateLinkEndpointSecurityGroup: !GetAtt VpcStack.Outputs.PrivateLinkEndpointSecurityGroup
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole

@@ -3,6 +3,19 @@ Description: This stack deploys an isolated VPC that has no internet access
              at all. It has additional PrivateLink endpoints designed to allow
              launching an Amazon ECS orchestrated container using ECS and it's
              supporting AWS services.
+Parameters:
+  DeployingToEC2:
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
+    Description: Set value to "true" in order to create additional ECS endpoints
+                 to enable ECS on EC2 usage.
+
+Conditions:
+  CreateEcsOnEc2Resources: !Equals [ !Ref "DeployingToEC2", true ]
+
 Mappings:
   # Hard values for the subnet masks. These masks define
   # the range of internal IP addresses that can be assigned.
@@ -168,6 +181,64 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup
       ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+      VpcId: !Ref VPC
+
+  SecretsManagerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      VpcId: !Ref VPC
+
+  # The following endpoints with the Condition: CreateEcsOnEc2Resources
+  # are not necessary for ECS on AWS Fargate, but are needed for
+  # ECS on EC2
+  EcsAgentEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-agent
+      VpcId: !Ref VPC
+
+  EcsTelemetryEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-telemetry
+      VpcId: !Ref VPC
+
+  EcsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs
       VpcId: !Ref VPC
 
 Outputs:

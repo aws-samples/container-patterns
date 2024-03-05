@@ -36,6 +36,10 @@ The following diagram shows the architecture of what will be created:
 * The VPC has an internet gateway that can be used from the public subnets by any container or compute that has a public IP address.
 * This pattern creates two NAT gateways that provide internet access to resources launching in the private subnets.
 
+::: info
+If you would prefer a fully isolated VPC, with no inbound or outbound internet access, you should use the VPC pattern ["Amazon ECS cluster with isolated VPC and no NAT Gateway"](ecs-cluster-isolated-vpc-no-nat-gateway). This alternative pattern utilizes AWS PrivateLink endpoints to provide secure access to the AWS services that are required for Amazon ECS functionality.
+:::
+
 #### Subnet Compatibility
 
 For this example VPC the following table shows subnet support for internet access and networking across each capacity and networking mode.

@@ -36,8 +36,8 @@ The following diagram depicts what you will deploy:
 
 !!! @/pattern/ecs-cluster-isolated-vpc-no-nat-gateway/diagram.svg
 
-* The deployed VPC is exclusively made up of private subnets. There are no public subnets, therefore there is no public IP address usage, no internet gateway, and no inbound or outbound internet access at all.
-* In order to have access to AWS services, the VPC has PrivateLink endpoints and an S3 gateway. The following endpoints are included out of the box:
+* The deployed VPC is exclusively made up of private subnets. There are no public subnets, therefore there is no public IP address usage, no internet gateway, no NAT gatways, and no inbound or outbound internet access at all.
+* In order to have access to the required AWS services, the VPC has PrivateLink endpoints and an S3 gateway. The following endpoints are included out of the box:
    - `com.amazonaws.<region>.ecr.api` - Access to the Elastic Container Registry API, used for downloading container images
    - `com.amazonaws.<region>.ecr.dkr` - Access to the Docker endpoint for ECR, used for downloading container images
    - `com.amazonaws.<region>.secretsmanager` - Access to Secrets Manager, if you use secrets in your ECS task definition
@@ -131,6 +131,8 @@ sam deploy \
   --resolve-s3
 ```
 
+After the stack deploys you can open the Amazon ECS console to verify that you are running two copies of a simple `busybox` based container.
+
 #### Tear it Down
 
 When you are done you can use the followin command to tear down the reference architecture:
@@ -138,3 +140,9 @@ When you are done you can use the followin command to tear down the reference ar
 ```sh
 sam delete --stack-name isolated-vpc-environment --no-prompts
 ```
+
+#### Next Steps
+
+This architecture deliberately excludes ingress from the public internet. If you do have a workload where you want both network isolation and a limited amount of internet traffic ingress consider deploying an API Gateway using the approach from the pattern: ["Serverless API Gateway Ingress for AWS Fargate, in CloudFormation"](api-gateway-fargate-cloudformation). This approach can be adopted to get serverless internet ingress without any public subnets at all, by creating an `AWS::ApiGatewayV2::VpcLink` to the private subnets.
+
+If you require access to additional AWS services you may need to add additional PrivateLink endpoints. This reference is designed to include only the most minimal set of AWS services required to have a functional Amazon ECS based deployment.

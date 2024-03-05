@@ -20,7 +20,7 @@ The ideal way to configure a VPC is to use both public and private subnets. The 
 
 However, private subnets need a NAT gateway for internet access, and NAT gateways comes with both an hourly fee, as well as an additional charge per GB of data that goes through the NAT gateway.
 
-For this reason you may prefer to use a VPC that has exclusively public subnets. You can always upgrade to add private subnets later on.
+For this reason you may prefer to use a VPC that has exclusively public subnets. You can always upgrade to add NAT gateways and private subnets later on.
 
 #### Architecture
 
@@ -30,6 +30,15 @@ The following diagram shows the architecture of what will be created:
 
 * The VPC that is created spans two availability zones. This gives you increased availability.
 * Each AZ has a single public subnet. Internet traffic originating from these subnets goes directly to the internet gateway.
+
+::: info
+This low cost architecture is designed for very small deployments, as each resource launched into the public subnet must have a public IPv4 address assigned to it in order to actually use the internet gateway.
+
+As of February 1, 2024 all public IPv4 addresses on your AWS account are billed. Large deployments that would require many public IPv4 addresses should migrate to a more complex but cost efficient architecture that utilizes private subnets and private IP addresses. See the following two options:
+
+* ["Large sized AWS VPC for an Amazon ECS cluster"](large-vpc-for-amazon-ecs-cluster)
+* ["Amazon ECS cluster with isolated VPC and no NAT Gateway"](ecs-cluster-isolated-vpc-no-nat-gateway)
+:::
 
 #### Subnet Compatibility
 

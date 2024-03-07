@@ -1,0 +1,292 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This stack deploys an dual stack VPC designed for IPv6 usage.
+Parameters:
+  DeployingToEC2:
+    Type: String
+    Default: false
+    AllowedValues:
+      - true
+      - false
+    Description: Set value to "true" in order to create additional ECS endpoints
+                 to enable ECS on EC2 usage.
+
+Conditions:
+  CreateEcsOnEc2Resources: !Equals [ !Ref "DeployingToEC2", true ]
+
+Mappings:
+  # Hard values for the subnet masks. These masks define
+  # the range of internal IP addresses that can be assigned.
+  # The VPC can have all IP's from 10.0.0.0 to 10.0.255.255
+  # There are four subnets which cover the ranges:
+  #
+  # 10.0.128.0 - 10.0.191.255 (16384 IP addresses)
+  # 10.0.192.0 - 10.0.255.0 (16384 IP addresses)
+  #
+  # This template leaves some unutilized IP address space in the following
+  # ranges in case you need to add more subnets in the future:
+  #
+  # 10.0.0.0 - 10.0.63.255 (16384 IP addresses)
+  # 10.0.64.0 - 10.0.127.255 (16384 IP addresses)
+  SubnetConfig:
+    VPC:
+      CIDR: '10.0.0.0/16'
+    PublicOneIpv4:
+      CIDR: '10.0.128.0/18'
+    PublicTwoIpv4:
+      CIDR: '10.0.192.0/18'
+Resources:
+  # VPC in which containers will be networked.
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+
+  # This allocates two blocks of IPv6 capacity from the Amazon owned IP space
+  CidrBlockOne:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref VPC
+  CidrBlockTwo:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref VPC
+
+  # Two dual stack subnets where containers can have both IPv4 and IPv6 addresses
+  SubnetOne:
+    Type: AWS::EC2::Subnet
+    DependsOn: CidrBlockOne
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 0
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOneIpv4', 'CIDR']
+      Ipv6CidrBlock: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
+      AssignIpv6AddressOnCreation: true
+  SubnetTwo:
+    Type: AWS::EC2::Subnet
+    DependsOn: CidrBlockTwo
+    Properties:
+      AvailabilityZone:
+         Fn::Select:
+         - 1
+         - Fn::GetAZs: {Ref: 'AWS::Region'}
+      VpcId: !Ref VPC
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicTwoIpv4', 'CIDR']
+      Ipv6CidrBlock: !Select [1, !GetAtt VPC.Ipv6CidrBlocks]
+      AssignIpv6AddressOnCreation: true
+
+  # Egress only gateway for IPv6
+  EgressOnlyGateway:
+    Type: AWS::EC2::EgressOnlyInternetGateway
+    Properties:
+      VpcId: !Ref VPC
+
+  # Internet gateway, allows inbound and outbound for IPv4
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+
+  # The route table describes how resources in the VPC will be able to reach
+  # various internet endpoints or address ranges.
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  IPv6PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref EgressOnlyGateway
+  IPv4PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+  SubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetOne
+      RouteTableId: !Ref RouteTable
+  SubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetTwo
+      RouteTableId: !Ref RouteTable
+
+  # PrivateLink endpoints that enable access over IPv4, for the dualstack deployment
+  # Note that we share one security group for all of the PrivateLink endpoints.
+  # This is in order to more easily grant ECS managed infrastructure permissions
+  # to utilize all of the endpoints.
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Shared security group.
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-shared
+
+  SecurityGroupAccessRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref SecurityGroup
+      GroupId: !Ref SecurityGroup
+
+  # The PrivateLink endpoints that provide access to required AWS services
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref RouteTable
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcId: !Ref VPC
+
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+      VpcId: !Ref VPC
+
+  SsmEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      VpcId: !Ref VPC
+
+  SsmMessagesEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssmmessages
+      VpcId: !Ref VPC
+
+  EcrApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.api
+      VpcId: !Ref VPC
+
+  EcrDkrEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+      VpcId: !Ref VPC
+
+  SecretsManagerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      VpcId: !Ref VPC
+
+  # The following endpoints with the Condition: CreateEcsOnEc2Resources
+  # are not necessary for ECS on AWS Fargate, but are needed for
+  # ECS on EC2
+  EcsAgentEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-agent
+      VpcId: !Ref VPC
+
+  EcsTelemetryEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-telemetry
+      VpcId: !Ref VPC
+
+  EcsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: CreateEcsOnEc2Resources
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs
+      VpcId: !Ref VPC
+
+Outputs:
+  VpcId:
+    Description: The ID of the VPC that this stack is deployed in
+    Value: !Ref VPC
+  SubnetIds:
+    Description: Comma seperated list of subnets with IPv6 egress gateway based internet access
+    Value: !Sub '${SubnetOne},${SubnetTwo}'
+  PrivateLinkEndpointSecurityGroup:
+    Description: The shared security group for all of the PrivateLink
+                 endpoints. The ECS services and/or EC2 instances that host
+                 those services must have permission to talk to this security group
+    Value: !Ref SecurityGroup

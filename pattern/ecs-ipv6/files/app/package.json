@@ -1,0 +1,10 @@
+{
+  "name": "hello",
+  "module": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.529.1",
+    "@aws-sdk/client-s3": "^3.529.1",
+    "express": "^4.18.3"
+  }
+}

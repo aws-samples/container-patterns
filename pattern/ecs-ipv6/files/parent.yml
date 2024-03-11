@@ -6,7 +6,6 @@ Description: Parent stack that deploys VPC, Amazon ECS cluster for AWS Fargate,
 Parameters:
   ImageUri:
     Type: String
-    Default: 209640446841.dkr.ecr.us-east-2.amazonaws.com/sample-app-repo:sample
     Description: The URI of the private container image to deploy
 
 Resources:

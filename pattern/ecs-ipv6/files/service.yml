@@ -37,13 +37,35 @@ Parameters:
     Description: What port that the application expects traffic on
   DesiredCount:
     Type: Number
-    Default: 0
+    Default: 1
     Description: How many copies of the service task to run
   PrivateLinkEndpointSecurityGroup:
     Type: String
     Description: The security group on the PrivateLink endpoints. It must accept traffic from the service's SG.
 
 Resources:
+
+  # This a role used by the application itself
+  ApplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Path: /
+
+      # This managed role allows the application to read Amazon S3
+      # See: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-iam-awsmanpol.html#security-iam-awsmanpol-amazons3readonlyaccess
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
   # The task definition. This is a simple metadata description of what
   # container to run, and what resource requirements it has.
@@ -56,6 +78,7 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
+      TaskRoleArn: !Ref ApplicationRole
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
         - Name: !Ref ServiceName
@@ -65,6 +88,9 @@ Resources:
           PortMappings:
             - ContainerPort: !Ref ContainerPort
               HostPort: !Ref ContainerPort
+          Environment:
+            - Name: PORT
+              Value: 80
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:

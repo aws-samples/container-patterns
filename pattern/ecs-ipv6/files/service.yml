@@ -62,10 +62,14 @@ Resources:
                 aws:SourceAccount: !Ref AWS::AccountId
       Path: /
 
-      # This managed role allows the application to read Amazon S3
-      # See: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-iam-awsmanpol.html#security-iam-awsmanpol-amazons3readonlyaccess
       ManagedPolicyArns:
+        # This managed role allows the application to read Amazon S3
+        # See: https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-iam-awsmanpol.html#security-iam-awsmanpol-amazons3readonlyaccess
         - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+        # This managed role allows the application to read Amazon EC2
+        # See: https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonEC2ReadOnlyAccess.html
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
 
   # The task definition. This is a simple metadata description of what
   # container to run, and what resource requirements it has.

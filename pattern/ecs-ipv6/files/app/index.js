@@ -24,7 +24,7 @@ app.get('/list-buckets', async function (req, res) {
 app.get('/list-ec2', async function (req, res) {
   const command = new DescribeInstancesCommand({});
   const response = await ec2.send(command);
-  res.send(response.Buckets)
+  res.send(response)
 })
 
 app.get('/', async function (req, res) {

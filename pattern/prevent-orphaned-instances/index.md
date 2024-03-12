@@ -58,44 +58,12 @@ This pattern will deploy the following architecture:
 5. If configured (not enabled by default) instances that did not register correctly with the ECS cluster will be terminated.
 
 ::: warning
-The instances in your autoscaling group must have the following IAM permissions attached as part of the IAM role
+The instances in your autoscaling group must have the following IAM policies included as part of the IAM role
 
-```json
-"autoscaling:DescribeAutoScalingInstances",
-"cloudformation:CreateStack",
-"cloudformation:DescribeStacks",
-"cloudformation:UpdateStack",
-"events:PutRule","events:EnableRule",
-"events:ListEventBuses",
-"events:DescribeEventBus",
-"events:DescribeRule",
-"events:PutTargets",
-"iam:CreateRole",
-"iam:CreatePolicy",
-"iam:AttachRolePolicy",
-"iam:PassRole",
-"iam:PutRolePolicy",
-"iam:DeleteRolePolicy",
-"iam:GetRole",
-"logs:CreateLogGroup",
-"logs:DeleteLogGroup",
-"logs:PutRetentionPolicy",
-"logs:DeleteLogStream",
-"logs:DeleteRetentionPolicy",
-"logs:DescribeLogGroups",
-"lambda:CreateFunction",
-"lambda:UpdateFunctionCode",
-"lambda:PutFunctionEventInvokeConfig",
-"lambda:AddPermission",
-"lambda:DeleteFunctionEventInvokeConfig",
-"lambda:GetFunction",
-"lambda:InvokeFunction",
-"lambda:UpdateFunctionConfiguration",
-"ssm:CreateDocument",
-"ssm:PutParameter",
-"ssm:DeleteDocument",
-"ssm:GetDocument",
-"ssm:ListTagsForResource"
+```bash
+CloudWatchAgentServerPolicy
+AmazonSSMManagedInstanceCore
+AmazonEC2ContainerServiceforEC2Role
 ```
 :::
 

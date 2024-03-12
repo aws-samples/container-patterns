@@ -39,7 +39,7 @@ You should follow the appropriate [steps for installing SAM CLI](https://docs.aw
 
 #### Architecture
 
-::: danger
+::: warning
 This pattern is not suited for instances running on:
 
 - Windows operating systems
@@ -60,7 +60,7 @@ This pattern will deploy the following architecture:
 ::: warning
 The instances in your autoscaling group must have the following IAM policies included as part of the IAM role
 
-```bash
+```
 CloudWatchAgentServerPolicy
 AmazonSSMManagedInstanceCore
 AmazonEC2ContainerServiceforEC2Role

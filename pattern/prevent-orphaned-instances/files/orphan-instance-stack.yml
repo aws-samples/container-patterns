@@ -1,0 +1,414 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  A Cloudformation template to create a lambda function and SSM script to detect orphan instances within an ASG.
+Parameters:
+  AutoScalingGroupName:
+    Type: String
+    Description: The name of the tracking Auto scaling group to execute the lambda function on.
+  WaitTimer:
+    Type: Number
+    Description: The number of seconds to wait for the instance to start and set up ECS
+    Default: 300
+  TerminateEnabled:
+    Type: String
+    Description: Whether to terminate instances if it's orphaned
+    Default: false
+    AllowedValues: [true, false]
+
+Resources:
+  ECSOrphanInstanceSSMDocument:
+    Type: "AWS::SSM::Document"
+    Properties:
+      DocumentFormat: "YAML"
+      DocumentType: "Command"
+      Name: "ECSOrphanInstanceCheck"
+      Content:
+        schemaVersion: "2.2"
+        description: "RegisterContainerInstance Check Command Document"
+        parameters:
+          InstanceId:
+            type: "String"
+            description: "Instance ID of the tracking EC2 Instance"
+          Region:
+            type: "String"
+            description: "Region of the tracking EC2 Instance"
+        mainSteps:
+        - action: "aws:runShellScript"
+          name: "ECSOrphanInstanceChecker"
+          inputs:
+            workingDirectory: "/tmp"
+            timeoutSeconds: "900"
+            runCommand:
+            - mkdir /tmp/ecs-orphan-instance-diagnostic-checker/
+            - | 
+              cat << EOF > /tmp/ecs-orphan-instance-diagnostic-checker/Dockerfile
+              FROM public.ecr.aws/docker/library/busybox:uclibc
+              CMD ["echo", "testing docker"]
+              EOF
+            - |
+              #!/bin/bash
+              REGISTERED=$(curl -s http://localhost:51678/v1/metadata)
+              REGION={{ Region }}
+              EC2_INSTANCE_ID={{ InstanceId }}
+              ECS_STATUS="active"
+              DOCKER_STATUS="active"
+              CONTAINERD_STATUS="active"
+              DOCKER_CONTAINER_EXIT_CODE=""
+              DOCKER_CONTAINER_ERROR=""
+              DOCKER_CONTAINER_OOM=""
+              AGENT_EXIT_CODE=""
+              AGENT_ERROR=""
+              AGENT_OOM=""
+              ECS_CONFIG_FILE_ERROR="false"
+              NVIDIA_DRIVER_AVAILABLE="false"
+              DOCKER_STATE_ERROR="{{.State.Error}}"
+              DOCKER_STATE_OOMKILLED="{{.State.OOMKilled}}"
+              DOCKER_STATE_EXIT_CODE="{{.State.ExitCode}}"
+
+              if [  -z "$REGISTERED" ]; then
+                echo "Warning! Container instance is not registered to ECS. [Reported Instance ID: $EC2_INSTANCE_ID]" > validation_output.log
+                echo "----Summary----" >> validation_output.log
+                ERROR_OUTPUT=$(cat /var/log/ecs/ecs-agent.log | grep "Unable to register as a container instance with ECS" | tail -1)
+                if [[ ! -z "$ERROR_OUTPUT" ]]; then 
+                  echo "Register Container Instance Output: $ERROR_OUTPUT" >> validation_output.log
+                fi
+
+                echo "Checking status of essential system services..." >> validation_output.log
+                CHECK_ECS=$(ps aux | grep -v grep | grep "amazon-ecs-init" | head -n 1)
+                CHECK_DOCKER=$(ps aux | grep -v grep | grep "dockerd" | head -n 1)
+                CHECK_CONTAINERD=$(ps aux | grep -v grep | grep "containerd" | head -n 1)
+                if [ -z "$CHECK_ECS" ]; then
+                  ECS_STATUS="inactive"
+                fi
+                if [ -z "$CHECK_DOCKER" ]; then
+                  DOCKER_STATUS="inactive"
+                fi
+                if [ -z "CHECK_CONTAINERD" ]; then
+                  CONTAINERD_STATUS="inactive"
+                fi
+                echo "* ECS Status: $ECS_STATUS" >> validation_output.log
+                echo "* Docker Status: $DOCKER_STATUS" >> validation_output.log
+                echo "* Containerd Status: $CONTAINERD_STATUS" >> validation_output.log
+
+                echo "Conducting Docker lifecycle test..." >> validation_output.log
+                docker build -t aws-docker-test /tmp/ecs-orphan-instance-diagnostic-checker/
+                if [ $? -eq 0 ]; then
+                  echo "* Docker Image Build Status: Success" >> validation_output.log
+                  docker run --name aws-docker-test aws-docker-test
+                  sleep 5
+                  if [ "$(docker ps -aq -f status=exited -f name=aws-docker-test)" ]; then
+                    echo "* Docker Container Test Run: Success" >> validation_output.log
+                  else
+                    echo "* Docker Container Test Run:: Failed" >> validation_output.log
+                  fi
+                  DOCKER_CONTAINER_EXIT_CODE=$(docker inspect aws-docker-test --format="$DOCKER_STATE_EXIT_CODE")
+                  if [[ $? -eq 0 && $DOCKER_CONTAINER_EXIT_CODE != "0" ]]; then
+                    DOCKER_CONTAINER_ERROR=$(docker inspect aws-docker-test --format="$DOCKER_STATE_ERROR")
+                    DOCKER_CONTAINER_OOM=$(docker inspect aws-docker-test --format="$DOCKER_STATE_OOMKILLED")
+                    echo "* Docker Container Exit Code: $DOCKER_CONTAINER_EXIT_CODE" >> validation_output.log
+                    echo "* Docker Container Error: $DOCKER_CONTAINER_ERROR" >> validation_output.log
+                    echo "* Docker Container OOM: $DOCKER_CONTAINER_OOM" >> validation_output.log
+                  fi
+                  docker rm aws-docker-test
+                  docker image rm aws-docker-test
+                  rm /tmp/ecs-orphan-instance-diagnostic-checker/Dockerfile
+                else
+                  echo "* Docker Image Build Status: Failed" >> validation_output.log
+                fi
+
+                echo "Checking status of ECS Agent..." >> validation_output.log 
+                AGENT_EXIT_CODE=$(docker inspect ecs-agent --format="$DOCKER_STATE_EXIT_CODE")
+                AGENT_ERROR=$(docker inspect ecs-agent --format="$DOCKER_STATE_ERROR")
+                AGENT_OOM=$(docker inspect ecs-agent --format="$DOCKER_STATE_OOMKILLED")
+                echo "* Agent Container Exit Code: $AGENT_EXIT_CODE" >> validation_output.log
+                echo "* Agent Container Error: $AGENT_ERROR" >> validation_output.log
+                echo "* Agent Container OOM: $AGENT_OOM" >> validation_output.log
+
+                echo "Checking if ECS endpoint is reachable..." >> validation_output.log
+                ECS_ENDPOINT="ecs.$REGION.amazonaws.com"
+                IS_ENDPOINT_REACHABLE=$(ping -c 1 "$ECS_ENDPOINT" | grep "1 packets transmitted, 1 received")
+
+                if [[ -z "$IS_ENDPOINT_REACHABLE" ]]; then
+                  echo "* ECS Endpoint Reachability: Unable to reach $ECS_ENDPOINT" >> validation_output.log
+                else
+                  echo "* ECS Endpoint Reachability: Able to reach $ECS_ENDPOINT" >> validation_output.log
+                fi
+
+                echo "Validating ECS Configuration file..." >> validation_output.log 
+                while IFS= read -r line; do
+                  if [[ "${line:0:1}" = "#"  || -z "$line" ]]; then
+                    continue
+                  fi
+                  validate_line=$(echo ${line} | grep -E "^[A-Za-z0-9_].+=.+$")
+                  if [[ ${validate_line} == "" ]]; then
+                    ECS_CONFIG_FILE_ERROR="true"
+                    echo "* Error in ECS configuration file with invalid contents: ${line}" >> validation_output.log
+                  fi
+                done < "/etc/ecs/ecs.config"
+        
+                echo "Checking Nvidia driver status..." >> validation_output.log 
+                NVIDIA_DRIVER=$(nvidia-smi -L)
+                if [ $? -eq 0 ]; then
+                  NVIDIA_DRIVER_AVAILABLE="true"
+                  echo "* Nvidia Driver Status: $NVIDIA_DRIVER" >> validation_output.log
+                else
+                  echo "* Nvidia Driver Status: Unavailable" >> validation_output.log
+                fi
+
+                echo "----Analysis----" >> validation_output.log
+
+                if [[ $ECS_STATUS = "inactive" || $DOCKER_STATUS = "inactive" || $CONTAINERD_STATUS = "inactive" ]]; then 
+                  echo "* One or more essential service is inactive. Please ensure that either ECS, Docker, and Containerd is up and running. To further debug, you can obtain the full logs via: journalctl -u <SERVICE_NAME>.service" >> validation_output.log
+                fi
+
+                if [[ $DOCKER_CONTAINER_OOM = "true" || $AGENT_OOM = "true" ]]; then 
+                  echo "* Unable to start up docker containers. Please ensure that there's enough resouces allocated within the instance. Refer to the following link for more information regarding OOM: https://docs.docker.com/config/containers/resource_constraints/" >> validation_output.log
+                fi
+
+                 if [[ $DOCKER_CONTAINER_EXIT_CODE != "0" ]]; then
+                  echo "* Error while running test container $DOCKER_EXIT_CODE. Please refer to the following link regarding docker diagnostics: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-diags.html" >> validation_output.log
+                fi
+
+                if [[ $AGENT_EXIT_CODE != "0" ]]; then
+                  echo "* Agent was unable to start up properly. Please refer to the following doc to obtain agent logs: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-logs-collector.html." >> validation_output.log
+                fi
+
+                if [[ -z "$IS_ENDPOINT_REACHABLE" ]]; then
+                  echo "* Unable to reach ECS Endpoint. Please ensure that your networking configuration is properly set up. https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-networking.html" >> validation_output.log
+                fi
+
+                if [[ $ECS_CONFIG_FILE_ERROR = "true" ]]; then
+                  echo "* Error found in ECS configuration file. Please ensure that the config file is properly formatted. Refer to the following link regarding agent configuration options: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html" >> validation_output.log
+                fi
+
+                if [[ $NVIDIA_DRIVER_AVAILABLE = "false" ]]; then
+                    echo "* Unable to check Nvidia Driver Status. Disregard if the AMI is not GPU-supported, otherwise please ensure that the nvidia-smi library is installed." >> validation_output.log
+                fi
+                cat validation_output.log
+                exit 8
+              else
+                echo "Container Instance with ID: ${EC2_INSTANCE_ID} is registered to an ECS Cluster." > validation_output.log
+                cat validation_output.log
+                exit 0
+              fi
+
+  ECSOrphanInstanceSSMLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      RetentionInDays: 14
+      LogGroupName: ecs-orphan-instance-checker-output-log-group
+
+  ECSOrphanInstanceLambdaLogGroup: 
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      RetentionInDays: 14
+      LogGroupName: ecs-orphan-instance-lambda-log-group
+
+  ECSOrphanInstanceLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: lambda
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                Resource: !GetAtt ECSOrphanInstanceLambdaLogGroup.Arn
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeInstances
+                  - ec2:DescribeInstanceStatus
+                  - ec2:TerminateInstances
+                  - logs:*
+                  - ssm:GetCommandInvocation
+                  - ssm:SendCommand
+                Resource: '*'
+
+  ECSOrphanInstanceLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: "ECSOrphanInstanceLambda"
+      Code:
+        ZipFile: |
+          import boto3
+          import os
+          import logging
+          import json
+          import time
+
+          ssmClient = boto3.client('ssm')
+          ec2Client = boto3.client('ec2')
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          waitTime = os.environ.get('WAIT_TIME')
+          enableTerminateInstance = os.environ.get('TERMINATE_INSTANCE')
+
+          ssmDocumentName = 'ECSOrphanInstanceCheck'
+          logGroupName = 'ecs-orphan-instance-checker-output-log-group'
+
+          def lambda_handler(event, context):
+              instanceId = event["detail"]["EC2InstanceId"]
+              region = event["region"]
+              responseCode = -1
+              commandId = ""
+
+              logger.info("Attempting to run ECS Orphan Instance checker on EC2 Instance: %s", instanceId)
+              # Waiting until the instance is up and running
+              while True:
+                  time.sleep(1)
+                  try:
+                      response = ec2Client.describe_instances(
+                          InstanceIds=[
+                              instanceId,
+                          ],
+                      )
+                      status = response["Reservations"][0]["Instances"][0]["State"]["Name"]
+                      if status != "pending" and status != "running":
+                          logger.critical("%s is no longer in a startup/running state", instanceId)
+                          return {
+                              'output': json.dumps('Instance is no longer in a startup/running state')
+                          }
+                      if status == "running":
+                          logger.info("EC2 instance %s is up and running.", instanceId)
+                          break
+                  except Exception as e:
+                      logger.exception(e)
+                      return {
+                              'output': json.dumps('Unable to find instance, error: ' + str(e))
+                      }
+              # Sleeping the configured wait time to give the instance a chance to register to ECS 
+              logger.info("Sleeping for %s seconds to give the instance a chance to register to ECS", waitTime)
+              time.sleep(int(waitTime))
+              try:
+                  response = ssmClient.send_command(
+                      InstanceIds=[
+                          instanceId,
+                      ],
+                      Targets=[
+                          {
+                            'Key': 'InstanceIds',
+                            'Values': [
+                              instanceId,
+                            ]
+                          },
+                      ],
+                      Parameters={
+                        'InstanceId': [
+                          instanceId,
+                        ],
+                        'Region': [
+                          region,
+                        ]
+                      },
+                      DocumentName=ssmDocumentName,
+                      DocumentVersion='$LATEST',
+                      CloudWatchOutputConfig={
+                          'CloudWatchLogGroupName': logGroupName,
+                          'CloudWatchOutputEnabled': True
+                      },
+                  )
+                  
+                  commandId = response['Command']['CommandId']
+                  logger.info("Running ECS Orphan Instance checker SSM Document with command ID: %s", commandId)
+              except Exception as e:
+                  logger.exception(e)
+                  return {
+                      'output': json.dumps('Unable to send command to instance, error: ' + str(e))
+                  }
+                      
+              # We're waiting until the SSM document finishes running
+              while True:
+                  time.sleep(1)
+                  try:
+                      response = ssmClient.get_command_invocation(
+                          CommandId=commandId,
+                          InstanceId=instanceId
+                      )
+                      commandStatus = response['Status']
+                      if commandStatus != "Pending" and commandStatus != "InProgress" and commandStatus != "Delayed":
+                          responseCode = response['ResponseCode']
+                          break
+                  except Exception as e:
+                      logger.info("Encountered exception: %s. Waiting until SSM document finish executing.", str(e))
+                      continue   
+              
+              # The SSM Document will return a custom exit code 8 which will correlate with an instance failing to register to ECS
+              if responseCode == 8 and enableTerminateInstance == "true":
+                  logger.info("RegisterContainerInstance failed for instance %s, terminating...", instanceId)
+                  try:
+                      response = ec2Client.terminate_instances(
+                          InstanceIds=[
+                              instanceId,
+                          ],
+                      )
+                  except Exception as e:
+                      logger.exception(e)
+                      return {
+                          'output': json.dumps('Unable to termiante instance, error: ' + str(e))
+                      }
+              return {
+                  'output': json.dumps('ECS Orphan Instance Lambda function finished.')
+              }
+      Description: 'This lambda function is responsible for invoking the SSM document to run the orphan instance diagnostic checks.'
+      MemorySize: 512
+      Timeout: 900
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          TERMINATE_INSTANCE: !Ref TerminateEnabled
+          WAIT_TIME: !Ref WaitTimer
+      PackageType: Zip
+      Role: !GetAtt ECSOrphanInstanceLambdaRole.Arn
+      LoggingConfig:
+        LogGroup: ecs-orphan-instance-lambda-log-group
+  
+  LambdaEventInvokeConfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref ECSOrphanInstanceLambdaFunction
+      MaximumRetryAttempts: 1
+      Qualifier: $LATEST
+  
+  ECSOrphanInstanceEventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: default
+      EventPattern:
+        source:
+          - aws.autoscaling
+        detail-type:
+          - EC2 Instance Launch Successful
+        detail:
+          AutoScalingGroupName: !Split [",", !Ref AutoScalingGroupName]
+      Name: ecs-orphan-instance-eventbridge-rule
+      State: ENABLED
+      Targets:
+        - Id: "TargetFunction"
+          Arn: !GetAtt ECSOrphanInstanceLambdaFunction.Arn
+  
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: "ECSOrphanInstanceLambda"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ECSOrphanInstanceEventBridgeRule.Arn

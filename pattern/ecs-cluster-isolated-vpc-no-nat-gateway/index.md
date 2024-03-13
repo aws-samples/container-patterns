@@ -10,6 +10,15 @@ filterDimensions:
 authors:
  - peckn
 date: 2024-03-01
+alternatives:
+  - key: type
+    value: pattern
+    id: large-vpc-for-amazon-ecs-cluster
+    description: A VPC that provides access to the internet via AWS managed NAT Gateway.
+  - key: type
+    value: pattern
+    id: dual-stack-ipv6-networking-ecs-fargate
+    description: A dual-stack VPC that has support for both IPv4 and IPv6.
 ---
 
 #### Terminology

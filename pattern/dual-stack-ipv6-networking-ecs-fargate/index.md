@@ -1,5 +1,5 @@
 ---
-title: Dual stack IPv6 networking for Amazon ECS and AWS Fargate
+title: Dual-stack IPv6 networking for Amazon ECS and AWS Fargate
 description: >-
   Start rolling out IPv6 for your Fargate hosted service, while retaining
   IPv4 support as well.
@@ -11,6 +11,15 @@ filterDimensions:
 authors:
   - peckn
 date: March 6 20245
+alternatives:
+  - key: type
+    value: pattern
+    id: ecs-cluster-isolated-vpc-no-nat-gateway
+    description: A completely isolated VPC network, with no access to the internet.
+  - key: type
+    value: pattern
+    id: large-vpc-for-amazon-ecs-cluster
+    description: A VPC that provides access to the internet via AWS managed NAT Gateway.
 ---
 
 #### Terminology
@@ -21,15 +30,15 @@ date: March 6 20245
 
 [IPv6](https://en.wikipedia.org/wiki/IPv6) is the most recent Internet Protocol, with approximately 3.4×10<sup>38</sup> available addresses. This protocol will enable greatly simplified internet networking. Unfortunately IPv6 rollout is still only partially completed. This means that not every internet user can actually use IPv6 yet.
 
-A dual stack deployment is a deployment in which your networked cloud resources have both IPv4 addresses and IPv6 addresses. This transitional networking approach allows you to make use of both IPv4 and IPv6 networking.
+A dual-stack deployment is a deployment in which your networked cloud resources have both IPv4 addresses and IPv6 addresses. This transitional networking approach allows you to make use of both IPv4 and IPv6 networking.
 
-This pattern will demonstrate how to setup a dual stack deployment using Amazon ECS, and deploy a sample application that verifies that you can use an IPv6 egress only gateway to make requests to AWS services that have dual stack endpoints that support IPv6.
+This pattern will demonstrate how to setup a dual-stack deployment using Amazon ECS, and deploy a sample application that verifies that you can use an IPv6 egress only gateway to make requests to AWS services that have dual-stack endpoints that support IPv6.
 
 #### Why?
 
 IPv6 rollout is an ongoing project. At this time many internet service providers do not yet support IPv6. Therefore your architecture must still support IPv4 for many of your own users. Additionally, at this time in order to use Amazon ECS and many other AWS services you will still need to make use of IPv4 for some resources. You can find a [list of AWS services that support IPv6](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html), in the official AWS documentation.
 
-Despite limited support for IPv6 you will likely want to begin testing IPv6 support for the AWS services that do have IPv6 support. A dual stack deployment allows you to have the best of both worlds: IPv4 and IPv6.
+Despite limited support for IPv6 you will likely want to begin testing IPv6 support for the AWS services that do have IPv6 support. A dual-stack deployment allows you to have the best of both worlds: IPv4 and IPv6.
 
 ::: warning
 If you are seeking an IPv6 only deployment for Amazon ECS, this is not possible at this time. At this time Amazon ECS still has dependencies on IPv4 only resources, and therefore has only partial support for IPv6. It is not yet possible to completely avoid IPv4 usage. Further updates will be made to this pattern as additional IPv6 support is released.
@@ -38,6 +47,14 @@ If you are seeking an IPv6 only deployment for Amazon ECS, this is not possible 
 #### Architecture
 
 The following diagram depicts what will be created when you deploy this pattern:
+
+!!! @/pattern/dual-stack-ipv6-networking-ecs-fargate/diagram.svg
+
+* An ECS task is deployed into AWS Fargate capacity, in a VPC subnet that is dual-stack enabled. As a result the task and it's container are reachable via an IPv4 address as well as an IPv6 address.
+* Ingress from the internet is via an Application Load Balancer that is configured for dual-stack mode. As a result both IPv4 and IPv6 clients can talk to the dual stack endpoint for the load balancer.
+* Due to current Amazon ECS limitations, only the tasks's IPv4 address is registered into the ALB target group. Therefore, traffic from the ALB to the task is always over IPv4.
+* Due to current Amazon ECS and AWS Fargate limitations, several supporting dependencies such as Amazon Elastic Container Registry, Amazon S3 (for container image layers), and Amazon ECS, are accessed over IPv4, via AWS PrivateLink endpoints.
+* The application is able to use it's IPv6 support, to make request to the public internet and to dual-stack AWS services via an egress only gateway. As a verification, the application uses the Amazon EC2 dual-stack API endpoint, and the Amazon S3 dual-stack API endpoint.
 
 #### Dependencies
 
@@ -49,7 +66,7 @@ This pattern requires the following local dependencies:
 
 #### Define the Amazon VPC
 
-Download the following `ipv6-vpc.yml` file which defines a dual stack VPC with both IPv4 and IPv6 support:
+Download the following `ipv6-vpc.yml` file which defines a dual-stack VPC with both IPv4 and IPv6 support:
 
 <<< files/ipv6-vpc.yml
 
@@ -82,7 +99,7 @@ A few things to note in this template:
 
 #### Build and push the test image
 
-In order to test dual stack, this pattern provides a small test application that uses the AWS SDK to make API calls to two different dual stack service endpoints: S3 and EC2.
+In order to test dual-stack, this pattern provides a small test application that uses the AWS SDK to make API calls to two different dual-stack service endpoints: S3 and EC2.
 
 <tabs>
 <tab label="app/index.js">
@@ -90,7 +107,7 @@ In order to test dual stack, this pattern provides a small test application that
 <<< files/app/index.js
 
 ::: tip
-The sample application toggles `useDualstackEndpoint: true` when defining the AWS service client. This is what enables you to use IPv6 AWS endpoints from inside of a dual stack VPC.
+The sample application toggles `useDualstackEndpoint: true` when defining the AWS service client. This is what enables you to use IPv6 AWS endpoints from inside of a dual-stack VPC.
 :::
 
 </tab>
@@ -136,7 +153,7 @@ Now download the following `parent.yml` file that deploy the previous three temp
 Your overall folder structure should look like:
 
 - `parent.yml` - Top level index file that defines the overall application deployment
-- `ipv6-vpc.yml` - Defines the dual stack networking configuration
+- `ipv6-vpc.yml` - Defines the dual-stack networking configuration
 - `cluster.yml` - Standard boilerplate for an Amazon ECS cluster
 - `service.yml` - The container deployment itself
 - `app` - Folder that holds the sample application code
@@ -157,7 +174,7 @@ sam deploy \
 
 #### Test it Out
 
-First let's make sure that the load balancer has a dual stack endpoint that supports both IPv4 and IPv6:
+First let's make sure that the load balancer has a dual-stack endpoint that supports both IPv4 and IPv6:
 
 ```sh
 PUBLIC_URI=$(aws cloudformation describe-stacks --stack-name ipv6-environment --query "Stacks[0].Outputs[?OutputKey=='PublicURI'].OutputValue" --output text)
@@ -169,13 +186,13 @@ dig A $PUBLIC_URI
 dig AAAA $PUBLIC_URI
 ```
 
-Now test two different endpoints in the service which make use of IPv6 via the egress only gateway:
+Now test two different endpoints in the service. Both endpoints internally make use of IPv6 via the egress only gateway:
 
 ```sh
-# Verify that the application is able to communiate to the S3 dual stack endpoint
+# Verify that the application is able to communiate to the S3 dual-stack endpoint
 curl $PUBLIC_URI/list-buckets
 
-# Verify that the application is able to communciate to the EC2 dual stack endpoint
+# Verify that the application is able to communciate to the EC2 dual-stack endpoint
 curl $PUBLIC_URI/list-ec2
 ```
 

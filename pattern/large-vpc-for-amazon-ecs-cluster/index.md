@@ -11,6 +11,15 @@ filterDimensions:
 authors:
   - peckn
 date: May 2 2023
+alternatives:
+  - key: type
+    value: pattern
+    id: ecs-cluster-isolated-vpc-no-nat-gateway
+    description: A completely isolated VPC network, with no access to the internet.
+  - key: type
+    value: pattern
+    id: dual-stack-ipv6-networking-ecs-fargate
+    description: A dual-stack VPC that has support for both IPv4 and IPv6.
 ---
 
 #### About

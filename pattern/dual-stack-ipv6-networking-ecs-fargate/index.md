@@ -52,7 +52,7 @@ The following diagram depicts what will be created when you deploy this pattern:
 
 * An ECS task is deployed into AWS Fargate capacity, in a VPC subnet that is dual-stack enabled. As a result the task and it's container are reachable via an IPv4 address as well as an IPv6 address.
 * Ingress from the internet is via an Application Load Balancer that is configured for dual-stack mode. As a result both IPv4 and IPv6 clients can talk to the dual stack endpoint for the load balancer.
-* Due to current Amazon ECS limitations, only the tasks's IPv4 address is registered into the ALB target group. Therefore, traffic from the ALB to the task is always over IPv4.
+* Due to current Amazon ECS limitations, only the task's IPv4 address is registered into the ALB target group. Therefore, traffic from the ALB to the task is always over IPv4.
 * Due to current Amazon ECS and AWS Fargate limitations, several supporting dependencies such as Amazon Elastic Container Registry, Amazon S3 (for container image layers), and Amazon ECS, are accessed over IPv4, via AWS PrivateLink endpoints.
 * The application is able to use it's IPv6 support, to make request to the public internet and to dual-stack AWS services via an egress only gateway. As a verification, the application uses the Amazon EC2 dual-stack API endpoint, and the Amazon S3 dual-stack API endpoint.
 

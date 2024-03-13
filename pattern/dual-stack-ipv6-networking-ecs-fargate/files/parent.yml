@@ -35,3 +35,8 @@ Resources:
         ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
         ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
         PrivateLinkEndpointSecurityGroup: !GetAtt VpcStack.Outputs.PrivateLinkEndpointSecurityGroup
+
+Outputs:
+  PublicURI:
+    Description: Public URI of the service on the internet
+    Value: !GetAtt ServiceStack.Outputs.PublicURI

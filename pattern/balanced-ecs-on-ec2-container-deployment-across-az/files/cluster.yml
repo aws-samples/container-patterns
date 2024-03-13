@@ -9,7 +9,7 @@ Parameters:
     Description: VPC ID where the ECS cluster is launched
 
 Resources:
-  # ECS Resources
+  # Cluster that keeps track of container deployments
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

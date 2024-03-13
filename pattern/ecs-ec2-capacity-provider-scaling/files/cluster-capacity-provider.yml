@@ -26,8 +26,7 @@ Parameters:
     Description: List of subnet IDs where the EC2 instances will be launched
 
 Resources:
-
-  # ECS Resources
+  # Cluster that keeps track of container deployments
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

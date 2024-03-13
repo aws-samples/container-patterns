@@ -3,14 +3,7 @@ Description: Empty ECS cluster that has no EC2 instances. It is designed
              to be used with AWS Fargate serverless capacity
 
 Resources:
-  # This is authorizes ECS to manage resources on your
-  # account on your behalf. This role is likely already created on your account
-  # ECSRole:
-  #  Type: AWS::IAM::ServiceLinkedRole
-  #  Properties:
-  #    AWSServiceName: 'ecs.amazonaws.com'
-
-  # ECS Resources
+  # Cluster that keeps track of container deployments
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

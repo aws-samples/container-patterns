@@ -1,7 +1,8 @@
 ---
 title: Dual stack IPv6 networking for Amazon ECS and AWS Fargate
 description: >-
-  Experiment with IPv6 support
+  Start rolling out IPv6 for your Fargate hosted service, while retaining
+  IPv4 support as well.
 filterDimensions:
   - key: tool
     value: cloudformation
@@ -14,24 +15,24 @@ date: March 6 20245
 
 #### Terminology
 
-[Amazon Elastic Container Service (Amazon ECS)](https://aws.amazon.com/ecs/) is a serverless orchestrator that manages container deployments on your behalf. As an orchestrator it not only launches application containers for you, but also configures various connectivity aspects, including networking, load balancer attachments, and other critical integrations.
+[Amazon Elastic Container Service (Amazon ECS)](https://aws.amazon.com/ecs/) is a serverless orchestrator that manages container deployments on your behalf. As an orchestrator it not only launches application containers for you, but also configures various connectivity aspects, including networking, load balancer attachments, and other AWS integrations.
 
-[IPv4](https://en.wikipedia.org/wiki/Internet_Protocol_version_4) is the most widely adopted Internet Protocol. It provides address space for up to 4,294,967,296 devices on the internet, however large portions of the address space are reserved and therefore not usable. As a result, there are not enough IP addresses available to give every device in the world it's own unique IPv4 address.
+[IPv4](https://en.wikipedia.org/wiki/Internet_Protocol_version_4) is the most widely adopted Internet Protocol. It provides address space for up to 4,294,967,296 devices on the internet, however large portions of the address space are reserved and therefore not usable. As a result, there are not enough IP addresses available to give every device in the world it's own unique IPv4 address. This necessitates the use of more complex networking setups such as Network Address Translation (NAT) gateways that allow multiple devices to share a single public IPv4 address that is used for internet communications.
 
-[IPv6](https://en.wikipedia.org/wiki/IPv6) is the most recent Internet Protocol, which has aproximately 3.4×10<sup>38</sup> available addresses. This will allow every device on the internet to have it's own unique IP address, greatly simplifying internet networking. Unfortunately IPv6 rollout is still only partially completed. This means that not every internet user can actually use IPv6 yet.
+[IPv6](https://en.wikipedia.org/wiki/IPv6) is the most recent Internet Protocol, with approximately 3.4×10<sup>38</sup> available addresses. This protocol will enable greatly simplified internet networking. Unfortunately IPv6 rollout is still only partially completed. This means that not every internet user can actually use IPv6 yet.
 
-A dual stack deployment is a deployment in which your networked cloud resources have both IPv4 addresses and IPv6 addresses. This transitional networking approach allows you to make use of both IPv4 and IPv6 addresses on the internet.
+A dual stack deployment is a deployment in which your networked cloud resources have both IPv4 addresses and IPv6 addresses. This transitional networking approach allows you to make use of both IPv4 and IPv6 networking.
 
 This pattern will demonstrate how to setup a dual stack deployment using Amazon ECS, and deploy a sample application that verifies that you can use an IPv6 egress only gateway to make requests to AWS services that have dual stack endpoints that support IPv6.
 
 #### Why?
 
-IPv6 rollout is an ongoing project. At this time many internet service providers do not yet support IPv6. Therefore your architecture must support IPv4 for many of your own users. Additionally, at this time in order to use Amazon ECS and many other AWS services you will still need to make use of IPv4 for some resources. You can find a [list of AWS services that support IPv6](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html), in the official AWS documentation.
+IPv6 rollout is an ongoing project. At this time many internet service providers do not yet support IPv6. Therefore your architecture must still support IPv4 for many of your own users. Additionally, at this time in order to use Amazon ECS and many other AWS services you will still need to make use of IPv4 for some resources. You can find a [list of AWS services that support IPv6](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ipv6-support.html), in the official AWS documentation.
 
-Despite limited support for IPv6 you will likely want to begin testing IPv6 support for the users and services that do have IPv6 support. A dual stack deployment allows you to have the best of both worlds: IPv4 and IPv6.
+Despite limited support for IPv6 you will likely want to begin testing IPv6 support for the AWS services that do have IPv6 support. A dual stack deployment allows you to have the best of both worlds: IPv4 and IPv6.
 
 ::: warning
-If you are seeking an IPv6 only deployment for Amazon ECS, this is not possible at this time. At this time you can make partial usage of IPv6 via a dual stack deployment, but it is not possible to completely avoid IPv4 usage. Further updates will be made to this pattern as additional IPv6 support is released.
+If you are seeking an IPv6 only deployment for Amazon ECS, this is not possible at this time. At this time Amazon ECS still has dependencies on IPv4 only resources, and therefore has only partial support for IPv6. It is not yet possible to completely avoid IPv4 usage. Further updates will be made to this pattern as additional IPv6 support is released.
 :::
 
 #### Architecture
@@ -54,6 +55,8 @@ Download the following `ipv6-vpc.yml` file which defines a dual stack VPC with b
 
 Things to note in this template:
 
+- `AWS::EC2::VPCCidrBlock` - We request two blocks of Amazon provided IPv6 address space
+- `AWS::EC2::Subnet` - VPC subnets are configured to use the IPv6 blocks, and to assign IPv6 addresses to network interfaces in the subnet.
 - `AWS::EC2::InternetGateway` - The internet gateway provides both inbound and outbound access for IPv4 based internet communications
 - `AWS::EC2::EgressOnlyInternetGateway` - The egress only gateway serves a similar role compared to a NAT Gateway in a traditional IPv4 deployment. It allows resources in a private VPC subnet to communicate to the internet over IPv6.
 - `IPv6PublicRoute` - This route sends IPv6 traffic out through the egress only internet gateway.
@@ -154,7 +157,27 @@ sam deploy \
 
 #### Test it Out
 
+First let's make sure that the load balancer has a dual stack endpoint that supports both IPv4 and IPv6:
 
+```sh
+PUBLIC_URI=$(aws cloudformation describe-stacks --stack-name ipv6-environment --query "Stacks[0].Outputs[?OutputKey=='PublicURI'].OutputValue" --output text)
+
+# Lookup the IPv4 address of the service
+dig A $PUBLIC_URI
+
+# Lookup the IPv6 address of the service
+dig AAAA $PUBLIC_URI
+```
+
+Now test two different endpoints in the service which make use of IPv6 via the egress only gateway:
+
+```sh
+# Verify that the application is able to communiate to the S3 dual stack endpoint
+curl $PUBLIC_URI/list-buckets
+
+# Verify that the application is able to communciate to the EC2 dual stack endpoint
+curl $PUBLIC_URI/list-ec2
+```
 
 #### Tear it Down
 

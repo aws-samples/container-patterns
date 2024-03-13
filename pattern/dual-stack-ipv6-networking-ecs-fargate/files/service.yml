@@ -173,6 +173,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internet-facing
+      IpAddressType: dualstack
       LoadBalancerAttributes:
       - Key: idle_timeout.timeout_seconds
         Value: '30'
@@ -215,3 +216,8 @@ Resources:
   # This log group stores the stdout logs from this service's containers
   LogGroup:
     Type: AWS::Logs::LogGroup
+
+Outputs:
+  PublicURI:
+    Description: The public URI of the service on the internet
+    Value: !GetAtt PublicLoadBalancer.DNSName

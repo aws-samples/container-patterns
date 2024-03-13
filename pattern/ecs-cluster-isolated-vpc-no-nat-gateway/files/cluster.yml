@@ -3,8 +3,7 @@ Description: Empty ECS cluster that has no EC2 instances. It is designed
              to be used with AWS Fargate serverless capacity
 
 Resources:
-
-  # ECS Resources
+  # Cluster that keeps track of container deployments
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

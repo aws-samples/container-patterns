@@ -51,21 +51,29 @@ This pattern will deploy the following architecture:
 
 !!! @/pattern/prevent-orphaned-instances/diagram.svg
 
-1. An EventBridge rule runs when new instances are launched in the autoscaling group in the ECS cluster.
-2. The event triggers an AWS Lambda function to run a specific SSM document on the newly launched EC2 instance.
-3. The SSM document runs a health check script to verify if the EC2 instances has passed all the necessary checks and can run ECS tasks.
-4. The output of the script will be sent to Amazon CloudWatch.
-5. If configured (not enabled by default) instances that did not register correctly with the ECS cluster will be terminated.
+1. The Autoscaling group intiats a scaling event 
+2. An EventBridge rule runs when new instances are launched in the autoscaling group in the ECS cluster.
+3. The event triggers an AWS Lambda function to run a specific SSM document on the newly launched EC2 instance.
+4. The SSM document runs a health check script to verify if the EC2 instances has passed all the necessary checks and can run ECS tasks.
+5. The output of the script will be sent to Amazon CloudWatch.
+6. If configured (not enabled by default) instances that did not register correctly with the ECS cluster will be terminated.
 
 ::: warning
 The instances in your autoscaling group must have the following IAM policies included as part of the IAM role
-
 ```
 CloudWatchAgentServerPolicy
 AmazonSSMManagedInstanceCore
 AmazonEC2ContainerServiceforEC2Role
 ```
 :::
+
+
+#### Customization
+You can customize a number of parameters of the pattern deployment by modifying the code in the CloudFormation stack:
+
+- `WaitTimer` This is the period of time that the script will wait for the ECS to become healthy, before tunning the script. Default is 300 seconds.
+- `TerminateEnabled` Should the instance be terminated if the health check script fails. Default is false. 
+
 
 #### Deploy the pattern
 

@@ -1,12 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Empty ECS cluster that has no EC2 instances. It is designed
              to be used with AWS Fargate serverless capacity
-Parameters:
-  VpcId:
-    Type: String
-    Description: The VPC that the service is running inside of
 
 Resources:
+
   # Cluster that keeps track of container deployments
   ECSCluster:
     Type: AWS::ECS::Cluster
@@ -32,18 +29,11 @@ Resources:
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
       Path: /
+
       # This role enables basic features of ECS. See reference:
       # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-iam-awsmanpol.html#security-iam-awsmanpol-AmazonECSTaskExecutionRolePolicy
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-
-  # This namespace will keep track of all the tasks in the cluster
-  ServiceDiscoveryNamespace:
-    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
-    Properties:
-      Name: internal
-      Description: Internal, private service discovery namespace
-      Vpc: !Ref VpcId
 
 Outputs:
   ClusterName:
@@ -52,6 +42,3 @@ Outputs:
   ECSTaskExecutionRole:
     Description: The role used to start up a task
     Value: !Ref ECSTaskExecutionRole
-  ServiceDiscoveryNamespaceId:
-    Description: The shared service discovery namespace for all services in the cluster
-    Value: !Ref ServiceDiscoveryNamespace

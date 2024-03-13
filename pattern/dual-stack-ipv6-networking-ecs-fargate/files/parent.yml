@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Parent stack that deploys VPC, Amazon ECS cluster for AWS Fargate,
+             and a serverless Amazon ECS service deployment that hosts
+             the task containers on AWS Fargate
+Parameters:
+  ImageUri:
+    Type: String
+    Description: The URI of the private container image to deploy
+
+Resources:
+
+  # The networking configuration. This creates an isolated
+  # network specific to this particular environment
+  VpcStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ipv6-vpc.yml
+
+  # This stack contains the Amazon ECS cluster itself
+  ClusterStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: cluster.yml
+
+  # This stack contains the container deployment
+  ServiceStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: service.yml
+      Parameters:
+        ImageUri: !Ref ImageUri
+        VpcId: !GetAtt VpcStack.Outputs.VpcId
+        SubnetIds: !GetAtt VpcStack.Outputs.SubnetIds
+        ClusterName: !GetAtt ClusterStack.Outputs.ClusterName
+        ECSTaskExecutionRole: !GetAtt ClusterStack.Outputs.ECSTaskExecutionRole
+        PrivateLinkEndpointSecurityGroup: !GetAtt VpcStack.Outputs.PrivateLinkEndpointSecurityGroup
+
+Outputs:
+  PublicURI:
+    Description: Public URI of the service on the internet
+    Value: !GetAtt ServiceStack.Outputs.PublicURI

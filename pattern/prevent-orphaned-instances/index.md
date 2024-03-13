@@ -71,7 +71,7 @@ AmazonEC2ContainerServiceforEC2Role
 #### Customization
 You can customize a number of parameters of the pattern deployment by modifying the code in the CloudFormation stack:
 
-- `WaitTimer` This is the period of time that the script will wait for the ECS to become healthy, before tunning the script. Default is 300 seconds.
+- `WaitTimer` This is the period of time that the script will wait for the ECS to become healthy, before running the script. Default is 300 seconds.
 - `TerminateEnabled` Should the instance be terminated if the health check script fails. Default is false. 
 
 

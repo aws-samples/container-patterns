@@ -42,7 +42,10 @@ Resources:
         - Name: ecs-metadata
           Image: !Ref ImageURI
           PortMappings:
-            - ContainerPort: 80
+            - ContainerPort: 3000
+          Environment:
+            - Key: PORT
+              Value: 3000
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:
@@ -115,7 +118,7 @@ Resources:
       HealthyThresholdCount: 2
       TargetType: ip
       Name: 'ecs-metdata-on-ec2'
-      Port: 80
+      Port: 3000
       Protocol: HTTP
       UnhealthyThresholdCount: 2
       VpcId: !Ref VpcId
@@ -131,7 +134,7 @@ Resources:
       HealthyThresholdCount: 2
       TargetType: ip
       Name: 'ecs-metadata-on-fargate'
-      Port: 80
+      Port: 3000
       Protocol: HTTP
       UnhealthyThresholdCount: 2
       VpcId: !Ref VpcId

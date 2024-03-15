@@ -33,7 +33,7 @@ Parameters:
     Description: How much memory in megabytes to give the container
   ContainerPort:
     Type: Number
-    Default: 3000 Stashed changes
+    Default: 3000
     Description: What port that the application expects traffic on
   DesiredCount:
     Type: Number

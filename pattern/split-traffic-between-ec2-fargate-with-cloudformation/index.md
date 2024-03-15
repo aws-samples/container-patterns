@@ -32,37 +32,41 @@ The Node.js sample application grabs information from the ECS Task Metadata endp
 Create the following three files:
 
 <tabs>
-<tab label="index.js">
+<tab label="app/index.js">
 
 <<< files/index.js
 
 </tab>
 
-<tab label='package.json'>
+<tab label='app/package.json'>
 
 <<< files/package.json
 
 </tab>
 
-<tab label='Dockerfile'>
+<tab label='app/Dockerfile'>
 
 <<< files/Dockerfile{Dockerfile}
 
 </tab>
 </tabs>
 
-These files serve the following purpose:
+You should have the following folder structure:
 
-- `index.js` - The actual code for the sample application
-- `package.json` - A manifest files that lists some open source packages from NPM that the application depends on
-- `Dockerfile` - Instructions on how to build the application and package it up into a container image.
+- `app` - Folder containing the application code
+- `app/index.js` - The actual code for the sample application
+- `app/package.json` - A manifest files that lists some open source packages from NPM that the application depends on
+- `app/Dockerfile` - Instructions on how to build the application and package it up into a container image.
 
 Now you can build and push the image to ECR using command like this (substitute [your own ECR private repository URL](https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-create.html)):
 
 ```shell
-docker build -t ecs-metadata .
-docker tag ecs-metadata:latest 209640446841.dkr.ecr.us-east-2.amazonaws.com/ecs-metadata:latest
-docker push 209640446841.dkr.ecr.us-east-2.amazonaws.com/ecs-metadata:latest
+REPO_URI=$(aws ecr create-repository --repository-name sample-app-repo --query 'repository.repositoryUri' --output text)
+if [ -z "${REPO_URI}" ]; then
+  REPO_URI=$(aws ecr describe-repositories --repository-names sample-app-repo --query 'repositories[0].repositoryUri' --output text)
+fi
+docker build -t ${REPO_URI}:ecs-metadata ./app
+docker push ${REPO_URI}:ecs-metadata
 ```
 
 #### Deploy an ECS cluster and environment
@@ -91,7 +95,7 @@ aws cloudformation deploy \
   --stack-name service-across-ec2-and-fargate \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
-     ImageURI=209640446841.dkr.ecr.us-east-2.amazonaws.com/ecs-metadata:latest \
+     ImageURI=${REPO_URI}:ecs-metadata \
      Cluster=capacity-provider-environment-BaseStack-18PANC6K9E7D8-ECSCluster-NNBNpIh5AkZO \
      Ec2CapacityProvider=capacity-provider-environment-BaseStack-18PANC6K9E7D8-CapacityProvider-FI323ISAaRbn \
      VpcId=vpc-79508710 \
@@ -127,7 +131,11 @@ By reloading the endpoint a few times you will see it flip back and forth betwee
 You can use the following command to tear down the stack and delete the services:
 
 ```shell
+# Tear down the CloudFormation
 aws cloudformation delete-stack --stack-name service-across-ec2-and-fargate
+
+# Empty and delete the Amazon ECR container registry we created
+aws ecr delete-repository --repository-name sample-app-repo --force
 ```
 
 You should also delete the container image that you uploaded to Amazon ECR.

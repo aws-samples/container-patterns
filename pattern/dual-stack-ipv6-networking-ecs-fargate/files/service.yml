@@ -33,7 +33,7 @@ Parameters:
     Description: How much memory in megabytes to give the container
   ContainerPort:
     Type: Number
-    Default: 80
+    Default: 3000 Stashed changes
     Description: What port that the application expects traffic on
   DesiredCount:
     Type: Number
@@ -94,7 +94,7 @@ Resources:
               HostPort: !Ref ContainerPort
           Environment:
             - Name: PORT
-              Value: 80
+              Value: !Ref ContainerPort
           LogConfiguration:
             LogDriver: 'awslogs'
             Options:

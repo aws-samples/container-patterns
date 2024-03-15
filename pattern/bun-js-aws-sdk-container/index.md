@@ -87,9 +87,12 @@ Build and push the application container image to a private Amazon ECR container
 using the following commands:
 
 ```sh
-REPO_URI=$(aws ecr create-repository --repository-name bun-hitcounter --query 'repository.repositoryUri' --output text)
-docker build -t $REPO_URI .
-docker push $REPO_URI
+REPO_URI=$(aws ecr create-repository --repository-name sample-app-repo --query 'repository.repositoryUri' --output text)
+if [ -z "${REPO_URI}" ]; then
+  REPO_URI=$(aws ecr describe-repositories --repository-names sample-app-repo --query 'repositories[0].repositoryUri' --output text)
+fi
+docker build -t ${REPO_URI}:bun-app .
+docker push ${REPO_URI}:bun-app
 ```
 
 You can now open the [Amazon ECR console](https://console.aws.amazon.com/ecr/repositories) to verify that the image has been built and uploaded to AWS.
@@ -150,7 +153,7 @@ sam deploy \
   --stack-name bun-fargate-hitcounter \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides ImageUrl=$REPO_URI
+  --parameter-overrides ImageUrl=${REPO_URI}:bun-app
 ```
 
 #### Test it out
@@ -163,6 +166,18 @@ Open up the Amazon ECS console and locate the deployed service. The cluster and 
 Click into the service details and then select the "Network" tab. Under the section "DNS Names" you can see the public facing load balancer ingress URL. Click on "open address" or copy and paste the URL to your browser window.
 
 You will see a number, which is the number of web requests that have hit this endpoint so far. You can reload the URL to see the number count up.
+
+#### Tear it down
+
+You can use the following commands to clean up when you are done:
+
+```sh
+# Delete the Amazon ECS deployment
+sam delete --stack-name bun-fargate-hitcounter --no-prompts
+
+# Empty and delete the Amazon ECR container registry we created
+aws ecr delete-repository --repository-name sample-app-repo --force
+```
 
 #### Next steps
 

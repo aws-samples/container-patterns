@@ -44,7 +44,7 @@ Resources:
           PortMappings:
             - ContainerPort: 3000
           Environment:
-            - Key: PORT
+            - Name: PORT
               Value: 3000
           LogConfiguration:
             LogDriver: 'awslogs'

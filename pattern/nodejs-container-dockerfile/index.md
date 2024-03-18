@@ -26,14 +26,18 @@ The `Dockerfile` defines how to build the Node.js application.
 
 <<< files/.dockerignore
 
-</tab>
-
 The `.dockerignore` file defines local file paths to exclude from the built image.
+
+</tab>
 
 </tabs>
 
 
 #### How it works
+
+The following diagram shows how this container image build works:
+
+!!! @/pattern/nodejs-container-dockerfile/diagram.svg
 
 This `Dockerfile` has two stages. The build stage use a full featured Node.js image that has NPM and other development tools inside of it. The production stage uses a slim image that does not have any extras that aren't necessary for running in production.
 
@@ -42,6 +46,8 @@ The build stage runs first. It uses a [Docker bind mount](https://docs.docker.co
 The production stage runs next. It copies the installed packages from the build container, and then it copies in the application code files from the host machine. It also sets the `NODE_ENV=production` environment variable. This variable is consumed by various JavaScript packages that modify their behavior when running in production.
 
 One more important detail is that this container runs the application process as the user `node`. Since this user is not root, the operating system will not allow the application to bind to any ports below 1024. Therefore this Dockerfile exposes port 3000 (the default port for an Express web server).
+
+The final goal of the container image build process is to upload a fully functioning container image build artifact back to a private Elastic Container Registry so that it can be downloaded and run as a container on compute inside of AWS Fargate, EC2, or other AWS container services.
 
 #### Build and push a container image
 

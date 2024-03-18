@@ -110,8 +110,10 @@ The following script assumes that you already have the [Amazon ECR credential he
 :::
 
 ```sh
-# Replace this with a static value once the REPO is created.
 REPO_URI=$(aws ecr create-repository --repository-name sample-app-repo --query 'repository.repositoryUri' --output text)
+if [ -z "${REPO_URI}" ]; then
+  REPO_URI=$(aws ecr describe-repositories --repository-names sample-app-repo --query 'repositories[0].repositoryUri' --output text)
+fi
 docker build -t ${REPO_URI}:sample .
 docker push ${REPO_URI}:sample
 ```

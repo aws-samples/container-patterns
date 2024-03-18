@@ -44,15 +44,7 @@ You can read more about `awslogs` behavior at ["Preventing log loss with non-blo
 
 #### Dependencies
 
-This pattern uses [CloudFormation Guard](https://docs.aws.amazon.com/cfn-guard/latest/ug/what-is-guard.html), which can be installed with the following command:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
-export PATH=~/.guard/bin:$PATH
-cfn-guard --version
-```
-
-You can also see the [install instructions for other systems](https://docs.aws.amazon.com/cfn-guard/latest/ug/setting-up.html).
+<!--@include: @/parts/cloudformation-guard.md-->
 
 #### CloudFormation Guard
 
@@ -119,5 +111,6 @@ CloudFormation Guard will return a non zero exit code to indicate a failure. Whe
 
 More policy as code patterns:
 
-- [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)
 - [Enforce readonly root filesystem for containers in ECS, with CloudFormation Guard policy as code](enforce-read-only-root-filesystem-ecs-policy-as-code)
+- [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)
+- [Deny Linux kernel capabilities for Amazon ECS and AWS Fargate tasks](deny-kernel-capabilities-ecs-fargate-task)

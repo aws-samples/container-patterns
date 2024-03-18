@@ -28,15 +28,7 @@ Generally speaking you should not launch a container with a privileged mode turn
 
 #### Dependencies
 
-This pattern uses [CloudFormation Guard](https://docs.aws.amazon.com/cfn-guard/latest/ug/what-is-guard.html), which can be installed with the following command:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
-export PATH=~/.guard/bin:$PATH
-cfn-guard --version
-```
-
-You can also see the [install instructions for other systems](https://docs.aws.amazon.com/cfn-guard/latest/ug/setting-up.html).
+<!--@include: @/parts/cloudformation-guard.md-->
 
 #### CloudFormation Guard Rule
 
@@ -126,3 +118,4 @@ More policy as code patterns:
 
 - [Enforce non-blocking mode for awslogs logging driver, with CloudFormation Guard policy as code](nonblocking-awslogs-policy-as-code)
 - [Enforce readonly root filesystem for containers in ECS, with CloudFormation Guard policy as code](enforce-read-only-root-filesystem-ecs-policy-as-code)
+- [Deny Linux kernel capabilities for Amazon ECS and AWS Fargate tasks](deny-kernel-capabilities-ecs-fargate-task)

@@ -28,15 +28,7 @@ Enforcing a read only root filesystem makes this behavior much more explicit, an
 
 #### Dependencies
 
-This pattern uses [CloudFormation Guard](https://docs.aws.amazon.com/cfn-guard/latest/ug/what-is-guard.html), which can be installed with the following command:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
-export PATH=~/.guard/bin:$PATH
-cfn-guard --version
-```
-
-You can also see the [install instructions for other systems](https://docs.aws.amazon.com/cfn-guard/latest/ug/setting-up.html).
+<!--@include: @/parts/cloudformation-guard.md-->
 
 #### Guard Rule
 
@@ -127,9 +119,8 @@ Resource = DefaultTaskDefinition {
 
 The `cfn-guard` process will also exit with a non-zero exit code. In a typical CI/CD server, this exceptional exit will stop the release process, and return an error. This allows you to use CloudFormation guard as a gate that blocks privileged containers from being released to your infrastructure.
 
-#### See Also
-
 More policy as code patterns:
 
 - [Enforce non-blocking mode for awslogs logging driver, with CloudFormation Guard policy as code](nonblocking-awslogs-policy-as-code)
 - [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)
+- [Deny Linux kernel capabilities for Amazon ECS and AWS Fargate tasks](deny-kernel-capabilities-ecs-fargate-task)

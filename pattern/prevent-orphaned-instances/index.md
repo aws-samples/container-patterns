@@ -51,7 +51,7 @@ This pattern will deploy the following architecture:
 
 !!! @/pattern/prevent-orphaned-instances/diagram.svg
 
-1. The Autoscaling group intiats a scaling event 
+1. The Autoscaling group initiates a scaling event.
 2. An EventBridge rule runs when new instances are launched in the autoscaling group in the ECS cluster.
 3. The event triggers an AWS Lambda function to run a specific SSM document on the newly launched EC2 instance.
 4. The SSM document runs a health check script to verify if the EC2 instances has passed all the necessary checks and can run ECS tasks.

@@ -21,7 +21,7 @@ Parameters:
   ECSAMI:
     Description: The Bottlerocket Amazon Machine Image ID used for the cluster
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Default: /aws/service/bottlerocket/aws-ecs-1/x86_64/latest/image_id
+    Default: /aws/service/bottlerocket/aws-ecs-2/x86_64/latest/image_id
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the ECS cluster is launched

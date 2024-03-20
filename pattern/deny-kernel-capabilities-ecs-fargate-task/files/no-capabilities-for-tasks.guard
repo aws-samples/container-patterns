@@ -1,0 +1,13 @@
+
+let task_defs = Resources.*[Type == 'AWS::ECS::TaskDefinition']
+
+#
+# Verify that ECS tasks are not adding Linux kernel capabilities
+#
+rule tasks_denied_linux_capabilities {
+  when %task_defs !empty {
+    %task_defs.Properties.ContainerDefinitions[*] {
+      LinuxParameters.Capabilities.Add !exists
+    }
+  }
+}

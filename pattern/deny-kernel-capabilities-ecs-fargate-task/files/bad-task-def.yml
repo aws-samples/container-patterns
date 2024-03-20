@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example task definition that adds linux capabilities
+
+Resources:
+  AddedCapabilityTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          LinuxParameters:
+            Capabilities:
+              Add:
+                - SYS_ADMIN

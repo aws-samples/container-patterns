@@ -40,7 +40,7 @@ We will use the following CloudFormation template to define a cluster that uses 
 
 A few specific things to note in this template are:
 
-The latest Bottlerocket Amazon Machine Image (AMI) id is retrieved from the SSM parameter `/aws/service/bottlerocket/aws-ecs-1/x86_64/latest/image_id`.
+The latest Bottlerocket Amazon Machine Image (AMI) id is retrieved from the SSM parameter `/aws/service/bottlerocket/aws-ecs-2/x86_64/latest/image_id`.
 
 Bottlerocket uses [TOML](https://toml.io/en/) configuration format. You can specify which cluster to connect to using the following userdata config:
 
@@ -59,7 +59,7 @@ The following template defines a service that uses the capacity provider to requ
 
 #### (Optional) Deploy the cluster auto updater
 
-Bottlerocket has it's own automatic updater process which can update the Bottlerocket operating system in waves across your cluster, with automatic task draining to avoid downtime during restarts. You can find the [full source code for the automatic updater on Github](https://github.com/bottlerocket-os/bottlerocket-ecs-updater). Or you can use the following embedded stack to setup the updater:
+Bottlerocket has it's own automatic updater process which can update the Bottlerocket operating system in waves across your cluster, with automatic task draining to avoid downtime during restarts. You can find the [full source code for the automatic updater on Github](https://github.com/bottlerocket-os/bottlerocket-ecs-updater) and [read the full ECS Updater documentation on Bottlerocket.dev](https://bottlerocket.dev/en/ecs-updater/). Or you can use the following embedded stack to setup the updater:
 
 <<< files/bottlerocket-updater.yml
 

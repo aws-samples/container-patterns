@@ -14,7 +14,7 @@ date: Mar 18, 2024
 
 #### What and why?
 
-[Amazon Elastic Container Service (ECS)](https://aws.amazon.com/ecs/) is a container orchestrator that launches and manages container deployments on your behalf. It configures the settings that are used when running the application container. One of those settings that can be configured is the linux capabilities of the application container.
+[Amazon Elastic Container Service (ECS)](https://aws.amazon.com/ecs/) is a container orchestrator that launches and manages container deployments on your behalf. It configures the settings that are used when running the application container. One of those settings that can be configured is the Linux capabilities of the application container.
 
 Linux capabilities are a way to limit or increase the level of access a process
 has to use the full capabilities of the Linux kernel. Elevated capabilities could
@@ -22,6 +22,11 @@ be exploited by a process to "break out" of it's container and interfere with th
 limits around a process that may be running potential untrustworthy code.
 
 In this pattern you will learn how to deny containers linux capabilities using [CloudFormation Guard](https://docs.aws.amazon.com/cfn-guard/latest/ug/what-is-guard.html), an open-source, general-purpose, policy-as-code evaluation tool.
+
+::: tip
+If you are deploying Amazon ECS tasks on AWS Fargate then there are already existing restrictions on which
+Linux capabilities can be added. See the [`KernelCapabilities` documentation for a list of the capabilities that can be added, as well as the current AWS Fargate restrictions on capabilities](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_KernelCapabilities.html). This pattern is primarily applicable to deploying Amazon ECS tasks on EC2 capacity.
+:::
 
 #### Dependencies
 

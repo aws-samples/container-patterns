@@ -1,0 +1,14 @@
+
+let task_defs = Resources.*[Type == 'AWS::ECS::TaskDefinition']
+
+#
+# Verify that ECS tasks are not running as root
+#
+rule tasks_denied_root {
+  when %task_defs !empty {
+    %task_defs.Properties.ContainerDefinitions[*] {
+      User exists    <<Container in the ECS task definition must specify the `User` property>>
+      User != /root/ <<Container in the ECS task definition denied `User` that includes 'root'>>
+    }
+  }
+}

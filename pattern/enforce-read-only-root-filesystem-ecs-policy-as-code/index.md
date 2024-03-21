@@ -124,3 +124,4 @@ More policy as code patterns:
 - [Enforce non-blocking mode for awslogs logging driver, with CloudFormation Guard policy as code](nonblocking-awslogs-policy-as-code)
 - [Deny privileged container mode in Amazon ECS with CloudFormation Guard policy as code](deny-privileged-container-ecs-policy-as-code)
 - [Deny Linux kernel capabilities for Amazon ECS and AWS Fargate tasks](deny-kernel-capabilities-ecs-fargate-task)
+- [Deny root user for Amazon ECS and AWS Fargate tasks](deny-root-user-ecs-fargate-task)

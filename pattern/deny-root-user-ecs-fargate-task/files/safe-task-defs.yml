@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example task definitions that use a safe user
+Resources:
+
+  SafeUid:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          User: '1010'
+          Essential: true
+
+  SafeUidAndGuid:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          User: 1010:1010
+          Essential: true
+
+  SafeUser:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          User: 'node'
+          Essential: true
+
+  SafeUserAndGroup:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          User: 'node:node'
+          Essential: true

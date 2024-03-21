@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example task definitions that run as root
+
+Resources:
+  # If not specified then the user is likely root, or it depends on the
+  # contents of the Dockerfile and what USER it defines
+  AmbiguousUser:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+
+  # Runs as root via running as the user 0
+  RootViaUid:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          User: '0'
+
+  # Runs as root explicitly
+  RootViaUserName:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          User: 'root'
+
+  # Runs as root via the group name
+  RootViaGroup:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: alpine
+      Cpu: 256
+      Memory: 128
+      ContainerDefinitions:
+        - Name: alpine
+          Image: public.ecr.aws/docker/library/alpine:latest
+          Essential: true
+          User: 'bin:root'

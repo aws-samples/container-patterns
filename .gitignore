@@ -9,4 +9,4 @@ cdk.out
 # Exclude Terraform generated content
 *.tfstate
 *.tfstate.backup
-.terraform*
+.terraformm*

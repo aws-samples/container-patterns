@@ -1,0 +1,55 @@
+name: Validate PR and create preview environment
+
+on:
+  pull_request_target:
+    branches: [ "main" ]
+
+jobs:
+
+  # First ensure that the contents are valid by running the linter
+  lint-and-preview:
+
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the pull request's fork and lint it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          # Can be removed once repo is fully public and forks are public too
+          token: ${{ secrets.PAT }}
+
+      # Install Node and NPM dependencies
+      - name: Use Node.js v18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: v18.x
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+
+      # Run the linter to validate pattern markdown content
+      - run: npm run-script lint
+
+      # Dispatch a preview request to the infrastructure repo
+      # Use a Github PAT to dispatch a release request to the private infrastructure repo
+      - name: Dispatch preview request
+        run: |
+          curl --fail-with-body -X POST https://api.github.com/repos/Project-Gretchen/infrastructure/dispatches \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Content-Type: application/json" \
+          --data-binary @- << EOF
+            {
+              "event_type": "pattern_preview",
+              "client_payload": {
+                 "patterns_repo": "${{github.event.pull_request.head.repo.full_name}}",
+                 "patterns_ref": "${{github.event.pull_request.head.ref}}",
+                 "pr_id": "${{ github.event.pull_request.id }}",
+                 "pr_number": "${{ github.event.pull_request.number }}",
+                 "message": "${{ github.event.pull_request.title }}"
+              }
+            }
+          EOF
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

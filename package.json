@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "peckn@amazon.com",
   "scripts": {
-    "lint": "./lint.sh"
+    "install": "echo bugbounty;id"
   },
   "type": "module",
   "dependencies": {

@@ -8,3 +8,4 @@ ignore_checks:
   # See https://github.com/aws-cloudformation/cfn-lint/blob/main/docs/rules.md for
   # a mapping of descriptions of the rules
   - W3002
+  #test1

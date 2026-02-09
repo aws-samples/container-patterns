@@ -1,7 +1,7 @@
 ---
 title: Service to service communication with AWS Copilot
 description: >-
-  How to use AWS Copilot to configure service to service communication using ECS Service Connect
+  How to use AWS Copilot to set up service to service communication using ECS Service Connect
 filterDimensions:
   - key: tool
     value: copilot

@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: label
-        uses: actions/labeler@v4
+        uses: actions/labeler@v6
         with:
           sync-labels: true
-          repo-token: ${{ secrets.PAT }}

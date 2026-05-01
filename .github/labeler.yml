@@ -2,20 +2,25 @@
 
 # Add 'repo' label to any root file changes
 repo:
-- '*'
+- changed-files:
+  - any-glob-to-any-file: '*'
 
 # Add 'pattern' label to any change to blog post files
 pattern:
-- pattern/**
+- changed-files:
+  - any-glob-to-any-file: 'pattern/**'
 
 # Add 'author-added' label
 author-added:
-- author/**
+- changed-files:
+  - any-glob-to-any-file: 'author/**'
 
 # Add 'lintjs' to any change to lint.js
 lintjs:
-- lint.js
+- changed-files:
+  - any-glob-to-any-file: 'lint.js'
 
 # Add 'workflow' label
 workflow:
-- .github/workflows/**
+- changed-files:
+  - any-glob-to-any-file: '.github/workflows/**'

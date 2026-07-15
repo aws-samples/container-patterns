@@ -16,28 +16,25 @@ class ECSStack extends cdk.Stack {
     const environment = new Environment(this, 'production');
 
     // Build out the service description
-    const nameDescription = new ServiceDescription();
+    const nginxDescription = new ServiceDescription();
 
     // Define the container for the service.
-    nameDescription.add(new Container({
+    nginxDescription.add(new Container({
       cpu: 1024,
       memoryMiB: 2048,
       trafficPort: 80,
-      image: ecs.ContainerImage.fromRegistry('nathanpeck/name'),
-      environment: {
-        PORT: '80',
-      },
+      image: ecs.ContainerImage.fromRegistry('public.ecr.aws/nginx/nginx:latest'),
     }));
 
     // Create a load balancer and attach it to the
     // container's traffic port.
-    nameDescription.add(new HttpLoadBalancerExtension());
+    nginxDescription.add(new HttpLoadBalancerExtension());
 
     // Use the service description to make a service
     // inside of the environment.
-    new Service(this, 'name', {
+    new Service(this, 'nginx', {
       environment: environment,
-      serviceDescription: nameDescription,
+      serviceDescription: nginxDescription,
     });
   }
 }

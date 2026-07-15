@@ -82,11 +82,7 @@ Deploy the stack:
 npm run-script cdk deploy
 ```
 
-You will see an `Outputs` section that shows the DNS name of the load balancer that provides ingress to the service. When you load up that URL you should see a random name, and the address of the container instance, similar to this:
-
-```txt
-Catalina (ip-10-0-199-15.us-east-2.compute.internal)
-```
+You will see an `Outputs` section that shows the DNS name of the load balancer that provides ingress to the service. When you load up that URL you should see the default nginx welcome page with the heading "Welcome to nginx!".
 
 #### Clean Up
 

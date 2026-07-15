@@ -69,8 +69,9 @@ Now create the following file to define the CDK application itself:
 
 Some things to note in this application:
 
-- `ec2.MachineImage.fromSsmParameter('/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended/image_id')` - The CDK application uses this SSM Parameter to automatically launch the latest version of the ECS Optimized AMI with built-in GPU support.
+- `ec2.MachineImage.fromSsmParameter('/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended/image_id')` - The CDK application uses this SSM Parameter to automatically launch the latest version of the ECS Optimized AMI with built-in GPU support.
 - `gpuCount: 1` - The ECS task is configured to require one GPU core.
+- The `G4dn` instance type provides NVIDIA T4 GPUs with CUDA 12 support.
 
 #### Build and deploy the CDK app
 
@@ -97,26 +98,26 @@ tab to see its output. You should see something similar to this:
 ---------------------------------------------------------------------------------------------------
 |   timestamp   |                                     message                                     |
 |---------------|---------------------------------------------------------------------------------|
-| 1681813598289 | Tue Apr 18 10:26:38 2023                                                        |
-| 1681813598289 | +-----------------------------------------------------------------------------+ |
-| 1681813598289 | | NVIDIA-SMI 470.161.03   Driver Version: 470.161.03   CUDA Version: 11.4     | |
-| 1681813598289 | |-------------------------------+----------------------+----------------------+ |
-| 1681813598289 | | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC | |
-| 1681813598289 | | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. | |
-| 1681813598289 | |                               |                      |               MIG M. | |
-| 1681813598289 | |===============================+======================+======================| |
-| 1681813598295 | |   0  Tesla M60           Off  | 00000000:00:1E.0 Off |                    0 | |
-| 1681813598295 | | N/A   28C    P0    36W / 150W |      0MiB /  7618MiB |     98%      Default | |
-| 1681813598295 | |                               |                      |                  N/A | |
-| 1681813598295 | +-------------------------------+----------------------+----------------------+ |
-| 1681813598295 |                                                                                 |
-| 1681813598295 | +-----------------------------------------------------------------------------+ |
-| 1681813598295 | | Processes:                                                                  | |
-| 1681813598295 | |  GPU   GI   CI        PID   Type   Process name                  GPU Memory | |
-| 1681813598295 | |        ID   ID                                                   Usage      | |
-| 1681813598295 | |=============================================================================| |
-| 1681813598295 | |  No running processes found                                                 | |
-| 1681813598295 | +-----------------------------------------------------------------------------+ |
+| 1752574414000 | Wed Jul 15 11:46:58 2026                                                        |
+| 1752574414000 | +-----------------------------------------------------------------------------------------+ |
+| 1752574414000 | | NVIDIA-SMI 580.159.03             Driver Version: 580.159.03     CUDA Version: 13.0     | |
+| 1752574414000 | +-----------------------------------------+------------------------+----------------------+ |
+| 1752574414000 | | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC | |
+| 1752574414000 | | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. | |
+| 1752574414000 | |                                         |                        |               MIG M. | |
+| 1752574414000 | |=========================================+========================+======================| |
+| 1752574414000 | |   0  Tesla T4                       On  |   00000000:00:1E.0 Off |                    0 | |
+| 1752574414000 | | N/A   29C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default | |
+| 1752574414000 | |                                         |                        |                  N/A | |
+| 1752574414000 | +-----------------------------------------+------------------------+----------------------+ |
+| 1752574414000 |                                                                                         |
+| 1752574414000 | +-----------------------------------------------------------------------------------------+ |
+| 1752574414000 | | Processes:                                                                              | |
+| 1752574414000 | |  GPU   GI   CI              PID   Type   Process name                        GPU Memory | |
+| 1752574414000 | |        ID   ID                                                               Usage      | |
+| 1752574414000 | |=========================================================================================| |
+| 1752574414000 | |  No running processes found                                                             | |
+| 1752574414000 | +-----------------------------------------------------------------------------------------+ |
 ---------------------------------------------------------------------------------------------------
 ```
 

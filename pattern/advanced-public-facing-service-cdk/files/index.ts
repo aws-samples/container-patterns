@@ -17,7 +17,7 @@ cluster.addCapacity('DefaultAutoScalingGroup', {
 // Create Task Definition
 const taskDefinition = new ecs.Ec2TaskDefinition(stack, 'TaskDef');
 const container = taskDefinition.addContainer('web', {
-  image: ecs.ContainerImage.fromRegistry("amazon/amazon-ecs-sample"),
+  image: ecs.ContainerImage.fromRegistry("public.ecr.aws/nginx/nginx:latest"),
   memoryLimitMiB: 256,
 });
 
@@ -50,7 +50,7 @@ listener.addTargets('ECS', {
   // include health check (default is none)
   healthCheck: {
     interval: cdk.Duration.seconds(60),
-    path: "/health",
+    path: "/",
     timeout: cdk.Duration.seconds(5),
   }
 });

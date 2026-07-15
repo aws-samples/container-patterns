@@ -12,11 +12,11 @@ class ECSCluster extends cdk.Stack {
     // Autoscaling group that will launch a fleet of instances that have GPU's
     const asg = new autoscaling.AutoScalingGroup(this, "MyFleet", {
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.G3,
-        ec2.InstanceSize.XLARGE4
+        ec2.InstanceClass.G4DN,
+        ec2.InstanceSize.XLARGE
       ),
       machineImage: ec2.MachineImage.fromSsmParameter(
-        "/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended/image_id"
+        "/aws/service/ecs/optimized-ami/amazon-linux-2023/gpu/recommended/image_id"
       ),
       vpc,
       maxCapacity: 10,
@@ -34,15 +34,13 @@ class ECSCluster extends cdk.Stack {
     cluster.addAsgCapacityProvider(capacityProvider);
 
     // Define a task that requires GPU. In this case we just run
-    // Make sure to update the image with the last nvidia cuda drivers image for your usage
-    // Adapt your nvidia image to your OS as well (for us, Amazon Linux is close to centos7)
     // nvidia-smi to verify that the task is able to reach the GPU
     const gpuTaskDefinition = new ecs.Ec2TaskDefinition(this, "gpu-task");
     gpuTaskDefinition.addContainer("gpu", {
       essential: true,
-      image: ecs.ContainerImage.fromRegistry("nvidia/cuda:12.3.1-base-centos7"),
-      memoryLimitMiB: 80,
-      cpu: 100,
+      image: ecs.ContainerImage.fromRegistry("public.ecr.aws/deep-learning-containers/base:runtime-cu129-amzn2023"),
+      memoryLimitMiB: 2048,
+      cpu: 256,
       gpuCount: 1,
       command: ["sh", "-c", "nvidia-smi && sleep 3600"],
       logging: new ecs.AwsLogDriver({

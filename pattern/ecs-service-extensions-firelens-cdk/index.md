@@ -90,14 +90,14 @@ You will see output similar to this:
 ```json
 [
     {
-        "image": "nathanpeck/name",
-        "lastStatus": "RUNNING",
-        "name": "app"
-    },
-    {
-        "image": "906394416424.dkr.ecr.us-east-2.amazonaws.com/aws-for-fluent-bit:latest",
+        "image": "906394416424.dkr.ecr.us-east-1.amazonaws.com/aws-for-fluent-bit:latest",
         "lastStatus": "RUNNING",
         "name": "firelens"
+    },
+    {
+        "image": "public.ecr.aws/nginx/nginx:latest",
+        "lastStatus": "RUNNING",
+        "name": "app"
     }
 ]
 ```
@@ -107,20 +107,20 @@ This shows that the FireLens container called `aws-for-fluent-bit` has been laun
 You can also view the logs for the Fluent Bit sidecar itself in the ECS console. Look for lines similar to this in the Fluent Bit logs:
 
 ```txt
-time="2023-04-20T15:30:41Z" level=info msg="[cloudwatch 0] Log stream name/app-firelens-fcfc4e8175d848e496380e8e8de88e47 does not exist in log group name-logs"	firelens
-4/20/2023, 11:30:41 AM	time="2023-04-20T15:30:41Z" level=info msg="[cloudwatch 0] Created log stream name/app-firelens-fcfc4e8175d848e496380e8e8de88e47 in group name-logs"
+time="2023-04-20T15:30:41Z" level=info msg="[cloudwatch 0] Log stream nginx/app-firelens-fcfc4e8175d848e496380e8e8de88e47 does not exist in log group nginx-logs"	firelens
+4/20/2023, 11:30:41 AM	time="2023-04-20T15:30:41Z" level=info msg="[cloudwatch 0] Created log stream nginx/app-firelens-fcfc4e8175d848e496380e8e8de88e47 in group nginx-logs"
 ```
 
 FireLens has automatically created a CloudWatch log group for the application, and has begun piping logs into it. Find the referenced log group and open it in CloudWatch to see the logs within. You should see a log output similar to this:
 
 ```json
 {
-    "container_id": "fcfc4e8175d848e496380e8e8de88e47-527074092",
+    "container_id": "46a3b94019c54f8093ae95fa03f7a668-0527074092",
     "container_name": "app",
-    "ecs_cluster": "ECSStack-productionenvironmentclusterC6599D2D-oR4P0udMijYx",
-    "ecs_task_arn": "arn:aws:ecs:us-east-2:209640446841:task/ECSStack-productionenvironmentclusterC6599D2D-oR4P0udMijYx/fcfc4e8175d848e496380e8e8de88e47",
-    "ecs_task_definition": "ECSStacknametaskdefinitionCB1493C3:2",
-    "log": "Listening on port 80!",
+    "ecs_cluster": "ECSStack-productionenvironmentclusterC6599D2D-abcdefgh",
+    "ecs_task_arn": "arn:aws:ecs:us-east-2:209640446841:task/ECSStack-productionenvironmentclusterC6599D2D-abcdefgh/46a3b94019c54f8093ae95fa03f7a668",
+    "ecs_task_definition": "ECSStacknginxtaskdefinitionCB1493C3:2",
+    "log": "10.0.45.177 - - [15/Jul/2026:10:45:48 +0000] \"GET / HTTP/1.1\" 200 896 \"-\" \"ELB-HealthChecker/2.0\" \"-\"",
     "source": "stdout"
 }
 ```

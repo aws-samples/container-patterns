@@ -10,7 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.3",
+    "express": "^5.2.1",
     "faker": "^4.1.0"
   }
 }
